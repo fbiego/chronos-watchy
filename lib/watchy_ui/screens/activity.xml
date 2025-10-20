@@ -1,0 +1,65 @@
+<screen>
+	<styles>
+		<style name="style_main" bg_color="0xffffff" text_color="0x000000" text_font="NS_Regular_16" />
+		<style
+			name="style_row"
+			layout="flex"
+			flex_flow="column"
+			flex_main_place="center"
+			flex_track_place="center"
+			flex_cross_place="center"
+			pad_row="5"
+		/>
+		<style
+			name="style_cont"
+			width="200"
+			pad_all="0"
+			height="content"
+			border_width="0"
+			radius="0"
+			layout="flex"
+			text_align="center"
+			flex_main_place="space_around"
+		/>
+		<style name="style_chart" width="200" height="85" border_width="0" radius="0" pad_column="2" />
+		<style name="style_chart_items" pad_column="0" pad_row="0" />
+	</styles>
+	<view>
+		<style name="style_main" />
+
+		<status_bar />
+
+		<lv_label name="a_date" text="Today" align="top_mid" y="24" />
+
+		<lv_label align="center" text="No Data" />
+
+		<lv_chart name="bar_chart" type="bar" y="40" point_count="17" hor_div_line_count="0" ver_div_line_count="0">
+			<style name="style_chart" />
+			<lv_chart-axis axis="primary_y" min_value="0" max_value="1000" />
+			<lv_chart-series
+				color="0x000000"
+				axis="primary_y"
+				values="650 345 0 245 56 80 345 65 245 456 850 345 150 345 65 245 56"
+			/>
+		</lv_chart>
+
+		<lv_obj align="bottom_mid" y="-45" x="0">
+			<style name="style_cont" />
+			<lv_image src="ic_steps" />
+			<lv_image src="ic_calories" />
+			<lv_image src="ic_distance" />
+		</lv_obj>
+		<lv_obj align="bottom_mid" y="-20" x="0" style_text_font="NS_Regular_20">
+			<style name="style_cont" />
+			<lv_label name="a_steps" width="60" text="1234" />
+			<lv_label name="a_calories" width="60" text="324" />
+			<lv_label name="a_distance" width="60" text="1.3" />
+		</lv_obj>
+		<lv_obj align="bottom_mid" y="-1" x="0">
+			<style name="style_cont" />
+			<lv_label width="60" text="steps" />
+			<lv_label width="60" text="kcal" />
+			<lv_label width="60" bind_text="subject_distance_unit" />
+		</lv_obj>
+	</view>
+</screen>

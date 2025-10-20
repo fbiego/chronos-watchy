@@ -1,0 +1,40 @@
+<screen>
+	<styles>
+		<style name="style_main" text_font="NS_Regular_16" bg_color="0xffffff" />
+		<style
+			name="style_contacts"
+			width="200"
+			height="175"
+			pad_all="0"
+			radius="0"
+			layout="flex"
+			flex_flow="column"
+			pad_row="0"
+			border_width="0"
+		/>
+		<style name="style_scrollbar" bg_color="0x000000" bg_opa="255" pad_all="0" pad_right="2" radius="0" />
+	</styles>
+	<view>
+		<style name="style_main" />
+		<status_bar />
+
+		<lv_label
+			name="c_info"
+			width="180"
+			align="center"
+			text="There are no contacts available, connect to Chronos App and sync them first"
+			style_text_font="NS_Regular_20"
+		/>
+
+		<lv_obj name="c_list" align="top_mid" y="25">
+			<style name="style_contacts" />
+			<style name="style_scrollbar" selector="scrollbar" />
+
+			<contact_item name="Taylor" normal="false" />
+			<contact_item name="John" />
+			<contact_item name="Sarah" />
+			<contact_item name="Jane" />
+			<contact_item name="Rodgers" />
+		</lv_obj>
+	</view>
+</screen>

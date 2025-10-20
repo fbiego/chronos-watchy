@@ -1,0 +1,24 @@
+<screen>
+	<styles>
+		<style name="style_main" text_font="NS_Regular_16" bg_color="0xffffff" />
+	</styles>
+	<view>
+		<style name="style_main" />
+		<status_bar />
+
+		<lv_label
+			width="180"
+			align="center"
+			text="Music Control&#10;Connected"
+			bind_text="subject_bluetooth_state"
+			bind_text-fmt="Music Control&#10;%s"
+			style_text_align="center"
+			style_text_font="NS_Bold_20"
+		/>
+
+		<lv_label y="-5" align="bottom_mid" text="Double tap&#10;for next" style_text_align="center" />
+		<lv_image src="ic_previous" align="top_right" x="-5" y="30" />
+		<lv_image src="ic_next" align="bottom_right" x="-5" y="-5" />
+		<lv_image src="ic_pause" align="bottom_left" x="5" y="-5" />
+	</view>
+</screen>

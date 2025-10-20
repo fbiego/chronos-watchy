@@ -1,0 +1,38 @@
+<screen>
+	<styles>
+		<style name="style_main" bg_color="0xffffff" text_color="0x000000" text_font="NS_Regular_16" />
+		<style
+			name="style_row"
+			layout="flex"
+			flex_flow="column"
+			flex_main_place="center"
+			flex_track_place="center"
+			flex_cross_place="center"
+			pad_row="5"
+		/>
+	</styles>
+	<view>
+		<style name="style_main" />
+		<status_bar />
+		<lv_image name="n_icon" src="ic_whatsapp" x="5" y="30" />
+		<lv_label
+			name="n_title"
+			text="Whatsapp"
+			style_text_font="NS_Regular_20"
+			x="45"
+			y="30"
+			width="150"
+			height="20"
+		/>
+		<lv_label name="n_count" text="1/10" align="top_right" y="50" x="-5" />
+		<lv_label
+			name="n_message"
+			text="Notifications are sent from the phone via Chronos app when connected. Not realtime since bluetooth is not always on to reduce power consumption."
+			width="200"
+			y="70"
+			height="130"
+			style_pad_all="5"
+		/>
+		<lv_label name="n_time" text="12:40" x="45" y="50" />
+	</view>
+</screen>

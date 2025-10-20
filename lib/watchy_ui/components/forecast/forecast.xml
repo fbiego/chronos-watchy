@@ -1,0 +1,44 @@
+<component>
+	<previews>
+		<preview width="200" height="200" />
+	</previews>
+	<styles>
+		<style
+			name="style_main"
+			width="180"
+			height="30"
+			pad_all="0"
+			text_font="NS_Regular_20"
+			border_width="1"
+			border_color="0x000000"
+			border_side="top"
+			radius="0"
+		/>
+		<style
+			name="style_cont"
+			height="100%"
+			pad_all="0"
+			width="content"
+			layout="flex"
+			pad_column="0"
+			border_width="0"
+			flex_cross_place="center"
+			flex_track_place="center"
+		/>
+	</styles>
+	<api>
+		<prop name="day" type="string" default="SUN" />
+		<prop name="icon" type="image" default="ic_sun_cloud" />
+		<prop name="temp" type="string" default="23" />
+	</api>
+	<view scrollable="false">
+		<style name="style_main" />
+		<lv_label text="$day" y="2" align="left_mid" />
+		<lv_image align="center" src="$icon" />
+		<lv_obj align="right_mid" y="2">
+			<style name="style_cont" />
+			<lv_label text="$temp" />
+			<lv_label bind_text="subject_temp_unit" style_text_font="NS_Regular_16" />
+		</lv_obj>
+	</view>
+</component>

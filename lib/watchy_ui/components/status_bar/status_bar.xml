@@ -1,0 +1,35 @@
+<component>
+	<previews>
+		<preview width="200" height="200" />
+	</previews>
+	<styles>
+		<style
+			name="style_main"
+			width="200"
+			height="22"
+			radius="0"
+			border_width="1"
+			border_color="0x000000"
+			border_side="bottom"
+			pad_all="0"
+			pad_top="0"
+			pad_left="5"
+			pad_right="5"
+			pad_column="5"
+			layout="flex"
+			flex_track_place="center"
+			flex_cross_place="center"
+			text_font="NS_Regular_16"
+		/>
+	</styles>
+	<view scrollable="false">
+		<style name="style_main" />
+		<lv_label bind_text="subject_time" flex_grow="1" style_pad_top="4" />
+		<lv_image src="ic_nav">
+			<bind_flag_if_not_eq subject="subject_navigation" flag="hidden" ref_value="1" />
+		</lv_image>
+		<!-- <lv_label text="3:56" /> -->
+		<bluetooth />
+		<lv_label bind_text="subject_battery" bind_text-fmt="%d%%" style_pad_top="4" />
+	</view>
+</component>

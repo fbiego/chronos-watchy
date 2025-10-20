@@ -1,0 +1,14 @@
+<component>
+	<styles>
+		<style name="style_main" height="content" width="content" pad_all="0" bg_opa="0" radius="0" border_width="0" />
+	</styles>
+	<view>
+		<style name="style_main" />
+		<lv_image src="ic_bt_con">
+			<bind_flag_if_not_eq flag="hidden" ref_value="2" subject="subject_bluetooth" />
+		</lv_image>
+		<lv_image src="ic_bt_on">
+			<bind_flag_if_not_eq flag="hidden" ref_value="1" subject="subject_bluetooth" />
+		</lv_image>
+	</view>
+</component>

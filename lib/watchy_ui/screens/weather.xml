@@ -1,0 +1,63 @@
+<screen>
+	<styles>
+		<style name="style_main" bg_color="0xffffff" text_color="0x000000" />
+		<style
+			name="style_row"
+			layout="flex"
+			flex_flow="column"
+			flex_main_place="center"
+			flex_track_place="center"
+			flex_cross_place="center"
+			pad_row="5"
+		/>
+		<style
+			name="style_cont"
+			width="200"
+			pad_all="0"
+			height="content"
+			border_width="0"
+			radius="0"
+			layout="flex"
+			text_align="center"
+			flex_main_place="space_around"
+		/>
+		<style
+			name="style_forecast"
+			width="190"
+			height="90"
+			pad_all="0"
+			radius="0"
+			layout="flex"
+			flex_flow="column"
+			flex_track_place="center"
+			pad_row="0"
+			border_width="0"
+		/>
+		<style name="style_scrollbar" bg_color="0x000000" bg_opa="255" pad_all="0" pad_right="-2" radius="0" />
+	</styles>
+	<view scrollable="false">
+		<style name="style_main" />
+
+		<status_bar />
+
+		<lv_obj y="50" style_flex_main_place="center" style_flex_cross_place="center">
+			<style name="style_cont" />
+			<lv_image name="w_icon" src="ic_sun_cloud" x="46" y="51" />
+			<lv_label bind_text="subject_temperature" style_text_font="NS_Bold_40" style_pad_top="10" />
+			<lv_label bind_text="subject_temp_unit" style_text_font="NS_Bold_20" />
+		</lv_obj>
+
+		<lv_label name="w_city" text="Nairobi" align="top_mid" y="30" style_text_font="NS_Regular_20" />
+
+		<lv_obj name="w_forecast" align="top_mid" y="110">
+			<style name="style_forecast" />
+			<style name="style_scrollbar" selector="scrollbar" />
+			<forecast day="MON" icon="ic_cloud" temp="24" />
+			<forecast day="TUE" icon="ic_sun_cloud" temp="23" />
+			<forecast day="WED" icon="ic_sunny" temp="25" />
+			<forecast day="MON" icon="ic_cloud" temp="24" />
+			<forecast day="TUE" icon="ic_sun_cloud" temp="23" />
+			<forecast day="WED" icon="ic_sunny" temp="25" />
+		</lv_obj>
+	</view>
+</screen>

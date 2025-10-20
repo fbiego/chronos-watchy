@@ -1,0 +1,26 @@
+<screen>
+	<styles>
+		<style name="style_main" text_font="NS_Regular_16" bg_color="0xffffff" />
+		<style
+			name="style_text"
+			width="170"
+			height="18"
+			text_align="center"
+			transform_pivot_x="85"
+			transform_pivot_y="9"
+		/>
+	</styles>
+	<view scrollable="false">
+		<style name="style_main" />
+		<status_bar />
+
+		<lv_qrcode name="p_qr" y="30" align="top_mid" size="150" data="https://chronos.ke/" />
+		<lv_label align="bottom_mid" text="Scan with Chronos" />
+		<lv_label name="p_name" bind_text="subject_ble_name" style_transform_rotation="-900" align="left_mid" x="-72">
+			<style name="style_text" />
+		</lv_label>
+		<lv_label name="p_address" align="right_mid" bind_text="subject_address" style_transform_rotation="900" x="70">
+			<style name="style_text" />
+		</lv_label>
+	</view>
+</screen>

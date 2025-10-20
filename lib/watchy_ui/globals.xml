@@ -1,0 +1,166 @@
+<globals>
+	<api>
+		<!-- Add <enumdefs> here -->
+	</api>
+
+	<consts>
+		<!-- Add <px>, <int>, <color> etc here -->
+	</consts>
+
+	<styles>
+		<!-- Add <style> tags here -->
+	</styles>
+
+	<subjects>
+		<!-- Add <int>, <string>, or <float> subjects here -->
+		<string name="subject_time" value="12:45" />
+		<string name="subject_date" value="Sun 5 Oct" />
+		<string name="subject_info" value="Info" />
+
+		<int name="subject_bluetooth" value="1" />
+		<int name="subject_camera" value="0" />
+		<string name="subject_bluetooth_state" value="Connected" />
+		<int name="subject_voltage" value="3869" />
+		<int name="subject_battery" value="83" />
+		<int name="subject_phone_battery" value="53" />
+		<int name="subject_steps" value="1234" />
+		<int name="subject_calories" value="324" />
+		<int name="subject_temperature" value="24" />
+		<string name="subject_distance" value="1.3" />
+		<string name="subject_distance_unit" value="km" />
+		<string name="subject_temp_unit" value="°C" />
+		<string name="subject_last_sync" value="36m" />
+
+		<int name="subject_navigation" value="1" />
+
+		<string name="subject_address" value="AA:45:45:24:35:DC" />
+		<string name="subject_ble_name" value="Watchy" />
+		<string name="subject_new" value="new" />
+
+		<int name="subject_settings_index" value="0" min_value="0" max_value="4" />
+		<int name="subject_settings_view" value="0" />
+		<string name="subject_camera_state" value="Ready" />
+	</subjects>
+
+	<images>
+		<!-- Add <file> or <data> tags here -->
+		<data name="ic_telegram" src_path="images/icon_telegram.png" color_format="i1" />
+		<data name="ic_next" src_path="images/icon_next.png" color_format="i1" />
+		<data name="ic_twitter" src_path="images/icon_twitter.png" color_format="i1" />
+		<data name="ic_chronos_100" src_path="images/icon_chronos_100.png" color_format="i1" />
+		<data name="ic_line" src_path="images/icon_line.png" color_format="i1" />
+		<data name="ic_storage" src_path="images/icon_storage.png" color_format="i1" />
+		<data name="ic_sos" src_path="images/icon_sos.png" color_format="i1" />
+		<data name="ic_search" src_path="images/icon_search.png" color_format="i1" />
+		<data name="ic_pairing" src_path="images/icon_pairing.png" color_format="i1" />
+		<data name="ic_kakao_talk" src_path="images/icon_kakao_talk.png" color_format="i1" />
+		<data name="ic_settings" src_path="images/icon_settings.png" color_format="i1" />
+		<data name="ic_rainy" src_path="images/icon_rainy.png" color_format="i1" />
+		<data name="ic_instagram" src_path="images/icon_instagram.png" color_format="i1" />
+		<data name="ic_cloud" src_path="images/icon_cloud.png" color_format="i1" />
+		<data name="ic_message" src_path="images/icon_message.png" color_format="i1" />
+		<data name="ic_phone" src_path="images/icon_phone.png" color_format="i1" />
+		<data name="ic_skype" src_path="images/icon_skype.png" color_format="i1" />
+		<data name="ic_pause" src_path="images/icon_pause.png" color_format="i1" />
+		<data name="ic_sunny" src_path="images/icon_sunny.png" color_format="i1" />
+		<data name="ic_sync" src_path="images/icon_sync.png" color_format="i1" />
+		<data name="ic_distance" src_path="images/icon_distance.png" color_format="i1" />
+		<data name="ic_bluetooth" src_path="images/icon_bluetooth.png" color_format="i1" />
+		<data name="ic_qr_codes" src_path="images/icon_qr_codes.png" color_format="i1" />
+		<data name="ic_wechat" src_path="images/icon_wechat.png" color_format="i1" />
+		<data name="ic_haze" src_path="images/icon_haze.png" color_format="i1" />
+		<data name="ic_sun_cloud" src_path="images/icon_sun_cloud.png" color_format="i1" />
+		<data name="ic_timeout" src_path="images/icon_timeout.png" color_format="i1" />
+		<data name="ic_no_weather" src_path="images/icon_no_weather.png" color_format="i1" />
+		<data name="ic_chronos_40" src_path="images/icon_chronos_40.png" color_format="i1" />
+		<data name="ic_calories" src_path="images/icon_calories.png" color_format="i1" />
+		<data name="ic_snow" src_path="images/icon_snow.png" color_format="i1" />
+		<data name="ic_battery" src_path="images/icon_battery.png" color_format="i1" />
+		<data name="ic_vkontakte" src_path="images/icon_vkontakte.png" color_format="i1" />
+		<data name="ic_viber" src_path="images/icon_viber.png" color_format="i1" />
+		<data name="ic_weibo" src_path="images/icon_weibo.png" color_format="i1" />
+		<data name="ic_music" src_path="images/icon_music.png" color_format="i1" />
+		<data name="ic_wind" src_path="images/icon_wind.png" color_format="i1" />
+		<data name="ic_camera" src_path="images/icon_camera.png" color_format="i1" />
+		<data name="ic_activity" src_path="images/icon_activity.png" color_format="i1" />
+		<data name="ic_steps" src_path="images/icon_steps.png" color_format="i1" />
+		<data name="ic_weather" src_path="images/icon_weather.png" color_format="i1" />
+		<data name="ic_sleep_mode" src_path="images/icon_sleep_mode.png" color_format="i1" />
+		<data name="ic_contacts" src_path="images/icon_contacts.png" color_format="i1" />
+		<data name="ic_notifications" src_path="images/icon_notifications.png" color_format="i1" />
+		<data name="ic_whatsapp" src_path="images/icon_whatsapp.png" color_format="i1" />
+		<data name="ic_info" src_path="images/icon_info.png" color_format="i1" />
+		<data name="ic_controls" src_path="images/icon_controls.png" color_format="i1" />
+		<data name="ic_bt_con" src_path="images/icon_bt_con.png" color_format="i1" />
+		<data name="ic_bt_on" src_path="images/icon_bt_on.png" color_format="i1" />
+		<data name="ic_configs" src_path="images/icon_configs.png" color_format="i1" />
+		<data name="ic_navigation" src_path="images/icon_navigation.png" color_format="i1" />
+		<data name="ic_mail" src_path="images/icon_mail.png" color_format="i1" />
+		<data name="ic_messenger" src_path="images/icon_messenger.png" color_format="i1" />
+		<data name="ic_watch" src_path="images/icon_watch.png" color_format="i1" />
+		<data name="ic_nav" src_path="images/icon_nav.png" color_format="i1" />
+		<data name="ic_tornado" src_path="images/icon_tornado.png" color_format="i1" />
+		<data name="ic_chronos_watchy" src_path="images/icon_chronos_watchy.png" color_format="i1" />
+		<data name="ic_facebook" src_path="images/icon_facebook.png" color_format="i1" />
+		<data name="ic_previous" src_path="images/icon_previous.png" color_format="i1" />
+		<data name="ic_low_battery" src_path="images/icon_low_battery.png" color_format="i1" />
+	</images>
+
+	<fonts>
+		<!-- Add <bin> , <tiny_ttf>, <freetype> tags here -->
+		<bin
+			name="NS_Regular_16"
+			size="16"
+			src_path="fonts/NotoSans-Regular.ttf"
+			bpp="2"
+			range="0x20-0x7F"
+			as_file="false"
+			symbols="°·"
+		/>
+		<bin
+			name="NS_Regular_20"
+			size="20"
+			src_path="fonts/NotoSans-Regular.ttf"
+			bpp="2"
+			range="0x20-0x7F"
+			as_file="false"
+			symbols="°·"
+		/>
+		<bin
+			name="NS_Regular_30"
+			size="30"
+			src_path="fonts/NotoSans-Regular.ttf"
+			bpp="2"
+			range="0x20-0x7F"
+			as_file="false"
+			symbols="°·"
+		/>
+		<bin
+			name="NS_Bold_20"
+			size="20"
+			src_path="fonts/NotoSans-Bold.ttf"
+			bpp="2"
+			range="0x20-0x7F"
+			as_file="false"
+			symbols="°·"
+		/>
+		<bin
+			name="NS_Bold_30"
+			size="30"
+			src_path="fonts/NotoSans-Bold.ttf"
+			bpp="2"
+			range="0x20-0x7F"
+			as_file="false"
+			symbols="°·"
+		/>
+		<bin
+			name="NS_Bold_40"
+			size="40"
+			src_path="fonts/NotoSans-Bold.ttf"
+			bpp="2"
+			range="0x20-0x7F"
+			as_file="false"
+			symbols="°·"
+		/>
+	</fonts>
+</globals>

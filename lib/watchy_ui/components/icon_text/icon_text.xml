@@ -1,0 +1,30 @@
+<component>
+	<styles>
+		<style
+			name="style_main"
+			width="content"
+			height="content"
+			bg_opa="0"
+			pad_all="0"
+			pad_column="2"
+			border_width="0"
+			radius="0"
+			text_color="0x000000"
+			text_font="NS_Regular_16"
+			layout="flex"
+			flex_flow="row"
+			flex_cross_place="center"
+			flex_track_place="center"
+		/>
+	</styles>
+	<api>
+		<prop name="icon" type="image" default="ic_calories" />
+		<prop name="bind_text" type="subject" default="subject_calories" />
+		<prop name="bind_format" type="string" default="%d" />
+	</api>
+	<view>
+		<style name="style_main" />
+		<lv_image src="$icon" />
+		<lv_label bind_text="$bind_text" bind_text-fmt="$bind_format" style_pad_top="5" />
+	</view>
+</component>

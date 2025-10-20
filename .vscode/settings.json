@@ -1,0 +1,20 @@
+{
+    "files.associations": {
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "vector": "cpp",
+        "string_view": "cpp",
+        "format": "cpp",
+        "initializer_list": "cpp",
+        "span": "cpp",
+        "text_encoding": "cpp",
+        "regex": "cpp",
+        "chrono": "cpp"
+    },
+    "editor.formatOnSave": true,
+    "files.autoSave": "afterDelay"
+}

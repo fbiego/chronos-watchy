@@ -1,0 +1,18 @@
+<screen>
+	<styles>
+		<style name="style_main" text_font="NS_Bold_20" bg_color="0xffffff" />
+	</styles>
+	<view scrollable="false">
+		<style name="style_main" />
+		<lv_label
+			name="q_info"
+			width="180"
+			align="center"
+			text="There are no QR codes available, connect to Chronos App and sync them first"
+			style_text_font="NS_Regular_20"
+		/>
+
+		<lv_label name="q_app" align="top_mid" text="Chronos" />
+		<lv_qrcode name="q_link" align="center" y="10" size="180" data="https://chronos.ke/" />
+	</view>
+</screen>

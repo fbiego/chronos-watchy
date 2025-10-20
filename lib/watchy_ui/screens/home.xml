@@ -1,0 +1,66 @@
+<screen>
+	<styles>
+		<style name="style_main" bg_color="0xffffff" text_color="0x000000" text_font="NS_Regular_16" pad_all="5" />
+		<style
+			name="style_cont"
+			width="content"
+			pad_all="0"
+			pad_column="5"
+			height="content"
+			border_width="0"
+			bg_opa="0"
+			radius="0"
+			layout="flex"
+			text_align="center"
+			flex_main_place="center"
+			flex_cross_place="center"
+		/>
+	</styles>
+	<view>
+		<style name="style_main" />
+
+		<bluetooth align="top_right" />
+		<lv_image src="ic_nav">
+			<bind_flag_if_not_eq subject="subject_navigation" flag="hidden" ref_value="1" />
+		</lv_image>
+
+		<lv_label bind_text="subject_time" style_text_font="NS_Bold_40" align="top_mid" y="5" />
+		<lv_label bind_text="subject_date" style_text_font="NS_Regular_20" align="top_mid" y="45" />
+
+		<icon_text y="105" icon="ic_steps" bind_text="subject_steps" />
+		<icon_text y="135" icon="ic_calories" bind_text="subject_calories" />
+		<icon_text y="165" icon="ic_distance" bind_text="subject_distance" bind_format="%s" />
+
+		<icon_text
+			align="top_right"
+			flex_flow="row_reverse"
+			y="105"
+			icon="ic_watch"
+			bind_text="subject_battery"
+			bind_format="%d%%"
+		/>
+		<icon_text
+			align="top_right"
+			flex_flow="row_reverse"
+			y="135"
+			icon="ic_phone"
+			bind_text="subject_phone_battery"
+			bind_format="%d%%"
+		/>
+		<icon_text
+			align="top_right"
+			flex_flow="row_reverse"
+			y="165"
+			icon="ic_sync"
+			bind_text="subject_last_sync"
+			bind_format="%s"
+		/>
+
+		<lv_obj align="top_mid" y="65">
+			<style name="style_cont" />
+			<lv_image name="h_icon" src="ic_sun_cloud" x="46" y="51" />
+			<lv_label bind_text="subject_temperature" style_text_font="NS_Regular_30" style_pad_top="5" />
+			<lv_label bind_text="subject_temp_unit" style_text_font="NS_Regular_16" />
+		</lv_obj>
+	</view>
+</screen>

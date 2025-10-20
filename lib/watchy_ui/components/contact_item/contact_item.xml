@@ -1,0 +1,29 @@
+<component>
+	<previews>
+		<preview width="200" height="200" />
+	</previews>
+	<styles>
+		<style
+			name="style_main"
+			width="190"
+			height="50"
+			pad_all="5"
+			text_font="NS_Regular_20"
+			border_width="1"
+			border_side="bottom"
+			border_color="0x000000"
+			radius="0"
+		/>
+	</styles>
+	<api>
+		<prop name="name" type="string" default="Name" />
+		<prop name="number" type="string" default="03903456726" />
+		<prop name="normal" type="bool" default="true" />
+	</api>
+	<view scroll_one="true" snappable="true">
+		<style name="style_main" />
+		<lv_label text="$name" style_text_font="NS_Bold_20" />
+		<lv_label align="bottom_left" text="$number" />
+		<lv_image align="right_mid" src="ic_sos" hidden="$normal" />
+	</view>
+</component>
