@@ -15,6 +15,32 @@
 #define FORMAT_LITTLEFS_IF_FAILED true
 #define FLASH LittleFS
 
+#define CMD_FLASH_INFO_REQ 0xC0
+#define CMD_FILE_LIST_REQ 0xC1
+#define CMD_FILE_START 0xC2
+#define CMD_FILE_CHUNK 0xC3
+#define CMD_FILE_END 0xC4
+#define CMD_FILE_DELETE 0xC5
+#define CMD_FLASH_FORMAT 0xC6
+#define CMD_FILE_ENTRY 0xC7
+#define CMD_MKDIR 0xC8
+#define CMD_ACK 0xC9
+#define CMD_DOWNLOAD_REQ 0xCA
+#define CMD_FILE_START_TX 0xCB
+#define CMD_FILE_CHUNK_TX 0xCC
+#define CMD_FILE_END_TX 0xCD
+#define CMD_OP_STATUS 0xCE
+#define CMD_SET_ACTIVE_ENTRY 0xCF
+
+struct FileTransferContext
+{
+    File file;
+    String filename;
+    uint32_t expectedSize = 0;
+    uint32_t received = 0;
+    bool active = false;
+};
+
 class StorageModule
 {
 public:
@@ -23,6 +49,7 @@ public:
     ~StorageModule(); // destructor
 
     bool begin();
+    void update();
 
     bool readFile(String path, String &content);
     bool readFile(String path, JsonDocument &document);
@@ -36,17 +63,37 @@ public:
 
     String filePath(String type, int year, int month, int day);
 
+    String getFileName(const String &path, bool withExtension = true);
+
     int countFiles(String path);
 
-    JsonDocument listFiles(String path);
+    JsonDocument listFiles(String path, bool name_only = false, bool slash = false);
     String getFileList(String path);
+    String getParentFolder(const String &path);
+
+    JsonDocument listFaces();
 
     size_t getUsedBytes();
     size_t getTotalBytes();
 
+    /* BLE FILE TRANSFER */
+    void handleFileCommand(uint8_t *data, size_t len);
+    void bleNotify(uint8_t *data, size_t len);
+    void sendAck(uint8_t cmd, bool success);
+    void sendChunkAck(uint16_t chunkId, bool success = true);
+    void startFileWrite(const String &filename, uint32_t size);
+    void writeFileChunk(uint8_t *data, size_t len);
+    void finalizeFile();
+    void sendFileList(File dir, String basePath);
+    void setTransferCallback(void (*callback)(uint8_t *data, size_t len));
+
 protected:
     // cannot be accessed from outside the class, however, they can be accessed in inherited classes
 private:
+    FileTransferContext ft;
+    void (*transferCallback)(uint8_t *, size_t) = nullptr;
+
+    bool sendList = false;
 };
 
 #endif

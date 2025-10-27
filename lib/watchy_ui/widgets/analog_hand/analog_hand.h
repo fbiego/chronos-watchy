@@ -1,9 +1,10 @@
 /**
- * @file bluetooth_gen.h
+ * @file analog_hand.h
+ *
  */
 
-#ifndef BLUETOOTH_H
-#define BLUETOOTH_H
+#ifndef ANALOG_HAND_H
+#define ANALOG_HAND_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,11 +14,7 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-    #include "lvgl.h"
-#else
-    #include "lvgl/lvgl.h"
-#endif
+#include "analog_hand_gen.h"
 
 /*********************
  *      DEFINES
@@ -31,8 +28,6 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * bluetooth_create(lv_obj_t * parent);
-
 /**********************
  *      MACROS
  **********************/
@@ -41,4 +36,4 @@ lv_obj_t * bluetooth_create(lv_obj_t * parent);
 } /*extern "C"*/
 #endif
 
-#endif /*BLUETOOTH_H*/
+#endif /*ANALOG_HAND_H*/

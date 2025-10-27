@@ -1,0 +1,17 @@
+<screen>
+	<styles>
+		<style
+			name="style_main"
+			text_font="NS_Regular_16"
+			bg_color="0xffffff"
+			layout="flex"
+			flex_flow="column"
+			flex_main_place="start"
+			flex_track_place="center"
+		/>
+	</styles>
+	<view scrollbar_mode="off">
+		<style name="style_main" />
+		<face_item />
+	</view>
+</screen>

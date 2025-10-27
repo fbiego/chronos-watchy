@@ -48,6 +48,7 @@ lv_obj_t * info_create(void)
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
+    lv_obj_set_name_static(lv_obj_0, "info_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_t * info_icon = lv_image_create(lv_obj_0);
@@ -65,8 +66,6 @@ lv_obj_t * info_create(void)
     lv_obj_set_style_pad_all(info_text, 5, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "info");
 
     return lv_obj_0;
 }

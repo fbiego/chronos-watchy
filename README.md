@@ -1,6 +1,6 @@
 # Chronos Watchy
 
-**Chronos-Watchy** is an **alternative firmware** for the **Watchy open-source e-ink smartwatch**, built with **LVGL** and designed to connect seamlessly with the **Chronos App**, a modern companion app for smartwatch users.
+**Chronos-Watchy** is an **alternative firmware** for the **Watchy open-source e-ink smartwatch**, built with **LVGL** and designed to connect seamlessly with the [`Chronos App`](https://chronos.ke/), a modern companion app for smartwatch users.
 
 > ⚠️ This firmware is currently compatible with **Watchy v2.0**.
 > Tested successfully on an **AliExpress clone** with **USB Type-C**.
@@ -25,11 +25,10 @@
 * 🎶 **Controls**: Camera, Music, Find Phone controls (Only when connected)
 * 🔗 **QR Code Links**: Save QR Code links on Watchy
 * 📞 **Contacts**: Save contact info on Watchy
-
+* 🕹️ **Multiple Watchface**: Installable at runtime via BLE, [`Watchy Faces`](https://github.com/fbiego/watchy_faces)
 
 ## Planned / To-Do
 
-* 🕹️ Mutliple Watchface support
 * ⚡ Non-blocking operations (BLE & storage handled in background tasks)
 * ✋ Raise-to-wake gesture
 * 👆 Double-tap to wake
@@ -78,6 +77,8 @@ You can use the **browser-based ESP flasher** provided by Espressif:
 ## App Setup Guide
 
 <a href='https://chronos.ke/app?id=esp32'><img alt='Download Chronos' height="100px" src='https://chronos.ke/img/chronos.png'/></a>
+
+[`Chronos App`](https://chronos.ke/)
 
 ### Connecting / Pairing
 
@@ -140,3 +141,4 @@ Under the **User** tab:
 * **Chronos App**: Companion app for smartwatch sync and notifications. [Website](https://chronos.ke/)
 * **LVGL**: Powerful open-source embedded graphics library. [Website](https://lvgl.io/)
 * **LVGL Pro**: Used for UI design and layout. [Website](https://pro.lvgl.io/)
+* **Watchy Faces**: Watchfaces for the Chronos Watchy firmware. [Github](https://github.com/fbiego/watchy_faces)

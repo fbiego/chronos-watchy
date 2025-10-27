@@ -63,6 +63,7 @@ lv_obj_t * home_create(void)
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
+    lv_obj_set_name_static(lv_obj_0, "home_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_t * bluetooth_0 = bluetooth_create(lv_obj_0);
@@ -84,29 +85,45 @@ lv_obj_t * home_create(void)
     lv_obj_set_align(lv_label_1, LV_ALIGN_TOP_MID);
     lv_obj_set_y(lv_label_1, 45);
     
-    lv_obj_t * icon_text_0 = icon_text_create(lv_obj_0, ic_steps, &subject_steps, "%d");
+    lv_obj_t * icon_text_0 = icon_text_create(lv_obj_0);
     lv_obj_set_y(icon_text_0, 105);
+    icon_text_set_icon(icon_text_0, ic_steps);
+    icon_text_bind_text(icon_text_0, &subject_steps);
     
-    lv_obj_t * icon_text_1 = icon_text_create(lv_obj_0, ic_calories, &subject_calories, "%d");
+    lv_obj_t * icon_text_1 = icon_text_create(lv_obj_0);
     lv_obj_set_y(icon_text_1, 135);
+    icon_text_set_icon(icon_text_1, ic_calories);
+    icon_text_bind_text(icon_text_1, &subject_calories);
     
-    lv_obj_t * icon_text_2 = icon_text_create(lv_obj_0, ic_distance, &subject_distance, "%s");
+    lv_obj_t * icon_text_2 = icon_text_create(lv_obj_0);
     lv_obj_set_y(icon_text_2, 165);
+    icon_text_set_icon(icon_text_2, ic_distance);
+    icon_text_bind_text(icon_text_2, &subject_distance);
+    icon_text_set_bind_format(icon_text_2, "%s");
     
-    lv_obj_t * icon_text_3 = icon_text_create(lv_obj_0, ic_watch, &subject_battery, "%d%%");
+    lv_obj_t * icon_text_3 = icon_text_create(lv_obj_0);
     lv_obj_set_align(icon_text_3, LV_ALIGN_TOP_RIGHT);
     lv_obj_set_flex_flow(icon_text_3, LV_FLEX_FLOW_ROW_REVERSE);
     lv_obj_set_y(icon_text_3, 105);
+    icon_text_set_icon(icon_text_3, ic_watch);
+    icon_text_bind_text(icon_text_3, &subject_battery);
+    icon_text_set_bind_format(icon_text_3, "%d%%");
     
-    lv_obj_t * icon_text_4 = icon_text_create(lv_obj_0, ic_phone, &subject_phone_battery, "%d%%");
+    lv_obj_t * icon_text_4 = icon_text_create(lv_obj_0);
     lv_obj_set_align(icon_text_4, LV_ALIGN_TOP_RIGHT);
     lv_obj_set_flex_flow(icon_text_4, LV_FLEX_FLOW_ROW_REVERSE);
     lv_obj_set_y(icon_text_4, 135);
+    icon_text_set_icon(icon_text_4, ic_phone);
+    icon_text_bind_text(icon_text_4, &subject_phone_battery);
+    icon_text_set_bind_format(icon_text_4, "%d%%");
     
-    lv_obj_t * icon_text_5 = icon_text_create(lv_obj_0, ic_sync, &subject_last_sync, "%s");
+    lv_obj_t * icon_text_5 = icon_text_create(lv_obj_0);
     lv_obj_set_align(icon_text_5, LV_ALIGN_TOP_RIGHT);
     lv_obj_set_flex_flow(icon_text_5, LV_FLEX_FLOW_ROW_REVERSE);
     lv_obj_set_y(icon_text_5, 165);
+    icon_text_set_icon(icon_text_5, ic_sync);
+    icon_text_bind_text(icon_text_5, &subject_last_sync);
+    icon_text_set_bind_format(icon_text_5, "%s");
     
     lv_obj_t * lv_obj_1 = lv_obj_create(lv_obj_0);
     lv_obj_set_align(lv_obj_1, LV_ALIGN_TOP_MID);
@@ -128,8 +145,6 @@ lv_obj_t * home_create(void)
     lv_obj_set_style_text_font(lv_label_3, NS_Regular_16, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "home");
 
     return lv_obj_0;
 }

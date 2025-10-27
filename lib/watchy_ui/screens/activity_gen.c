@@ -81,6 +81,7 @@ lv_obj_t * activity_create(void)
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
+    lv_obj_set_name_static(lv_obj_0, "activity_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
@@ -105,8 +106,8 @@ lv_obj_t * activity_create(void)
     lv_chart_set_axis_min_value(bar_chart, LV_CHART_AXIS_PRIMARY_Y, 0);
     lv_chart_set_axis_max_value(bar_chart, LV_CHART_AXIS_PRIMARY_Y, 1000);
     lv_chart_series_t * lv_chart_series_0 = lv_chart_add_series(bar_chart, lv_color_hex(0x000000), LV_CHART_AXIS_PRIMARY_Y);
-    static const int32_t bar_chart_values[] = {650, 345, 0, 245, 56, 80, 345, 65, 245, 456, 850, 345, 150, 345, 65, 245, 56};
-    lv_chart_set_series_values(bar_chart, lv_chart_series_0, bar_chart_values, 17);
+    static const int32_t bar_chart_values_0[] = {650, 345, 0, 245, 56, 80, 345, 65, 245, 456, 850, 345, 150, 345, 65, 245, 56};
+    lv_chart_set_series_values(bar_chart, lv_chart_series_0, bar_chart_values_0, 17);
     
     lv_obj_t * lv_obj_1 = lv_obj_create(lv_obj_0);
     lv_obj_set_align(lv_obj_1, LV_ALIGN_BOTTOM_MID);
@@ -161,8 +162,6 @@ lv_obj_t * activity_create(void)
     lv_label_bind_text(lv_label_3, &subject_distance_unit, NULL);
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "activity");
 
     return lv_obj_0;
 }

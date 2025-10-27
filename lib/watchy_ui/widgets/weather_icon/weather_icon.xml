@@ -1,0 +1,46 @@
+<widget>
+	<styles>
+		<style name="style_main" width="content" height="content" radius="0" border_width="0" bg_opa="0" pad_all="0" />
+	</styles>
+	<api>
+		<prop name="no_weather" type="image" default="ic_no_weather" />
+		<prop name="sun_cloud" type="image" default="ic_sun_cloud" />
+		<prop name="sunny" type="image" default="ic_sunny" />
+		<prop name="snow" type="image" default="ic_snow" />
+		<prop name="rainy" type="image" default="ic_rainy" />
+		<prop name="cloud" type="image" default="ic_cloud" />
+		<prop name="tornado" type="image" default="ic_tornado" />
+		<prop name="wind" type="image" default="ic_wind" />
+		<prop name="haze" type="image" default="ic_haze" />
+	</api>
+	<view>
+		<style name="style_main" />
+		<lv_image name="img_no_weather" src="ic_no_weather">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="-1" />
+		</lv_image>
+		<lv_image name="img_sun_cloud" src="ic_sun_cloud">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="0" />
+		</lv_image>
+		<lv_image name="img_sunny" src="ic_sunny">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="1" />
+		</lv_image>
+		<lv_image name="img_snow" src="ic_snow">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="2" />
+		</lv_image>
+		<lv_image name="img_rainy" src="ic_rainy">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="3" />
+		</lv_image>
+		<lv_image name="img_cloud" src="ic_cloud">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="4" />
+		</lv_image>
+		<lv_image name="img_tornado" src="ic_tornado">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="5" />
+		</lv_image>
+		<lv_image name="img_wind" src="ic_wind">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="6" />
+		</lv_image>
+		<lv_image name="img_haze" src="ic_haze">
+			<bind_flag_if_not_eq subject="subject_weather_icon" flag="hidden" ref_value="7" />
+		</lv_image>
+	</view>
+</widget>

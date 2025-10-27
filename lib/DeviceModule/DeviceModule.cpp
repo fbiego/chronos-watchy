@@ -85,11 +85,16 @@ void DeviceModule::begin()
 	rtc.resetAlarm();
 	rtc.disableAlarm();
 	mWatch.setName(WATCH_NAME);
+	// mWatch.setScreen((ChronosScreen)0x80);
 	mWatch.set24Hour(get24hr());
 
 	milliVolts = (analogReadMilliVolts(BATT_ADC_PIN) * 2.0f) - 120.0;
 
 	mWatch.setBattery(getBattery());
+
+#ifdef LV_FS_ARDUINO_ESP_LITTLEFS_PATH
+	mStorage.createDir(LV_FS_ARDUINO_ESP_LITTLEFS_PATH);
+#endif
 }
 
 /**
@@ -163,6 +168,17 @@ void DeviceModule::update()
 			mHealth.syncData();
 			sync_data = false;
 		}
+	}
+}
+
+/**
+ * Initialize BLE
+ */
+void DeviceModule::initBLE()
+{
+	if (!mWatch.isRunning())
+	{
+		mWatch.begin();
 	}
 }
 
@@ -257,7 +273,7 @@ void DeviceModule::setRTC()
  */
 void DeviceModule::sleepTimerStart(long seconds)
 {
-	sleepTimer.duration = SECONDS_TO_MS(seconds);
+	sleepTimer.duration = seconds == TIMER_INFINITE ? TIMER_INFINITE : SECONDS_TO_MS(seconds);
 	sleepTimer.time = millis();
 	sleepTimer.active = seconds != TIMER_INFINITE;
 }
@@ -297,6 +313,31 @@ bool DeviceModule::sleepTimerEnded()
 long DeviceModule::sleepTimerDuration()
 {
 	return sleepTimer.duration;
+}
+
+/**
+ * Get the remaining time to sleep
+ * @return the time left in m:s or -1 if infinite
+ */
+String DeviceModule::sleepTimerLeft()
+{
+	if (sleepTimerDuration() == TIMER_INFINITE)
+	{
+		return "-1";
+	}
+	if (!sleepTimer.active)
+	{
+		return "";
+	}
+	else
+	{
+		long elapsed = millis() - sleepTimer.time;
+		long remaining = sleepTimer.duration - elapsed;
+		if (remaining < 0)
+			remaining = 0;
+		return String(remaining / 1000);
+	}
+	return "";
 }
 
 /**
@@ -971,6 +1012,9 @@ void DeviceModule::handleConfigs(Config config, uint32_t a, uint32_t b)
 	SettingTime s;
 	switch (config)
 	{
+	case CF_RST:
+		ESP.restart();
+		break;
 	case CF_RTW:
 		setRTW(b);
 		settingsUpdated = true;
@@ -1081,6 +1125,25 @@ void DeviceModule::setPhoneInfo()
 	settingsDoc["phoneInfo"]["version"] = mWatch.getAppVersion();
 	settingsDoc["phoneInfo"]["battery"] = mWatch.getPhoneBattery();
 	settingsDoc["phoneInfo"]["charging"] = mWatch.isPhoneCharging();
+}
+
+/**
+ * Set the current watchface path
+ * @param path the path to the watchface
+ */
+void DeviceModule::setWatchface(String path)
+{
+	settingsDoc["watchface"] = path;
+	settingsUpdated = true;
+}
+
+/**
+ * Get the current watchface
+ * @return the path to the watchface
+ */
+String DeviceModule::getWatchface()
+{
+	return settingsDoc["watchface"] | "default";
 }
 
 /**
@@ -1667,7 +1730,7 @@ void DeviceModule::houseKeeping()
 void DeviceModule::clearOldRecordFiles(String path)
 {
 	DateTime now = getDateTime();
-	JsonDocument files = mStorage.listFiles(path);
+	JsonDocument files = mStorage.listFiles(path, false, true);
 	JsonArray array = files.as<JsonArray>();
 	for (int i = 0; i < MAX_RECORD_DAYS; i++)
 	{

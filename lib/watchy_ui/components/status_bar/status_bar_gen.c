@@ -60,6 +60,7 @@ lv_obj_t * status_bar_create(lv_obj_t * parent)
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(parent);
+    lv_obj_set_name_static(lv_obj_0, "status_bar_#");
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLLABLE, false);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
@@ -72,15 +73,17 @@ lv_obj_t * status_bar_create(lv_obj_t * parent)
     lv_image_set_src(lv_image_0, ic_nav);
     lv_obj_bind_flag_if_not_eq(lv_image_0, &subject_navigation, LV_OBJ_FLAG_HIDDEN, 1);
     
+    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_0);
+    lv_label_bind_text(lv_label_1, &subject_power_off, NULL);
+    lv_obj_set_style_pad_top(lv_label_1, 4, 0);
+    
     lv_obj_t * bluetooth_0 = bluetooth_create(lv_obj_0);
     
-    lv_obj_t * lv_label_1 = lv_label_create(lv_obj_0);
-    lv_label_bind_text(lv_label_1, &subject_battery, "%d%%");
-    lv_obj_set_style_pad_top(lv_label_1, 4, 0);
+    lv_obj_t * lv_label_2 = lv_label_create(lv_obj_0);
+    lv_label_bind_text(lv_label_2, &subject_battery, "%d%%");
+    lv_obj_set_style_pad_top(lv_label_2, 4, 0);
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "status_bar_#");
 
     return lv_obj_0;
 }

@@ -1,4 +1,4 @@
-<component>
+<widget>
 	<styles>
 		<style
 			name="style_main"
@@ -24,7 +24,7 @@
 	</api>
 	<view>
 		<style name="style_main" />
-		<lv_image src="$icon" />
-		<lv_label bind_text="$bind_text" bind_text-fmt="$bind_format" style_pad_top="5" />
+		<lv_image name="img_icon" />
+		<lv_label style_pad_top="5" />
 	</view>
-</component>
+</widget>

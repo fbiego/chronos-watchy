@@ -39,8 +39,30 @@ Import("env")
 sep = os.sep
 
 FILE_PATH = Path(f"lib{sep}DeviceModule{sep}DeviceModule.h")
+WIDGETS_PATH = Path(f"lib{sep}watchy_ui{sep}widgets{sep}")
 
-print("Merge Script")
+print("Extra Script")
+
+def replace_in_files(base_path: Path, old_text: str, new_text: str):
+    """
+    Recursively scans the given base_path for .h and .c files
+    and replaces occurrences of old_text with new_text.
+    """
+    for file_path in base_path.rglob("*"):
+        if file_path.suffix.lower() in (".h", ".c"):
+            try:
+                text = file_path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                print(f"⚠️ Skipping non-text file: {file_path}")
+                continue
+
+                # Skip files where old_text isn't found to avoid unnecessary writes
+            if old_text not in text:
+                continue
+
+            new_content = text.replace(old_text, new_text)
+            file_path.write_text(new_content, encoding="utf-8")
+            print(f"✅ Replaced in: {file_path}")
 
 def merge_bins(pairs, out_path, new_pairs):
     """
@@ -211,3 +233,5 @@ env.AddPostAction("buildprog", after_build)
 
 #update
 run_update(FILE_PATH)
+
+replace_in_files(WIDGETS_PATH, "#include \"lvgl/", "#include \"")

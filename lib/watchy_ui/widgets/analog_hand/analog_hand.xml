@@ -1,0 +1,15 @@
+<widget>
+	<styles>
+		<style name="style_main" width="content" height="content" />
+	</styles>
+	<api>
+		<prop name="bind_rotation" type="subject" help="The subject to bind the image rotation" />
+		<prop name="src" type="image" help="The image src" />
+		<prop name="pivot_x" type="int" help="The x pivot point of the image" />
+		<prop name="pivot_y" type="int" help="The y pivot point of the image" />
+		<prop name="offset" type="int" help="The offset of the rotation" />
+	</api>
+	<view extends="lv_image">
+		<style name="style_main" />
+	</view>
+</widget>

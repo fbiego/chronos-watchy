@@ -1,9 +1,10 @@
 /**
- * @file icon_text_gen.h
+ * @file bluetooth_private_gen.h
+ *
  */
 
-#ifndef ICON_TEXT_H
-#define ICON_TEXT_H
+#ifndef BLUETOOTH_PRIVATE_H
+#define BLUETOOTH_PRIVATE_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,11 +14,8 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#ifdef LV_LVGL_H_INCLUDE_SIMPLE
-    #include "lvgl.h"
-#else
-    #include "lvgl/lvgl.h"
-#endif
+#include "lvgl_private.h"
+#include "bluetooth.h"
 
 /*********************
  *      DEFINES
@@ -26,12 +24,21 @@ extern "C" {
 /**********************
  *      TYPEDEFS
  **********************/
+typedef struct {
+    lv_obj_t obj;  /* Base widget to extend */
+    lv_obj_t * lv_image_0;
+    lv_obj_t * lv_image_1;
+} bluetooth_t;
+
+extern const lv_obj_class_t bluetooth_class;
 
 /**********************
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * icon_text_create(lv_obj_t * parent, const void * icon, lv_subject_t * bind_text, const char * bind_format);
+#if LV_USE_XML
+    void bluetooth_register(void);
+#endif
 
 /**********************
  *      MACROS
@@ -41,4 +48,4 @@ lv_obj_t * icon_text_create(lv_obj_t * parent, const void * icon, lv_subject_t *
 } /*extern "C"*/
 #endif
 
-#endif /*ICON_TEXT_H*/
+#endif /*BLUETOOTH_PRIVATE_H*/

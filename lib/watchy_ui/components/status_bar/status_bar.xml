@@ -28,7 +28,7 @@
 		<lv_image src="ic_nav">
 			<bind_flag_if_not_eq subject="subject_navigation" flag="hidden" ref_value="1" />
 		</lv_image>
-		<!-- <lv_label text="3:56" /> -->
+		<lv_label bind_text="subject_power_off" style_pad_top="4" />
 		<bluetooth />
 		<lv_label bind_text="subject_battery" bind_text-fmt="%d%%" style_pad_top="4" />
 	</view>

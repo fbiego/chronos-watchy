@@ -1,8 +1,8 @@
 <test>
-	<view extends="info" />
+	<view extends="music" />
 	<steps>
 		<subject_set subject="subject_bluetooth" value="2" />
 		<subject_set subject="subject_settings_view" value="2" />
-		<screenshot_compare path="info.png" />
+		<screenshot_compare path="music.png" />
 	</steps>
 </test>

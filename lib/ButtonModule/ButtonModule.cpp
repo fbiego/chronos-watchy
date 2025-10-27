@@ -66,6 +66,11 @@ void ButtonModule::begin()
     menu.setLongClickHandler(buttonHandler);
     back.setLongClickHandler(buttonHandler);
 
+    up.setLongClickDetectedHandler(longPressDetect);
+    down.setLongClickDetectedHandler(longPressDetect);
+    menu.setLongClickDetectedHandler(longPressDetect);
+    back.setLongClickDetectedHandler(longPressDetect);
+
     // Create event queue
     buttonQueue = xQueueCreate(10, sizeof(ButtonEvent));
 
@@ -77,7 +82,7 @@ void ButtonModule::begin()
         this,
         1,
         NULL,
-        0 // or 0/1 depending on core preference
+        1 // or 0/1 depending on core preference
     );
 }
 
@@ -142,12 +147,33 @@ void ButtonModule::buttonHandler(Button2 &button)
 }
 
 /**
+ * Long press detect handler
+ * @param button button
+ */
+void ButtonModule::longPressDetect(Button2 &button)
+{
+    if (instance->longPressCallback)
+    {
+        instance->longPressCallback();
+    }
+}
+
+/**
  * Set the function for the button event callbacks
  * @param callback the callback function
  */
 void ButtonModule::setButtonCallback(void (*callback)(ButtonEvent))
 {
     buttonCallback = callback;
+}
+
+/**
+ * Set the function for the long press callback
+ * @param callback the callback function
+ */
+void ButtonModule::setLongPressCallback(void(callback)(void))
+{
+    longPressCallback = callback;
 }
 
 /**
@@ -247,7 +273,7 @@ void ButtonModule::handleWakeup()
     event.type = BT_NONE;
     event.click = single_click;
     event.duration = 0;
-    if (wakeupBit & MENU_BTN_MASK && !isPressed(BUTTON_UP))
+    if (wakeupBit & MENU_BTN_MASK && !isPressed(BUTTON_MENU))
     {
         event.type = BT_MENU;
     }

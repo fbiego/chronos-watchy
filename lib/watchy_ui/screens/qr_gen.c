@@ -47,6 +47,7 @@ lv_obj_t * qr_create(void)
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
+    lv_obj_set_name_static(lv_obj_0, "qr_#");
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLLABLE, false);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
@@ -70,8 +71,6 @@ lv_obj_t * qr_create(void)
     lv_qrcode_set_data(q_link, "https://chronos.ke/");
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "qr");
 
     return lv_obj_0;
 }

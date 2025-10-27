@@ -1,4 +1,4 @@
-<component>
+<widget>
 	<styles>
 		<style name="style_main" height="content" width="content" pad_all="0" bg_opa="0" radius="0" border_width="0" />
 	</styles>
@@ -11,4 +11,4 @@
 			<bind_flag_if_not_eq flag="hidden" ref_value="1" subject="subject_bluetooth" />
 		</lv_image>
 	</view>
-</component>
+</widget>

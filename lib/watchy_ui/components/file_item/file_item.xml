@@ -1,0 +1,39 @@
+<component>
+	<previews>
+		<preview width="200" />
+	</previews>
+	<styles>
+		<style
+			name="style_main"
+			width="200"
+			height="35"
+			bg_opa="255"
+			pad_all="5"
+			pad_column="5"
+			border_width="0"
+			radius="0"
+			text_color="0x000000"
+			text_font="NS_Regular_20"
+			layout="flex"
+			flex_flow="row"
+			flex_cross_place="center"
+			flex_track_place="center"
+		/>
+		<style name="style_checked" bg_color="0x000000" text_color="0xffffff" />
+		<style name="style_icon_checked" image_recolor="0xffffff" image_recolor_opa="255" />
+	</styles>
+	<api>
+		<prop name="icon" type="image" default="ic_steps" />
+		<prop name="text" type="string" default="Bluetooth" />
+		<prop name="size" type="string" default="12kb" />
+	</api>
+	<view state_trickle="true">
+		<style name="style_main" />
+		<style name="style_checked" selector="checked" />
+		<lv_image src="$icon">
+			<style name="style_icon_checked" selector="checked" />
+		</lv_image>
+		<lv_label flex_grow="1" text="$text" style_pad_top="5" />
+		<lv_label text="$size" style_text_font="NS_Regular_16" style_pad_top="3" />
+	</view>
+</component>

@@ -25,6 +25,18 @@ DisplayModule::~DisplayModule()
 {
 }
 
+#if LV_USE_LOG != 0
+/**
+ * Function to print lvgl logs when enabled
+ * @param level the log level
+ * @param buf the log buffer to print
+ */
+void DisplayModule::lv_log_print(lv_log_level_t level, const char *buf)
+{
+	Serial.write(buf);
+}
+#endif
+
 /**
  * @brief begin
  * Initialize the e-paper display, lvgl and screens
@@ -43,6 +55,10 @@ void DisplayModule::begin(bool full_refresh)
 	lv_init();
 
 	lv_tick_set_cb(my_tick);
+
+#if LV_USE_LOG != 0
+	lv_log_register_print_cb(lv_log_print);
+#endif
 
 	lv_display_t *lv_display = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
 	lv_display_set_flush_cb(lv_display, my_disp_flush);
@@ -64,6 +80,8 @@ void DisplayModule::begin(bool full_refresh)
 	contacts_screen = contacts_create();
 	control_screen = control_create();
 	qr_screen = qr_create();
+	xml_screen = loader_create();
+	selector_screen = selector_create();
 
 	lv_obj_add_event_cb(navigation_screen, screen_events_cb, LV_EVENT_ALL, NULL);
 	lv_obj_add_event_cb(music_screen, screen_events_cb, LV_EVENT_ALL, NULL);
@@ -92,10 +110,7 @@ void DisplayModule::begin(bool full_refresh)
 	}
 
 	navigationDataCallback("Navigation\nInactive", "Chronos", "Start navigation on the connected phone", false);
-	lv_subject_copy_string(&subject_info, mDevice.mWatch.getAddress().c_str());
 	lv_subject_set_int(&subject_navigation, 0);
-
-	lv_screen_load(home_screen);
 }
 
 /**
@@ -104,6 +119,17 @@ void DisplayModule::begin(bool full_refresh)
 void DisplayModule::configure()
 {
 	setInvert(mDevice.getInvertDisplay());
+
+	String face = mDevice.getWatchface();
+	Timber.i("Using Watchface: " + face);
+	if (face == "default")
+	{
+		lv_screen_load(home_screen);
+	}
+	else
+	{
+		load_watchface_from_path(face);
+	}
 }
 
 /**
@@ -125,6 +151,7 @@ void DisplayModule::setInfo(String info)
 void DisplayModule::timeout()
 {
 	lv_subject_set_int(&subject_bluetooth, 0);
+	lv_subject_copy_string(&subject_power_off, "");
 
 	lv_obj_t *active = lv_screen_active();
 	if (active != home_screen)
@@ -163,6 +190,23 @@ void DisplayModule::update()
 	String time = mDevice.mWatch.getHourZ() + mDevice.mWatch.getTime(":%M ") + mDevice.mWatch.getAmPmC(false);
 	lv_subject_copy_string(&subject_time, time.c_str());
 	lv_subject_copy_string(&subject_date, mDevice.mWatch.getTime("%a %d %b").c_str());
+	lv_subject_set_int(&subject_hour, mDevice.mWatch.getHourC());
+	lv_subject_set_int(&subject_minute, mDevice.mWatch.getMinute());
+	lv_subject_set_int(&subject_hour_analog, (mDevice.mWatch.getHour() * 300) + (mDevice.mWatch.getMinute() * 5));
+	lv_subject_set_int(&subject_minute_analog, mDevice.mWatch.getMinute() * 60);
+
+	lv_subject_set_int(&subject_day, mDevice.mWatch.getDay());
+	lv_subject_set_int(&subject_month, mDevice.mWatch.getMonth() + 1);
+	lv_subject_set_int(&subject_year, mDevice.mWatch.getYear());
+	lv_subject_set_int(&subject_weekday, mDevice.mWatch.getDayofWeek());
+	lv_subject_copy_string(&subject_am_pm, mDevice.mWatch.getAmPmC(false).c_str());
+	lv_subject_copy_string(&subject_month_short, mDevice.mWatch.getTime("%b").c_str());
+	lv_subject_copy_string(&subject_month_long, mDevice.mWatch.getTime("%B").c_str());
+	lv_subject_copy_string(&subject_weekday_short, mDevice.mWatch.getTime("%a").c_str());
+	lv_subject_copy_string(&subject_weekday_long, mDevice.mWatch.getTime("%A").c_str());
+
+	lv_subject_copy_string(&subject_power_off, mDevice.sleepTimerLeft().c_str());
+
 	lv_subject_set_int(&subject_bluetooth, mDevice.mWatch.isConnected() ? 2 : mDevice.mWatch.isRunning() ? 1
 																										 : 0);
 	lv_subject_set_int(&subject_voltage, (int)mDevice.getMillitVolts());
@@ -181,6 +225,7 @@ void DisplayModule::update()
 
 	Weather w = mDevice.getCurrent();
 	lv_subject_set_int(&subject_temperature, mDevice.convertTemp(w.temp));
+	lv_subject_set_int(&subject_weather_icon, w.icon);
 	lv_obj_t *icon = lv_obj_find_by_name(home_screen, "h_icon");
 	if (icon)
 	{
@@ -243,11 +288,33 @@ void DisplayModule::screen_events_cb(lv_event_t *e)
 				instance->mDevice.sleepTimerStart(60);
 			}
 		}
-		else if (target == instance->control_screen || target == instance->music_screen)
+		else if (target == instance->control_screen)
+		{
+			instance->mDevice.sleepTimerStart(60);
+			if (instance->find_phone)
+			{
+				instance->find_phone = false;
+				instance->mDevice.mWatch.findPhone(instance->find_phone);
+			}
+		}
+		else if (target == instance->music_screen)
 		{
 			instance->mDevice.sleepTimerStart(60);
 		}
 	}
+}
+
+/**
+ * Callback to delete the temporary screen
+ * @param e event type
+ */
+void DisplayModule::temp_delete_cb(lv_event_t *e)
+{
+	if (instance->temp_screen)
+	{
+		lv_obj_delete(instance->temp_screen);
+	}
+	instance->temp_screen = NULL;
 }
 
 /**
@@ -263,6 +330,24 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 		switch (buttonEvent.type)
 		{
 		case BT_MENU:
+			if (active == selector_screen)
+			{
+				if (face_max > 1)
+				{
+					if (face_index == 0)
+					{
+						lv_obj_delete(home_screen);
+						home_screen = home_create();
+						lv_screen_load(home_screen);
+						mDevice.setWatchface("default");
+					}
+					else
+					{
+						JsonArray array = face_list.as<JsonArray>();
+						load_watchface_from_info(array[face_index - 1]);
+					}
+				}
+			}
 			if (active == home_screen)
 			{
 				load_menu_screen();
@@ -314,6 +399,11 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 				case CONTACTS:
 					load_contacts_screen();
 					break;
+				case XML_LOADER:
+					back_folder = "/";
+					xml_folder = String(LV_FS_ARDUINO_ESP_LITTLEFS_PATH) + "/";
+					load_xml_screen();
+					break;
 				default:
 					break;
 				}
@@ -329,11 +419,86 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 			}
 			if (active == music_screen)
 			{
-				mDevice.mWatch.musicControl(MUSIC_TOGGLE);
+				if (lv_subject_get_int(&subject_music_view) == 0)
+				{
+					mDevice.mWatch.musicControl(MUSIC_TOGGLE);
+				}
+				else
+				{
+					mDevice.mWatch.musicControl(VOLUME_MUTE);
+				}
 			}
 			if (active == control_screen)
 			{
 				mDevice.mWatch.capturePhoto();
+			}
+			if (active == xml_screen)
+			{
+				if (xml_max == 0)
+				{
+					Timber.i("No files found");
+				}
+				else
+				{
+					int i = 0;
+					if (back_folder != "/")
+					{
+						if (xml_index == 0)
+						{
+							Timber.i("Navigate back to " + back_folder);
+							xml_folder = back_folder;
+							back_folder = mDevice.mStorage.getParentFolder(xml_folder);
+							load_xml_screen();
+							return;
+						}
+						i = 1;
+					}
+					JsonArray array = xmls.as<JsonArray>();
+					String relative = array[xml_index - i].as<String>();
+					String path = array[xml_index - i].as<String>();
+					path.replace("/lvgl", "C:");
+					String name = mDevice.mStorage.getFileName(path, false);
+
+					if (path.endsWith(".xml"))
+					{
+						Timber.i("Opening xml file " + path);
+						lv_xml_register_component_from_file(path.c_str());
+						temp_screen = (lv_obj_t *)lv_xml_create(NULL, name.c_str(), NULL);
+						if (temp_screen)
+						{
+							lv_screen_load(temp_screen);
+							lv_obj_add_event_cb(temp_screen, temp_delete_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+						}
+						else
+						{
+							Timber.e("Failed to load component");
+						}
+					}
+					else if (path.endsWith(".bin"))
+					{
+						Timber.i("Opening bin file " + path);
+
+						temp_screen = lv_obj_create(NULL);
+
+						lv_obj_t *image = lv_image_create(temp_screen);
+						lv_obj_set_align(image, LV_ALIGN_CENTER);
+						lv_image_set_src(image, path.c_str());
+
+						lv_screen_load(temp_screen);
+						lv_obj_add_event_cb(temp_screen, temp_delete_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
+					}
+					else if (path.endsWith("/"))
+					{
+						Timber.i("Opening folder " + relative);
+						back_folder = mDevice.mStorage.getParentFolder(relative);
+						xml_folder = relative;
+						load_xml_screen();
+					}
+					else
+					{
+						Timber.e("Cannot open " + path + " Unknown format");
+					}
+				}
 			}
 			break;
 		case BT_BACK:
@@ -357,6 +522,14 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 				{
 					lv_subject_set_int(&subject_settings_view, 0);
 				}
+			}
+			else if (active == temp_screen)
+			{
+				lv_screen_load(xml_screen);
+			}
+			else if (active == selector_screen)
+			{
+				lv_screen_load(home_screen);
 			}
 			else
 			{
@@ -448,7 +621,14 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 			}
 			if (active == music_screen)
 			{
-				mDevice.mWatch.musicControl(MUSIC_PREVIOUS);
+				if (lv_subject_get_int(&subject_music_view) == 0)
+				{
+					mDevice.mWatch.musicControl(MUSIC_PREVIOUS);
+				}
+				else
+				{
+					mDevice.mWatch.musicControl(VOLUME_UP);
+				}
 			}
 			if (active == control_screen)
 			{
@@ -476,6 +656,31 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 					{
 						scroll_list(c_list, -1);
 					}
+				}
+			}
+			if (active == xml_screen)
+			{
+				xml_index--;
+				if (xml_index < 0)
+				{
+					xml_index = 0;
+				}
+				lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
+				if (file_list)
+				{
+					set_selected_item_index(file_list, xml_index, true);
+				}
+			}
+			if (active == selector_screen)
+			{
+				face_index--;
+				if (face_index < 0)
+				{
+					face_index = 0;
+				}
+				if (face_max > 0)
+				{
+					lv_obj_scroll_to_view(lv_obj_get_child(selector_screen, face_index), LV_ANIM_OFF);
 				}
 			}
 			break;
@@ -566,7 +771,14 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 			}
 			if (active == music_screen)
 			{
-				mDevice.mWatch.musicControl(MUSIC_NEXT);
+				if (lv_subject_get_int(&subject_music_view) == 0)
+				{
+					mDevice.mWatch.musicControl(MUSIC_NEXT);
+				}
+				else
+				{
+					mDevice.mWatch.musicControl(VOLUME_DOWN);
+				}
 			}
 			if (active == control_screen)
 			{
@@ -589,6 +801,31 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 					{
 						scroll_list(c_list, 1);
 					}
+				}
+			}
+			if (active == xml_screen)
+			{
+				xml_index++;
+				if (xml_index >= xml_max)
+				{
+					xml_index = xml_max - 1;
+				}
+				lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
+				if (file_list)
+				{
+					set_selected_item_index(file_list, xml_index, true);
+				}
+			}
+			if (active == selector_screen)
+			{
+				face_index++;
+				if (face_index >= face_max)
+				{
+					face_index = face_max - 1;
+				}
+				if (face_max > 0)
+				{
+					lv_obj_scroll_to_view(lv_obj_get_child(selector_screen, face_index), LV_ANIM_OFF);
 				}
 			}
 			break;
@@ -620,6 +857,27 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 				String path = mDevice.mStorage.filePath(STEPS_FOLDER, date.year, date.month, date.day);
 				mDevice.mStorage.deleteFile(path);
 			}
+			if (active == home_screen)
+			{
+				load_selector_screen();
+			}
+			if (active == music_screen)
+			{
+				int v = lv_subject_get_int(&subject_music_view);
+				v++;
+				if (v > 1)
+				{
+					v = 0;
+				}
+				lv_subject_set_int(&subject_music_view, v);
+			}
+			if (active == settings_screen)
+			{
+				if (lv_subject_get_int(&subject_settings_view) == STORAGE_VIEW)
+				{
+					mDevice.houseKeeping();
+				}
+			}
 			break;
 		case BT_BACK:
 			if (active != home_screen)
@@ -636,8 +894,28 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent)
 					mDevice.houseKeeping();
 				}
 			}
+			if (active == music_screen)
+			{
+				int v = lv_subject_get_int(&subject_music_view);
+				v++;
+				if (v > 1)
+				{
+					v = 0;
+				}
+				lv_subject_set_int(&subject_music_view, v);
+			}
 			break;
 		case BT_DOWN:
+			if (active == music_screen)
+			{
+				int v = lv_subject_get_int(&subject_music_view);
+				v++;
+				if (v > 1)
+				{
+					v = 0;
+				}
+				lv_subject_set_int(&subject_music_view, v);
+			}
 			break;
 		}
 	}
@@ -1069,7 +1347,7 @@ void DisplayModule::load_settings_screen()
 		lv_obj_t *s_bar = lv_obj_find_by_name(settings_screen, "s_bar");
 		if (s_bar)
 		{
-			lv_bar_set_value(s_bar, (used / total * 100), LV_ANIM_OFF);
+			lv_bar_set_value(s_bar, (used * 1.0 / total * 100), LV_ANIM_OFF);
 		}
 		lv_obj_t *s_steps = lv_obj_find_by_name(settings_screen, "s_steps");
 		if (s_steps)
@@ -1187,6 +1465,179 @@ void DisplayModule::load_qr_screen()
 }
 
 /**
+ * Load the xml screen
+ */
+void DisplayModule::load_xml_screen()
+{
+	if (!xml_screen)
+	{
+		return;
+	}
+
+	lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
+	if (file_list)
+	{
+		lv_obj_clean(file_list);
+		xmls = mDevice.mStorage.listFiles(xml_folder, false);
+		JsonArray array = xmls.as<JsonArray>();
+		xml_index = 0;
+		xml_max = 0;
+		if (back_folder != "/")
+		{
+			file_item_create(file_list, ic_file_back, mDevice.mStorage.getFileName(back_folder).c_str(), "");
+			xml_max++;
+		}
+		for (JsonVariant v : array)
+		{
+			String file = v.as<String>();
+			file_item_create(file_list, getFileIcon(file), mDevice.mStorage.getFileName(file).c_str(), "");
+			xml_max++;
+		}
+		set_selected_item_index(file_list, xml_index, true);
+		lv_obj_set_flag(file_list, LV_OBJ_FLAG_HIDDEN, xml_max == 0);
+	}
+
+	lv_obj_t *active = lv_screen_active();
+	if (active != xml_screen)
+	{
+		lv_screen_load(xml_screen);
+	}
+}
+
+/**
+ * Load the watchface selector screen
+ */
+void DisplayModule::load_selector_screen()
+{
+	if (!selector_screen)
+	{
+		return;
+	}
+
+	lv_obj_clean(selector_screen);
+
+	face_item_create(selector_screen, watchface_default, "Default");
+	face_list = mDevice.mStorage.listFaces();
+	JsonArray array = face_list.as<JsonArray>();
+	String current = mDevice.getWatchface();
+	face_index = 0;
+	face_max = 1;
+	for (JsonVariant v : array)
+	{
+		JsonObject file = v.as<JsonObject>();
+		String name = v["name"].as<String>();
+		String preview = v["preview"].as<String>();
+		String path = v["path"].as<String>();
+		lv_obj_t *face_item = face_item_create(selector_screen, preview.c_str(), name.c_str());
+		if (current == path)
+		{
+			lv_obj_scroll_to_view(face_item, LV_ANIM_OFF);
+			face_index = face_max;
+		}
+		face_max++;
+	}
+
+	lv_obj_t *active = lv_screen_active();
+	if (active != selector_screen)
+	{
+		lv_screen_load(selector_screen);
+	}
+}
+
+/**
+ * Load a custom watchface from info json
+ * @param info the json data from the info file
+ */
+void DisplayModule::load_watchface_from_info(JsonDocument info)
+{
+
+	/* First clear the existing home screen */
+	if (home_screen)
+	{
+		lv_obj_delete(home_screen);
+	}
+
+	/* Register fonts used by watchface */
+	JsonArray font_array = info["fonts"].as<JsonArray>();
+	for (JsonVariant v : font_array)
+	{
+		String file = v.as<String>();
+		String nm = mDevice.mStorage.getFileName(file, false);
+		lv_font_t *font = lv_binfont_create(file.c_str());
+		if (font)
+		{
+			lv_xml_register_font(NULL, nm.c_str(), font);
+		}
+		else
+		{
+			Timber.e("Failed to load font " + file);
+		}
+	}
+
+	/* Register images used by watchface */
+	JsonArray image_array = info["images"].as<JsonArray>();
+	for (JsonVariant v : image_array)
+	{
+		String file = v.as<String>();
+		String nm = mDevice.mStorage.getFileName(file, false);
+		lv_xml_register_image(NULL, nm.c_str(), file.c_str());
+	}
+
+	/* Update the watchface path if necessary */
+	String path = info["path"].as<String>();
+	if (mDevice.getWatchface() != path)
+	{
+		mDevice.setWatchface(path);
+	}
+
+	/* Get the main xml watchface to load */
+	String main = info["main"].as<String>();
+	String name = mDevice.mStorage.getFileName(main, false);
+	lv_xml_register_component_from_file(main.c_str());
+
+	/* Attempt to create the wachface from xml to the home screen object */
+	home_screen = (lv_obj_t *)lv_xml_create(NULL, name.c_str(), NULL);
+	if (!home_screen)
+	{
+		Timber.e("Failed to create watchface, using deafult");
+		mDevice.setWatchface("default");
+		home_screen = home_create(); /* Load the deafult watchface if failed */
+	}
+	lv_screen_load(home_screen);
+}
+
+/**
+ * Load a custom watchface from a path
+ * @param path the path to info.json of the watchface
+ */
+void DisplayModule::load_watchface_from_path(String path)
+{
+	JsonDocument info;
+	mDevice.mStorage.readFile(path, info);
+	info["path"] = path;
+	load_watchface_from_info(info);
+}
+
+/**
+ * Helper function to set and load a watchface from path
+ * @param path path to the watchface info.json
+ */
+void DisplayModule::loadFace(String path)
+{
+	if (instance == nullptr)
+		return; // safety check
+
+	// Defer LVGL work to main LVGL context
+	lv_async_call([](void *data)
+				  {
+					  String *pathPtr = static_cast<String *>(data);
+					  instance->load_watchface_from_path(*pathPtr);
+					  delete pathPtr; // free after use
+				  },
+				  new String(path));
+}
+
+/**
  * Get the lvgl weather icon from id
  * @param id icon id
  * @return icon descriptor
@@ -1291,6 +1742,8 @@ IconText DisplayModule::getApp(AppList app)
 		return {ic_controls, "Controls"};
 	case CONTACTS:
 		return {ic_contacts, "Contacts"};
+	case XML_LOADER:
+		return {ic_xml, "LVGL Files"};
 	default:
 		return {NULL, "Unknown"};
 	}
@@ -1366,4 +1819,53 @@ void DisplayModule::scroll_list(lv_obj_t *obj, int direction, bool scroll_one)
 		new_y = content_h - total_h;
 
 	lv_obj_scroll_to_y(obj, new_y, LV_ANIM_OFF);
+}
+
+/**
+ * Highlight an item in the list
+ * @param list the list object
+ * @param index the index of the item to highlight
+ * @param scroll scroll the item to view
+ */
+void DisplayModule::set_selected_item_index(lv_obj_t *list, int index, bool scroll)
+{
+	if (!list)
+		return;
+
+	int count = lv_obj_get_child_count(list);
+	if (!count)
+		return;
+	for (int i = 0; i < count; i++)
+	{
+		lv_obj_t *child = lv_obj_get_child(list, i);
+		lv_obj_set_state(child, LV_STATE_CHECKED, i == index);
+		if (scroll && i == index)
+		{
+			lv_obj_scroll_to_view(child, LV_ANIM_OFF);
+		}
+	}
+}
+
+/**
+ * Get the file icon
+ * @param path the file path
+ */
+const void *DisplayModule::getFileIcon(String path)
+{
+	if (path.endsWith(".xml"))
+	{
+		return ic_file_xml;
+	}
+	else if (path.endsWith(".bin"))
+	{
+		return ic_file_bin;
+	}
+	else if (path.endsWith("/"))
+	{
+		return ic_file_dir;
+	}
+	else
+	{
+		return ic_file_unknown;
+	}
 }

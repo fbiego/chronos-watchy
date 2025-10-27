@@ -54,6 +54,7 @@ public:
     void handleWakeup();
 
     void setButtonCallback(void (*callback)(ButtonEvent));
+    void setLongPressCallback(void(callback)(void));
 
     String getName(ButtonType button);
     String getInfo(ButtonEvent buttonEvent);
@@ -70,11 +71,14 @@ private:
     static void buttonHandler(Button2 &button);
     static void buttonTask(void *param);
 
+    static void longPressDetect(Button2 &button);
+
     bool isPressed(int btn);
 
     static ButtonModule *instance;
     void (*buttonCallback)(ButtonEvent) = nullptr;
     QueueHandle_t buttonQueue;
+    void (*longPressCallback)(void) = nullptr;
 };
 
 #endif

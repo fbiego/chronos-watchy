@@ -44,7 +44,22 @@ DisplayModule display(device, health);
 void connectionCallback(bool state)
 {
 	Timber.i("Connection state: %s", state ? "Connected" : "Disconnected");
-	device.sleepTimerStart(20); // 20 secs
+
+	if (device.sleepTimerDuration() != TIMER_INFINITE)
+	{
+		device.sleepTimerStart(20); // 20 secs
+	}
+	else if (device.sleepTimerDuration() == TIMER_INFINITE && !state)
+	{
+		device.sleepTimerStart(20); // 20 secs
+	}
+}
+
+void longPressCallback()
+{
+	digitalWrite(MOTOR_PIN, HIGH);
+	delay(20);
+	digitalWrite(MOTOR_PIN, LOW);
 }
 
 void notificationCallback(Notification notification)
@@ -84,10 +99,51 @@ void healthRequestCallback(HealthRequest request, bool state)
 	case HR_STEPS_RECORDS:
 	{
 		device.setSyncData(true);
-		device.sleepTimerStart(40); // 40 sec
+		if (device.sleepTimerDuration() != TIMER_INFINITE)
+		{
+			device.sleepTimerStart(40); // 40 sec
+		}
 	}
 	break;
 	}
+}
+
+void bleDataCallback(uint8_t *data, int len)
+{
+	if (data[0] >= 0xC0 && data[0] <= 0xCF)
+	{
+		storage.handleFileCommand(data, len);
+		if (data[0] == 0xCE)
+		{
+			if (data[4] == 0xFF)
+			{
+				device.sleepTimerStart(TIMER_INFINITE);
+			}
+			else if (data[4] == 0x00)
+			{
+				device.sleepTimerStart(30);
+			}
+		}
+	}
+	if (data[0] == 0xCF)
+	{
+		uint8_t nameLen = data[4];
+		String filename = String((char *)&data[5]).substring(0, nameLen);
+		Timber.i("Set default face: " + filename);
+		if (filename.startsWith("/lvgl/faces/") && filename.endsWith("/info.json"))
+		{
+			display.loadFace(filename);
+		}
+		else
+		{
+			Timber.e("Invalid watchface info path: " + filename);
+		}
+	}
+}
+
+void sendDataBle(uint8_t *data, size_t len)
+{
+	watch.sendCommand(data, len);
 }
 
 void navigationIconCallback(uint8_t *data, bool icon)
@@ -102,11 +158,8 @@ void navigationDataCallback(String text, String title, String directions, bool i
 
 void buttonHandler(ButtonEvent buttonEvent)
 {
-	if (!watch.isRunning())
-	{
-		// bluetooth not running, start it on any button press
-		watch.begin();
-	}
+	device.initBLE(); // if bluetooth not running, start it on any button press
+
 	if (device.sleepTimerDuration() != TIMER_INFINITE)
 	{
 		device.sleepTimerStart(40); // 40 sec
@@ -202,6 +255,7 @@ void setup()
 	device.checkHourlyData();
 
 	buttons.setButtonCallback(buttonHandler);
+	buttons.setLongPressCallback(longPressCallback);
 	device.setNavigationDataCallback(navigationDataCallback);
 	device.setNavigationIconCallback(navigationIconCallback);
 	watch.setConnectionCallback(connectionCallback);
@@ -209,6 +263,8 @@ void setup()
 	watch.setConfigurationCallback(configCallback);
 	watch.setNotificationCallback(notificationCallback);
 	motion.setInterruptCallback(motionInterruptCallback);
+	watch.setRawDataCallback(bleDataCallback);
+	storage.setTransferCallback(sendDataBle);
 
 	if (watch.getMinute() % device.getBLEInterval() == 0 || full_refresh || device.shouldSyncData())
 	{
@@ -225,7 +281,7 @@ void setup()
 
 	if (device.sleepTimerDuration() > 0)
 	{
-		watch.begin(); // run bluetooth
+		device.initBLE(); // run bluetooth
 	}
 	Timber.i("Setup done");
 
@@ -239,6 +295,7 @@ void loop()
 	motion.update();
 	device.update();
 	display.update();
+	storage.update();
 
 	if (device.sleepTimerEnded())
 	{

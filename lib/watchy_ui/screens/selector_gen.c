@@ -1,5 +1,5 @@
 /**
- * @file bluetooth_gen.c
+ * @file selector_gen.c
  * @brief Template source file for LVGL objects
  */
 
@@ -7,7 +7,7 @@
  *      INCLUDES
  *********************/
 
-#include "bluetooth_gen.h"
+#include "selector_gen.h"
 #include "watchy_ui.h"
 
 /*********************
@@ -30,7 +30,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * bluetooth_create(lv_obj_t * parent)
+lv_obj_t * selector_create(void)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -40,30 +40,24 @@ lv_obj_t * bluetooth_create(lv_obj_t * parent)
 
     if (!style_inited) {
         lv_style_init(&style_main);
-        lv_style_set_height(&style_main, LV_SIZE_CONTENT);
-        lv_style_set_width(&style_main, LV_SIZE_CONTENT);
-        lv_style_set_pad_all(&style_main, 0);
-        lv_style_set_bg_opa(&style_main, 0);
-        lv_style_set_radius(&style_main, 0);
-        lv_style_set_border_width(&style_main, 0);
+        lv_style_set_text_font(&style_main, NS_Regular_16);
+        lv_style_set_bg_color(&style_main, lv_color_hex(0xffffff));
+        lv_style_set_layout(&style_main, LV_LAYOUT_FLEX);
+        lv_style_set_flex_flow(&style_main, LV_FLEX_FLOW_COLUMN);
+        lv_style_set_flex_main_place(&style_main, LV_FLEX_ALIGN_START);
+        lv_style_set_flex_track_place(&style_main, LV_FLEX_ALIGN_CENTER);
 
         style_inited = true;
     }
 
-    lv_obj_t * lv_obj_0 = lv_obj_create(parent);
+    lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
+    lv_obj_set_name_static(lv_obj_0, "selector_#");
+    lv_obj_set_scrollbar_mode(lv_obj_0, LV_SCROLLBAR_MODE_OFF);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * lv_image_0 = lv_image_create(lv_obj_0);
-    lv_image_set_src(lv_image_0, ic_bt_con);
-    lv_obj_bind_flag_if_not_eq(lv_image_0, &subject_bluetooth, LV_OBJ_FLAG_HIDDEN, 2);
-    
-    lv_obj_t * lv_image_1 = lv_image_create(lv_obj_0);
-    lv_image_set_src(lv_image_1, ic_bt_on);
-    lv_obj_bind_flag_if_not_eq(lv_image_1, &subject_bluetooth, LV_OBJ_FLAG_HIDDEN, 1);
+    lv_obj_t * face_item_0 = face_item_create(lv_obj_0, watchface_default, "Default");
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "bluetooth_#");
 
     return lv_obj_0;
 }

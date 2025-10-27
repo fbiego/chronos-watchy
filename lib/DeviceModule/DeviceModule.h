@@ -19,10 +19,10 @@
 #include "HealthModule.h"
 
 #define CHRONOS_WATCHY_MAJOR 1
-#define CHRONOS_WATCHY_MINOR 0
+#define CHRONOS_WATCHY_MINOR 1
 #define CHRONOS_WATCHY_PATCH 0
 
-#define CHRONOS_WATCHY_BUILD "20251020"
+#define CHRONOS_WATCHY_BUILD "20251027"
 
 #define BATT_ADC_PIN 34
 
@@ -86,6 +86,8 @@ public:
     void begin();
     void update();
 
+    void initBLE();
+
     String getAddress();
 
     float getMillitVolts();
@@ -97,6 +99,7 @@ public:
     bool sleepTimerStop();
     long sleepTimerDuration();
     bool sleepTimerEnded();
+    String sleepTimerLeft();
 
     void setHourly(bool enabled);
     void set24hr(bool enabled);
@@ -130,6 +133,9 @@ public:
 
     void refreshWeather();
     void saveWeather();
+
+    void setWatchface(String path);
+    String getWatchface();
 
     void refreshNotifications();
     void saveNotifications();

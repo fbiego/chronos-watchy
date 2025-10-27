@@ -51,6 +51,7 @@ enum AppList
     PAIRING,
     CONTACTS,
     QR_CODES,
+    XML_LOADER,
     APP_COUNT
 };
 
@@ -91,6 +92,8 @@ public:
 
     void sleepMode(int hour, int minute);
 
+    void loadFace(String path);
+
 protected:
     // cannot be accessed from outside the class, however, they can be accessed in inherited classes
 private:
@@ -103,6 +106,10 @@ private:
     const void *getAppIcon(int id);
 
     IconText getApp(AppList app);
+
+#if LV_USE_LOG != 0
+    static void lv_log_print(lv_log_level_t level, const char *buf);
+#endif
 
     bool inverted;
 
@@ -119,6 +126,8 @@ private:
     lv_obj_t *contacts_screen;
     lv_obj_t *control_screen;
     lv_obj_t *qr_screen;
+    lv_obj_t *xml_screen;
+    lv_obj_t *selector_screen;
 
     void load_weather_screen();
     void load_notifications_screen();
@@ -128,6 +137,15 @@ private:
     void load_settings_screen();
     void load_contacts_screen();
     void load_qr_screen();
+    void load_xml_screen();
+    void load_selector_screen();
+
+    void load_watchface_from_info(JsonDocument info);
+    void load_watchface_from_path(String path);
+
+    void set_selected_item_index(lv_obj_t *list, int index, bool scroll);
+
+    static void temp_delete_cb(lv_event_t *e);
 
     int n_index;
     int n_size;
@@ -140,8 +158,21 @@ private:
     int battery_day = 0;
     bool go_home = false;
 
+    String xml_folder;
+    String back_folder;
+    JsonDocument xmls;
+    int xml_index = 0;
+    int xml_max;
+    lv_obj_t *temp_screen;
+
+    JsonDocument face_list;
+    int face_index = 0;
+    int face_max;
+
     DeviceModule &mDevice;
     HealthModule &mHealth;
+
+    const void *getFileIcon(String path);
 
     AppList nextApp(AppList app);
     AppList previousApp(AppList app);

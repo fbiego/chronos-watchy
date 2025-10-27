@@ -53,6 +53,7 @@ lv_obj_t * contact_item_create(lv_obj_t * parent, const char * name, const char 
     }
 
     lv_obj_t * lv_obj_0 = lv_obj_create(parent);
+    lv_obj_set_name_static(lv_obj_0, "contact_item_#");
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLL_ONE, true);
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SNAPPABLE, true);
 
@@ -71,8 +72,6 @@ lv_obj_t * contact_item_create(lv_obj_t * parent, const char * name, const char 
     lv_obj_set_flag(lv_image_0, LV_OBJ_FLAG_HIDDEN, normal);
 
     LV_TRACE_OBJ_CREATE("finished");
-
-    lv_obj_set_name(lv_obj_0, "contact_item_#");
 
     return lv_obj_0;
 }

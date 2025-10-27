@@ -15,7 +15,21 @@
 		<!-- Add <int>, <string>, or <float> subjects here -->
 		<string name="subject_time" value="12:45" />
 		<string name="subject_date" value="Sun 5 Oct" />
-		<string name="subject_info" value="Info" />
+		<int name="subject_hour" value="12" />
+		<int name="subject_minute" value="45" />
+		<int name="subject_hour_analog" value="3150" />
+		<int name="subject_minute_analog" value="450" />
+		<string name="subject_am_pm" value="AM" />
+		<int name="subject_day" value="5" />
+		<int name="subject_month" value="10" />
+		<int name="subject_year" value="2025" />
+		<string name="subject_month_short" value="Oct" />
+		<string name="subject_month_long" value="October" />
+		<int name="subject_weekday" value="0" />
+		<string name="subject_weekday_short" value="Sun" />
+		<string name="subject_weekday_long" value="Sunday" />
+
+		<string name="subject_power_off" value="12" />
 
 		<int name="subject_bluetooth" value="1" />
 		<int name="subject_camera" value="0" />
@@ -26,19 +40,18 @@
 		<int name="subject_steps" value="1234" />
 		<int name="subject_calories" value="324" />
 		<int name="subject_temperature" value="24" />
+		<int name="subject_weather_icon" value="0" min_value="-1" max_value="7" />
 		<string name="subject_distance" value="1.3" />
 		<string name="subject_distance_unit" value="km" />
 		<string name="subject_temp_unit" value="°C" />
 		<string name="subject_last_sync" value="36m" />
 
 		<int name="subject_navigation" value="1" />
-
 		<string name="subject_address" value="AA:45:45:24:35:DC" />
 		<string name="subject_ble_name" value="Watchy" />
-		<string name="subject_new" value="new" />
-
 		<int name="subject_settings_index" value="0" min_value="0" max_value="4" />
 		<int name="subject_settings_view" value="0" />
+		<int name="subject_music_view" value="0" min_value="0" max_value="1" />
 		<string name="subject_camera_state" value="Ready" />
 	</subjects>
 
@@ -47,9 +60,12 @@
 		<data name="ic_telegram" src_path="images/icon_telegram.png" color_format="i1" />
 		<data name="ic_next" src_path="images/icon_next.png" color_format="i1" />
 		<data name="ic_twitter" src_path="images/icon_twitter.png" color_format="i1" />
+		<data name="ic_mute" src_path="images/icon_mute.png" color_format="i1" />
 		<data name="ic_chronos_100" src_path="images/icon_chronos_100.png" color_format="i1" />
+		<data name="ic_volume_down" src_path="images/icon_volume_down.png" color_format="i1" />
 		<data name="ic_line" src_path="images/icon_line.png" color_format="i1" />
 		<data name="ic_storage" src_path="images/icon_storage.png" color_format="i1" />
+		<data name="ic_volume_up" src_path="images/icon_volume_up.png" color_format="i1" />
 		<data name="ic_sos" src_path="images/icon_sos.png" color_format="i1" />
 		<data name="ic_search" src_path="images/icon_search.png" color_format="i1" />
 		<data name="ic_pairing" src_path="images/icon_pairing.png" color_format="i1" />
@@ -60,6 +76,8 @@
 		<data name="ic_cloud" src_path="images/icon_cloud.png" color_format="i1" />
 		<data name="ic_message" src_path="images/icon_message.png" color_format="i1" />
 		<data name="ic_phone" src_path="images/icon_phone.png" color_format="i1" />
+		<data name="ic_file_xml" src_path="images/icon_file_xml.png" color_format="i1" />
+		<data name="ic_file_dir" src_path="images/icon_file_dir.png" color_format="i1" />
 		<data name="ic_skype" src_path="images/icon_skype.png" color_format="i1" />
 		<data name="ic_pause" src_path="images/icon_pause.png" color_format="i1" />
 		<data name="ic_sunny" src_path="images/icon_sunny.png" color_format="i1" />
@@ -67,14 +85,18 @@
 		<data name="ic_distance" src_path="images/icon_distance.png" color_format="i1" />
 		<data name="ic_bluetooth" src_path="images/icon_bluetooth.png" color_format="i1" />
 		<data name="ic_qr_codes" src_path="images/icon_qr_codes.png" color_format="i1" />
+		<data name="ic_file_unknown" src_path="images/icon_file_unknown.png" color_format="i1" />
 		<data name="ic_wechat" src_path="images/icon_wechat.png" color_format="i1" />
+		<data name="ic_file_bin" src_path="images/icon_file_bin.png" color_format="i1" />
 		<data name="ic_haze" src_path="images/icon_haze.png" color_format="i1" />
 		<data name="ic_sun_cloud" src_path="images/icon_sun_cloud.png" color_format="i1" />
 		<data name="ic_timeout" src_path="images/icon_timeout.png" color_format="i1" />
+		<data name="watchface_default" src_path="images/watchface_default.png" color_format="i1" />
 		<data name="ic_no_weather" src_path="images/icon_no_weather.png" color_format="i1" />
 		<data name="ic_chronos_40" src_path="images/icon_chronos_40.png" color_format="i1" />
 		<data name="ic_calories" src_path="images/icon_calories.png" color_format="i1" />
 		<data name="ic_snow" src_path="images/icon_snow.png" color_format="i1" />
+		<data name="ic_xml" src_path="images/icon_xml.png" color_format="i1" />
 		<data name="ic_battery" src_path="images/icon_battery.png" color_format="i1" />
 		<data name="ic_vkontakte" src_path="images/icon_vkontakte.png" color_format="i1" />
 		<data name="ic_viber" src_path="images/icon_viber.png" color_format="i1" />
@@ -82,6 +104,7 @@
 		<data name="ic_music" src_path="images/icon_music.png" color_format="i1" />
 		<data name="ic_wind" src_path="images/icon_wind.png" color_format="i1" />
 		<data name="ic_camera" src_path="images/icon_camera.png" color_format="i1" />
+		<data name="ic_file_back" src_path="images/icon_file_back.png" color_format="i1" />
 		<data name="ic_activity" src_path="images/icon_activity.png" color_format="i1" />
 		<data name="ic_steps" src_path="images/icon_steps.png" color_format="i1" />
 		<data name="ic_weather" src_path="images/icon_weather.png" color_format="i1" />

@@ -1,10 +1,22 @@
 list(
   APPEND
   PROJECT_SOURCES
-  ${CMAKE_CURRENT_LIST_DIR}/components/bluetooth/bluetooth_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/analog_hand/analog_hand.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/analog_hand/analog_hand_xml_parser.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/analog_hand/analog_hand_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/bluetooth/bluetooth.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/bluetooth/bluetooth_xml_parser.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/bluetooth/bluetooth_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/icon_text/icon_text.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/icon_text/icon_text_xml_parser.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/icon_text/icon_text_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/weather_icon/weather_icon.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/weather_icon/weather_icon_xml_parser.c
+  ${CMAKE_CURRENT_LIST_DIR}/widgets/weather_icon/weather_icon_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/contact_item/contact_item_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/face_item/face_item_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/components/file_item/file_item_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/forecast/forecast_gen.c
-  ${CMAKE_CURRENT_LIST_DIR}/components/icon_text/icon_text_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/list_item/list_item_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/components/status_bar/status_bar_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/activity_gen.c
@@ -12,12 +24,14 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/screens/control_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/home_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/info_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/loader_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/menu_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/music_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/navigation_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/notification_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/pairing_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/qr_gen.c
+  ${CMAKE_CURRENT_LIST_DIR}/screens/selector_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/settings_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/weather_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/watchy_ui_gen.c
@@ -31,9 +45,12 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_telegram_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_next_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_twitter_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_mute_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_chronos_100_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_volume_down_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_line_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_storage_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_volume_up_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_sos_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_search_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_pairing_data.c
@@ -44,6 +61,8 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_cloud_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_message_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_phone_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_file_xml_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_file_dir_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_skype_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_pause_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_sunny_data.c
@@ -51,14 +70,18 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_distance_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_bluetooth_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_qr_codes_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_file_unknown_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_wechat_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_file_bin_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_haze_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_sun_cloud_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_timeout_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/watchface_default_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_no_weather_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_chronos_40_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_calories_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_snow_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_xml_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_battery_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_vkontakte_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_viber_data.c
@@ -66,6 +89,7 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_music_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_wind_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_camera_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/ic_file_back_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_activity_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_steps_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_weather_data.c

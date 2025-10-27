@@ -159,10 +159,42 @@ String StorageModule::getFileList(String path)
  * @param path the path
  * @return the json array with the file paths
  */
-JsonDocument StorageModule::listFiles(String path)
+JsonDocument StorageModule::listFiles(String path, bool name_only, bool slash)
 {
 	JsonDocument array;
 	File dir = FLASH.open(path);
+	if (!dir || !dir.isDirectory())
+	{
+		return array;
+	}
+
+	String sep = slash ? "/" : "";
+
+	File entry;
+	while ((entry = dir.openNextFile()))
+	{
+		String entryName = entry.name();
+		if (!entry.isDirectory())
+		{
+			array.add(name_only ? entryName : path + sep + entryName);
+		}
+		else
+		{
+			array.add(name_only ? entryName + "/" : path + sep + entryName + "/");
+		}
+		entry.close();
+	}
+	return array;
+}
+
+/**
+ * List the faces from flash storage
+ * @return the json array with the watchfaces info
+ */
+JsonDocument StorageModule::listFaces()
+{
+	JsonDocument array;
+	File dir = FLASH.open("/lvgl/faces");
 	if (!dir || !dir.isDirectory())
 	{
 		return array;
@@ -172,13 +204,96 @@ JsonDocument StorageModule::listFiles(String path)
 	while ((entry = dir.openNextFile()))
 	{
 		String entryName = entry.name();
-		if (!entry.isDirectory())
+		if (entry.isDirectory())
 		{
-			array.add(path + "/" + entryName);
+			JsonDocument json;
+			File inf = FLASH.open("/lvgl/faces/" + entryName + "/info.json");
+			if (inf)
+			{
+				if (readFile("/lvgl/faces/" + entryName + "/info.json", json))
+				{
+					json["path"] = "/lvgl/faces/" + entryName + "/info.json";
+					array.add(json);
+				}
+			}
+			inf.close();
 		}
 		entry.close();
 	}
 	return array;
+}
+
+/**
+ * Extract the file name from the path
+ * @param path the path
+ * @param withExtension whether to return file name with extension or not
+ * @return the file name
+ */
+String StorageModule::getFileName(const String &path, bool withExtension)
+{
+	if (path.length() == 0)
+		return "";
+
+	String cleanPath = path;
+
+	// Remove trailing '/' or '\' if any (for folders)
+	while (cleanPath.endsWith("/") || cleanPath.endsWith("\\"))
+	{
+		cleanPath.remove(cleanPath.length() - 1);
+	}
+
+	// Find last separator
+	int slashIndex = cleanPath.lastIndexOf('/');
+	if (slashIndex == -1)
+		slashIndex = cleanPath.lastIndexOf('\\');
+
+	// Extract the last segment (file or folder)
+	String name = (slashIndex == -1) ? cleanPath : cleanPath.substring(slashIndex + 1);
+
+	// If it's a file and extension should be removed
+	if (!withExtension)
+	{
+		int dotIndex = name.lastIndexOf('.');
+		if (dotIndex > 0)
+		{ // skip hidden files like ".gitignore"
+			name = name.substring(0, dotIndex);
+		}
+	}
+
+	return name;
+}
+
+/**
+ * Get the parent folder of a path
+ * @param path the path
+ * @return the parent folder
+ */
+String StorageModule::getParentFolder(const String &path)
+{
+	if (path.length() == 0)
+		return "";
+
+	String cleanPath = path;
+
+	// Remove any trailing '/' or '\'
+	while (cleanPath.endsWith("/") || cleanPath.endsWith("\\"))
+	{
+		cleanPath.remove(cleanPath.length() - 1);
+	}
+
+	// Find the last '/' or '\'
+	int slashIndex = cleanPath.lastIndexOf('/');
+	if (slashIndex == -1)
+		slashIndex = cleanPath.lastIndexOf('\\');
+
+	// If there's no parent (e.g. "/folder" or "folder"), return root "/"
+	if (slashIndex <= 0)
+		return "/";
+
+	// Extract the parent path and ensure it ends with '/'
+	String parent = cleanPath.substring(0, slashIndex + 1);
+
+	return parent;
 }
 
 /**
@@ -244,4 +359,265 @@ size_t StorageModule::getUsedBytes()
 size_t StorageModule::getTotalBytes()
 {
 	return FLASH.totalBytes();
+}
+
+/**
+ * Handle BLE requests
+ */
+void StorageModule::update()
+{
+
+	if (sendList)
+	{
+		uint8_t startList[] = {CMD_FILE_ENTRY, 0x00, 0x00, 0x00, 0xFE};
+		bleNotify(startList, sizeof(startList));
+		File root = FLASH.open("/");
+		sendFileList(root, "");
+		// signal end of list
+		uint8_t endList[] = {CMD_FILE_ENTRY, 0x00, 0x00, 0x00, 0xFF};
+		bleNotify(endList, sizeof(endList));
+		sendList = false;
+	}
+}
+
+/**
+ * Handle the BLE commands
+ * @param data the incoming data buffer
+ * @param len the length of incoming data
+ */
+void StorageModule::handleFileCommand(uint8_t *data, size_t len)
+{
+	switch (data[0])
+	{
+	case CMD_FLASH_INFO_REQ:
+	{
+		uint32_t used = getUsedBytes();
+		uint32_t total = getTotalBytes();
+		uint8_t resp[12] = {CMD_FLASH_INFO_REQ};
+		resp[1] = 0x00; // flags
+		resp[2] = 0x00; // size
+		resp[3] = 0x00; // size
+		memcpy(&resp[4], &used, 4);
+		memcpy(&resp[8], &total, 4);
+		bleNotify(resp, 12);
+		break;
+	}
+
+	case CMD_FILE_LIST_REQ:
+	{
+		if (!sendList)
+		{
+			sendList = true;
+		}
+		break;
+	}
+
+	case CMD_FILE_START:
+	{
+		uint32_t fileSize;
+		memcpy(&fileSize, &data[4], 4);
+		uint8_t nameLen = data[8];
+		String filename = String((char *)&data[9]).substring(0, nameLen);
+		startFileWrite(filename, fileSize);
+		sendAck(CMD_FILE_START, true);
+		break;
+	}
+
+	case CMD_FILE_CHUNK:
+	{
+		uint16_t chunkId;
+		memcpy(&chunkId, &data[4], 2);
+		writeFileChunk(&data[6], len - 6);
+		sendChunkAck(chunkId);
+		break;
+	}
+
+	case CMD_FILE_END:
+	{
+		finalizeFile();
+		sendAck(CMD_FILE_END, true);
+		break;
+	}
+
+	case CMD_FILE_DELETE:
+	{
+		uint8_t nameLen = data[4];
+		String filename = String((char *)&data[5]).substring(0, nameLen);
+		bool ok = FLASH.remove(filename) || FLASH.rmdir(filename);
+		sendAck(CMD_FILE_DELETE, ok);
+		break;
+	}
+
+	case CMD_FLASH_FORMAT:
+	{
+		// FLASH.format();
+		// sendAck(CMD_FLASH_FMT, true);
+		break;
+	}
+	case CMD_MKDIR: // 0xC8
+	{
+		uint8_t nameLen = data[4];
+		String dirPath = String((char *)&data[5]).substring(0, nameLen);
+		bool ok = FLASH.mkdir(dirPath);
+		sendAck(CMD_MKDIR, ok);
+		break;
+	}
+	}
+}
+
+/**
+ * Send data back to BLE
+ * @param data the outgoing data buffer
+ * @param len the length of outgoing data
+ */
+void StorageModule::bleNotify(uint8_t *data, size_t len)
+{
+
+	if (transferCallback)
+	{
+		transferCallback(data, len);
+	}
+}
+
+/**
+ * Send an acknowledgement to BLE
+ * @param cmd the command
+ * @param success whether successful or not
+ */
+void StorageModule::sendAck(uint8_t cmd, bool success)
+{
+	uint8_t resp[6];
+	resp[0] = CMD_ACK;
+	resp[1] = 0x00; // flags
+	resp[2] = 0x00; // size
+	resp[3] = 0x00; // size
+	resp[4] = cmd;
+	resp[5] = success ? 1 : 0;
+	bleNotify(resp, sizeof(resp));
+}
+
+/**
+ * Send the chunk acknowledgement
+ * @param chunkId the chunk ID
+ */
+void StorageModule::sendChunkAck(uint16_t chunkId, bool success)
+{
+	uint8_t resp[7];
+	resp[0] = 0xC2;
+	resp[1] = 0x00; // flags
+	resp[2] = 0x00; // size
+	resp[3] = 0x00; // size
+	memcpy(&resp[4], &chunkId, 2);
+	resp[6] = success ? 1 : 0;
+	bleNotify(resp, sizeof(resp));
+}
+
+/**
+ * Start writing data to the file
+ * @param filename the file to write
+ * @param size the total size of expected data
+ */
+void StorageModule::startFileWrite(const String &filename, uint32_t size)
+{
+	if (ft.active && ft.file)
+	{
+		ft.file.close();
+	}
+
+	ft.filename = filename;
+	ft.expectedSize = size;
+	ft.received = 0;
+	ft.active = true;
+
+	ft.file = FLASH.open(ft.filename, "w");
+	if (!ft.file)
+	{
+		ft.active = false;
+		return;
+	}
+}
+
+/**
+ * Write data chunk to the file
+ * @param data the data buffer
+ * @param len the lenght of the data buffer
+ */
+void StorageModule::writeFileChunk(uint8_t *data, size_t len)
+{
+	if (!ft.active || !ft.file)
+	{
+		return;
+	}
+
+	ft.file.write(data, len);
+	ft.received += len;
+}
+
+/**
+ * Finish up writing to the file
+ */
+void StorageModule::finalizeFile()
+{
+	if (!ft.active)
+		return;
+
+	ft.file.close();
+	ft.active = false;
+}
+
+/**
+ * Send the file list to BLE
+ * @param dir the directory
+ * @param basePath the base path of the directory
+ */
+void StorageModule::sendFileList(File dir, String basePath)
+{
+	File entry = dir.openNextFile();
+	while (entry)
+	{
+		uint8_t buffer[128];
+		String fullPath = basePath + "/" + entry.name();
+		uint8_t type = entry.isDirectory() ? 1 : 0;
+		uint8_t nameLen = fullPath.length();
+		uint32_t size = entry.size();
+
+		int pos = 0;
+		buffer[pos++] = CMD_FILE_ENTRY;
+		buffer[pos++] = 0x00; // flags
+		buffer[pos++] = 0x00; // cmd size
+		buffer[pos++] = 0x00; // cmd size
+		buffer[pos++] = type;
+		memcpy(&buffer[pos], &size, 4);
+		pos += 4;
+		buffer[pos++] = nameLen;
+		memcpy(&buffer[pos], fullPath.c_str(), nameLen);
+		pos += nameLen;
+
+		bleNotify(buffer, pos);
+		delay(50); // allow BLE buffer time
+
+		if (entry.isDirectory())
+		{
+			// recursive listing
+			File sub = FLASH.open(fullPath);
+			if (sub)
+			{
+				sendFileList(sub, fullPath);
+				sub.close();
+			}
+		}
+
+		entry = dir.openNextFile();
+	}
+
+	dir.close();
+}
+
+/**
+ * Set the ble transfer callback
+ * @param callback the callback to set
+ */
+void StorageModule::setTransferCallback(void (*callback)(uint8_t *data, size_t len))
+{
+	transferCallback = callback;
 }
