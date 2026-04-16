@@ -27,7 +27,7 @@
 		<prop name="text" type="string" default="Bluetooth" />
 		<prop name="index" type="int" default="0" />
 	</api>
-	<view state_trickle="true">
+	<view state_trickle="true" scroll_on_focus="true">
 		<style name="style_main" />
 		<style name="style_checked" selector="checked" />
 		<lv_image src="$icon">

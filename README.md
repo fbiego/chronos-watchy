@@ -40,6 +40,11 @@
 
 ### Option 1: Use Prebuilt Firmware (Recommended)
 
+#### a. https://chronos.ke/watchy#install
+Just connect and flash firmware directly
+
+#### b. https://espressif.github.io/esptool-js/
+
 Prebuilt binaries are included in the `firmware/` directory, ready to flash, no build required.
 
 You can use the **browser-based ESP flasher** provided by Espressif:

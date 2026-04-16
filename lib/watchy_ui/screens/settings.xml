@@ -15,21 +15,24 @@
 		<style name="style_chart" width="200" height="100" border_width="0" radius="0" pad_column="2" />
 		<style name="style_bar" width="180" height="30" radius="5" bg_opa="0" border_width="4" />
 		<style name="style_bar_indicator" radius="5" bg_color="0x000000" />
+		<style name="style_scrollbar" bg_color="0x000000" bg_opa="255" pad_all="0" pad_right="0" radius="0" />
 	</styles>
 	<view>
 		<style name="style_main" />
 		<status_bar />
 
 		<!-- SETTINGS VIEW (0) -->
-		<lv_obj y="25">
+		<lv_obj name="settings_main_list" y="25">
 			<style name="style_cont" />
 			<style name="style_list" />
+			<style name="style_scrollbar" selector="scrollbar" />
 			<bind_flag_if_not_eq subject="subject_settings_view" flag="hidden" ref_value="0" />
 			<list_item icon="ic_bluetooth" text="Interval" index="0" />
 			<list_item icon="ic_configs" text="Configs" index="1" />
 			<list_item icon="ic_battery" text="Battery" index="2" />
 			<list_item icon="ic_storage" text="Storage" index="3" />
 			<list_item icon="ic_info" text="About" index="4" />
+			<list_item icon="ic_shutdown" text="Shutdown" index="5" />
 		</lv_obj>
 
 		<!-- INTERVAL VIEW (1) -->

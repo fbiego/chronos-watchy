@@ -16,5 +16,7 @@
         "chrono": "cpp"
     },
     "editor.formatOnSave": true,
-    "files.autoSave": "afterDelay"
+    "files.autoSave": "afterDelay",
+    "cmake.sourceDirectory": "/Users/felix/Documents/PlatformIO/Projects/chronos-watchy/lib/watchy_ui",
+    "idf.port": "/dev/tty.wchusbserial1110"
 }

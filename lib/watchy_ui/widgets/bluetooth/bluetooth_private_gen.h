@@ -14,12 +14,20 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lvgl_private.h"
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+    #include "lvgl_private.h"
+#else
+    #include "lvgl_private.h"
+#endif
 #include "bluetooth.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#ifndef BLUETOOTH_USER_DATA
+#define BLUETOOTH_USER_DATA
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -28,6 +36,7 @@ typedef struct {
     lv_obj_t obj;  /* Base widget to extend */
     lv_obj_t * lv_image_0;
     lv_obj_t * lv_image_1;
+    BLUETOOTH_USER_DATA
 } bluetooth_t;
 
 extern const lv_obj_class_t bluetooth_class;

@@ -8,7 +8,7 @@
  *********************/
 
 #include "pairing_gen.h"
-#include "watchy_ui.h"
+#include "../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -59,7 +59,7 @@ lv_obj_t * pairing_create(void)
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLLABLE, false);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
+    status_bar_create(lv_obj_0);
     
     lv_obj_t * p_qr = lv_qrcode_create(lv_obj_0);
     lv_obj_set_name(p_qr, "p_qr");

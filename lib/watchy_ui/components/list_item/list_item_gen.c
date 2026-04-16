@@ -8,7 +8,7 @@
  *********************/
 
 #include "list_item_gen.h"
-#include "watchy_ui.h"
+#include "../../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -70,6 +70,7 @@ lv_obj_t * list_item_create(lv_obj_t * parent, const void * icon, const char * t
     lv_obj_t * lv_obj_0 = lv_obj_create(parent);
     lv_obj_set_name_static(lv_obj_0, "list_item_#");
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_STATE_TRICKLE, true);
+    lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLL_ON_FOCUS, true);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_add_style(lv_obj_0, &style_checked, LV_STATE_CHECKED);

@@ -32,17 +32,17 @@
 
 #include <Arduino.h>
 #include <ChronosESP32.h>
-#include <Wire.h>
 #include <Timber.h>
+#include <Wire.h>
 
 #include "watchy_ui.h"
 
-#include "StorageModule.h"
-#include "MotionModule.h"
-#include "DisplayModule.h"
-#include "HealthModule.h"
 #include "ButtonModule.h"
 #include "DeviceModule.h"
+#include "DisplayModule.h"
+#include "HealthModule.h"
+#include "MotionModule.h"
+#include "StorageModule.h"
 
 #define I2C_SDA 21
 #define I2C_SCL 22
@@ -50,4 +50,7 @@
 #define RTC_INT_PIN 27
 #define MOTOR_PIN 13
 
-#define uS_TO_S_FACTOR 1000000ULL // Conversion factor for micro seconds to seconds
+#define uS_TO_S_FACTOR                                                         \
+  1000000ULL // Conversion factor for micro seconds to seconds
+
+void watchy_shutdown(bool low);

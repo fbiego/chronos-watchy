@@ -8,7 +8,7 @@
  *********************/
 
 #include "file_item_gen.h"
-#include "watchy_ui.h"
+#include "../../watchy_ui.h"
 
 /*********************
  *      DEFINES

@@ -8,7 +8,7 @@
  *********************/
 
 #include "contacts_gen.h"
-#include "watchy_ui.h"
+#include "../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -69,7 +69,7 @@ lv_obj_t * contacts_create(void)
     lv_obj_set_name_static(lv_obj_0, "contacts_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
+    status_bar_create(lv_obj_0);
     
     lv_obj_t * c_info = lv_label_create(lv_obj_0);
     lv_obj_set_name(c_info, "c_info");
@@ -84,15 +84,15 @@ lv_obj_t * contacts_create(void)
     lv_obj_set_y(c_list, 25);
     lv_obj_add_style(c_list, &style_contacts, 0);
     lv_obj_add_style(c_list, &style_scrollbar, LV_PART_SCROLLBAR);
-    lv_obj_t * Taylor = contact_item_create(c_list, "Taylor", "03903456726", false);
+    contact_item_create(c_list, "Taylor", "03903456726", false);
     
-    lv_obj_t * John = contact_item_create(c_list, "John", "03903456726", true);
+    contact_item_create(c_list, "John", "03903456726", true);
     
-    lv_obj_t * Sarah = contact_item_create(c_list, "Sarah", "03903456726", true);
+    contact_item_create(c_list, "Sarah", "03903456726", true);
     
-    lv_obj_t * Jane = contact_item_create(c_list, "Jane", "03903456726", true);
+    contact_item_create(c_list, "Jane", "03903456726", true);
     
-    lv_obj_t * Rodgers = contact_item_create(c_list, "Rodgers", "03903456726", true);
+    contact_item_create(c_list, "Rodgers", "03903456726", true);
 
     LV_TRACE_OBJ_CREATE("finished");
 

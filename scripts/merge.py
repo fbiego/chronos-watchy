@@ -64,7 +64,7 @@ def replace_in_files(base_path: Path, old_text: str, new_text: str):
             file_path.write_text(new_content, encoding="utf-8")
             print(f"✅ Replaced in: {file_path}")
 
-def merge_bins(pairs, out_path, new_pairs):
+def merge_bins(pairs, out_path, new_pairs, chip):
     """
     Merge ESP32 .bin segments into one file starting from the lowest offset.
 
@@ -106,6 +106,8 @@ def merge_bins(pairs, out_path, new_pairs):
     data["merged"]["file"] = f"{out_path.split(sep)[-1]}"
     data["merged"]["address"] = f"0x{min_off:X}"
     data["merged"]["hex"] = min_off
+    data["merged"]["size"] = total_size
+    data["merged"]["chip"] = chip
 
     data["split"] = []
     for off, name in new_pairs:
@@ -211,7 +213,7 @@ def after_build(source, target, env):
         shutil.copyfile(path, dest_dir + f"/{new_name}")
         new_pairs.append((offset,new_name))
 
-    merge_bins(pairs, merged_path, new_pairs) # use custom merge function
+    merge_bins(pairs, merged_path, new_pairs, chip) # use custom merge function
     
     # print(f"Command: {cmd}")
     # print("\n=== ESP32 Auto Binary Merge (Post-Build) ===")

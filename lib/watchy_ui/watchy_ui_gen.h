@@ -19,9 +19,13 @@ extern "C" {
 
 #ifdef LV_LVGL_H_INCLUDE_SIMPLE
     #include "lvgl.h"
+    #include "src/core/lv_obj_class_private.h"
 #else
     #include "lvgl/lvgl.h"
+    #include "lvgl/src/core/lv_obj_class_private.h"
 #endif
+
+
 
 /*********************
  *      DEFINES
@@ -133,6 +137,8 @@ extern const void * ic_chronos_watchy;
 extern const void * ic_facebook;
 extern const void * ic_previous;
 extern const void * ic_low_battery;
+extern const void * ic_shutdown;
+extern const void * ic_shutdown_mode;
 
 /*----------------
  * Subjects
@@ -198,11 +204,7 @@ void watchy_ui_init_gen(const char * asset_path);
  *   POST INCLUDES
  **********************/
 
-/*Include all the widget and components of this library*/
-#include "widgets/analog_hand/analog_hand_gen.h"
-#include "widgets/bluetooth/bluetooth_gen.h"
-#include "widgets/icon_text/icon_text_gen.h"
-#include "widgets/weather_icon/weather_icon_gen.h"
+/*Include all the widgets, components and screens of this library*/
 #include "components/contact_item/contact_item_gen.h"
 #include "components/face_item/face_item_gen.h"
 #include "components/file_item/file_item_gen.h"
@@ -224,6 +226,10 @@ void watchy_ui_init_gen(const char * asset_path);
 #include "screens/selector_gen.h"
 #include "screens/settings_gen.h"
 #include "screens/weather_gen.h"
+#include "widgets/analog_hand/analog_hand_gen.h"
+#include "widgets/bluetooth/bluetooth_gen.h"
+#include "widgets/icon_text/icon_text_gen.h"
+#include "widgets/weather_icon/weather_icon_gen.h"
 
 #ifdef __cplusplus
 } /*extern "C"*/

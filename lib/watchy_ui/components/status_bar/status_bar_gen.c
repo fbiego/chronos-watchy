@@ -8,7 +8,7 @@
  *********************/
 
 #include "status_bar_gen.h"
-#include "watchy_ui.h"
+#include "../../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -77,7 +77,7 @@ lv_obj_t * status_bar_create(lv_obj_t * parent)
     lv_label_bind_text(lv_label_1, &subject_power_off, NULL);
     lv_obj_set_style_pad_top(lv_label_1, 4, 0);
     
-    lv_obj_t * bluetooth_0 = bluetooth_create(lv_obj_0);
+    bluetooth_create(lv_obj_0);
     
     lv_obj_t * lv_label_2 = lv_label_create(lv_obj_0);
     lv_label_bind_text(lv_label_2, &subject_battery, "%d%%");

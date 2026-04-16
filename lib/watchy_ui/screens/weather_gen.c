@@ -8,7 +8,7 @@
  *********************/
 
 #include "weather_gen.h"
-#include "watchy_ui.h"
+#include "../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -91,7 +91,7 @@ lv_obj_t * weather_create(void)
     lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLLABLE, false);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
+    status_bar_create(lv_obj_0);
     
     lv_obj_t * lv_obj_1 = lv_obj_create(lv_obj_0);
     lv_obj_set_y(lv_obj_1, 50);
@@ -126,17 +126,17 @@ lv_obj_t * weather_create(void)
     lv_obj_set_y(w_forecast, 110);
     lv_obj_add_style(w_forecast, &style_forecast, 0);
     lv_obj_add_style(w_forecast, &style_scrollbar, LV_PART_SCROLLBAR);
-    lv_obj_t * forecast_0 = forecast_create(w_forecast, "MON", ic_cloud, "24");
+    forecast_create(w_forecast, "MON", ic_cloud, "24");
     
-    lv_obj_t * forecast_1 = forecast_create(w_forecast, "TUE", ic_sun_cloud, "23");
+    forecast_create(w_forecast, "TUE", ic_sun_cloud, "23");
     
-    lv_obj_t * forecast_2 = forecast_create(w_forecast, "WED", ic_sunny, "25");
+    forecast_create(w_forecast, "WED", ic_sunny, "25");
     
-    lv_obj_t * forecast_3 = forecast_create(w_forecast, "MON", ic_cloud, "24");
+    forecast_create(w_forecast, "MON", ic_cloud, "24");
     
-    lv_obj_t * forecast_4 = forecast_create(w_forecast, "TUE", ic_sun_cloud, "23");
+    forecast_create(w_forecast, "TUE", ic_sun_cloud, "23");
     
-    lv_obj_t * forecast_5 = forecast_create(w_forecast, "WED", ic_sunny, "25");
+    forecast_create(w_forecast, "WED", ic_sunny, "25");
 
     LV_TRACE_OBJ_CREATE("finished");
 

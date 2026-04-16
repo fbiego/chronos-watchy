@@ -8,9 +8,9 @@
 #define DISPLAYMODULE_H
 
 #define ENABLE_GxEPD2_GFX 0
+#include <ArduinoJson.h>
 #include <GxEPD2_BW.h>
 #include <lvgl.h>
-#include <ArduinoJson.h>
 
 #include "watchy_ui.h"
 
@@ -19,7 +19,8 @@
 #include "HealthModule.h"
 
 #define GxEPD2_DISPLAY_CLASS GxEPD2_BW
-#define GxEPD2_DRIVER_CLASS GxEPD2_154_D67 // GDEH0154D67 200x200, SSD1681, (HINK-E154A07-A1)
+#define GxEPD2_DRIVER_CLASS                                                    \
+  GxEPD2_154_D67 // GDEH0154D67 200x200, SSD1681, (HINK-E154A07-A1)
 
 #define SCREEN_WIDTH 200
 #define SCREEN_HEIGHT 200
@@ -33,150 +34,154 @@
 #define EPD_RST 9
 #define EPD_BUSY 19
 
-struct IconText
-{
-    const void *icon;
-    const char *text;
+struct IconText {
+  const void *icon;
+  const char *text;
 };
 
-enum AppList
-{
-    ACTIVITY,
-    NOTIFICATIONS,
-    WEATHER,
-    MUSIC,
-    CONTROLS,
-    NAVIGATION,
-    SETTINGS,
-    PAIRING,
-    CONTACTS,
-    QR_CODES,
-    XML_LOADER,
-    APP_COUNT
+enum AppList {
+  ACTIVITY,
+  NOTIFICATIONS,
+  WEATHER,
+  MUSIC,
+  CONTROLS,
+  NAVIGATION,
+  SETTINGS,
+  PAIRING,
+  CONTACTS,
+  QR_CODES,
+  XML_LOADER,
+  APP_COUNT
 };
 
-enum SettingsView
-{
-    LIST_VIEW,
-    INTERVAL_VIEW,
-    CONFIGS_VIEW,
-    BATTERY_VIEW,
-    STORAGE_VIEW,
-    ABOUT_VIEW
+enum SettingsView {
+  LIST_VIEW,
+  INTERVAL_VIEW,
+  CONFIGS_VIEW,
+  BATTERY_VIEW,
+  STORAGE_VIEW,
+  ABOUT_VIEW,
 };
 
 class DeviceModule;
 
-class DisplayModule : public GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT>
-{
+class DisplayModule : public GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT> {
 public:
-    // accessible from outside the class
-    DisplayModule(DeviceModule &device, HealthModule &mHealth); // constructor
-    ~DisplayModule();                                           // destructor
+  // accessible from outside the class
+  DisplayModule(DeviceModule &device, HealthModule &mHealth); // constructor
+  ~DisplayModule();                                           // destructor
 
-    void begin(bool full_refresh);
-    void configure();
-    void update();
+  void begin(bool full_refresh);
+  void configure();
+  void update();
 
-    void handleButtons(ButtonEvent buttonEvent);
-    void handleMotionInterrupt(uint16_t irq);
+  void handleButtons(ButtonEvent buttonEvent);
+  void handleMotionInterrupt(uint16_t irq);
 
-    void navigationIconCallback(uint8_t *data, bool icon);
-    void navigationDataCallback(String text, String title, String directions, bool icon);
+  void navigationIconCallback(uint8_t *data, bool icon);
+  void navigationDataCallback(String text, String title, String directions,
+                              bool icon);
 
-    void setInfo(String info);
+  void setInfo(String info);
 
-    void timeout();
+  void timeout();
 
-    void setInvert(bool invert);
+  void setInvert(bool invert);
 
-    void sleepMode(int hour, int minute);
+  void sleepMode(int hour, int minute);
 
-    void loadFace(String path);
+  void shutdownMode();
+
+  void lowBatteryMode();
+
+  void loadFace(String path);
 
 protected:
-    // cannot be accessed from outside the class, however, they can be accessed in inherited classes
+  // cannot be accessed from outside the class, however, they can be accessed in
+  // inherited classes
 private:
-    // cannot be accessed (or viewed) from outside the class
-    static uint32_t my_tick(void);
-    static void my_disp_flush(lv_display_t *disp, const lv_area_t *area, unsigned char *data);
-    static void screen_events_cb(lv_event_t *e);
+  // cannot be accessed (or viewed) from outside the class
+  static uint32_t my_tick(void);
+  static void my_disp_flush(lv_display_t *disp, const lv_area_t *area,
+                            unsigned char *data);
+  static void screen_events_cb(lv_event_t *e);
 
-    const void *getWeatherIcon(int id);
-    const void *getAppIcon(int id);
+  const void *getWeatherIcon(int id);
+  const void *getAppIcon(int id);
 
-    IconText getApp(AppList app);
+  IconText getApp(AppList app);
 
 #if LV_USE_LOG != 0
-    static void lv_log_print(lv_log_level_t level, const char *buf);
+  static void lv_log_print(lv_log_level_t level, const char *buf);
 #endif
 
-    bool inverted;
+  bool inverted;
 
-    lv_obj_t *home_screen;
-    lv_obj_t *info_screen;
-    lv_obj_t *notification_screen;
-    lv_obj_t *activity_screen;
-    lv_obj_t *weather_screen;
-    lv_obj_t *menu_screen;
-    lv_obj_t *pairing_screen;
-    lv_obj_t *navigation_screen;
-    lv_obj_t *settings_screen;
-    lv_obj_t *music_screen;
-    lv_obj_t *contacts_screen;
-    lv_obj_t *control_screen;
-    lv_obj_t *qr_screen;
-    lv_obj_t *xml_screen;
-    lv_obj_t *selector_screen;
+  lv_obj_t *home_screen;
+  lv_obj_t *info_screen;
+  lv_obj_t *notification_screen;
+  lv_obj_t *activity_screen;
+  lv_obj_t *weather_screen;
+  lv_obj_t *menu_screen;
+  lv_obj_t *pairing_screen;
+  lv_obj_t *navigation_screen;
+  lv_obj_t *settings_screen;
+  lv_obj_t *music_screen;
+  lv_obj_t *contacts_screen;
+  lv_obj_t *control_screen;
+  lv_obj_t *qr_screen;
+  lv_obj_t *xml_screen;
+  lv_obj_t *selector_screen;
 
-    void load_weather_screen();
-    void load_notifications_screen();
-    void load_activity_screen();
-    void load_menu_screen();
-    void load_pairing_screen();
-    void load_settings_screen();
-    void load_contacts_screen();
-    void load_qr_screen();
-    void load_xml_screen();
-    void load_selector_screen();
+  void load_weather_screen();
+  void load_notifications_screen();
+  void load_activity_screen();
+  void load_menu_screen();
+  void load_pairing_screen();
+  void load_settings_screen();
+  void load_contacts_screen();
+  void load_qr_screen();
+  void load_xml_screen();
+  void load_selector_screen();
 
-    void load_watchface_from_info(JsonDocument info);
-    void load_watchface_from_path(String path);
+  void load_watchface_from_info(JsonDocument info);
+  void load_watchface_from_path(String path);
 
-    void set_selected_item_index(lv_obj_t *list, int index, bool scroll);
+  void set_selected_item_index(lv_obj_t *list, int index, bool scroll);
 
-    static void temp_delete_cb(lv_event_t *e);
+  static void temp_delete_cb(lv_event_t *e);
 
-    int n_index;
-    int n_size;
-    int activity_day = 0;
-    AppList currentApp = ACTIVITY;
-    Notification notifications[MAX_NOTIFICATIONS];
+  int n_index;
+  int n_size;
+  int activity_day = 0;
+  AppList currentApp = ACTIVITY;
+  Notification notifications[MAX_NOTIFICATIONS];
 
-    bool find_phone = false;
-    int qr_index = 0;
-    int battery_day = 0;
-    bool go_home = false;
+  bool find_phone = false;
+  int qr_index = 0;
+  int battery_day = 0;
+  bool go_home = false;
 
-    String xml_folder;
-    String back_folder;
-    JsonDocument xmls;
-    int xml_index = 0;
-    int xml_max;
-    lv_obj_t *temp_screen;
+  String xml_folder;
+  String back_folder;
+  JsonDocument xmls;
+  int xml_index = 0;
+  int xml_max;
+  lv_obj_t *temp_screen;
 
-    JsonDocument face_list;
-    int face_index = 0;
-    int face_max;
+  JsonDocument face_list;
+  int face_index = 0;
+  int face_max = -1;
 
-    DeviceModule &mDevice;
-    HealthModule &mHealth;
+  DeviceModule &mDevice;
+  HealthModule &mHealth;
 
-    const void *getFileIcon(String path);
+  const void *getFileIcon(String path);
 
-    AppList nextApp(AppList app);
-    AppList previousApp(AppList app);
-    void scroll_list(lv_obj_t *obj, int direction, bool scroll_one = false);
+  AppList nextApp(AppList app);
+  AppList previousApp(AppList app);
+  void scroll_list(lv_obj_t *obj, int direction, bool scroll_one = false);
+  void scroll_to_checked(lv_obj_t *list);
 };
 
 #endif

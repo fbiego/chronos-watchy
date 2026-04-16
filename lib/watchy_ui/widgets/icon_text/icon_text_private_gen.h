@@ -14,12 +14,20 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lvgl_private.h"
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+    #include "lvgl_private.h"
+#else
+    #include "lvgl_private.h"
+#endif
 #include "icon_text.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#ifndef ICON_TEXT_USER_DATA
+#define ICON_TEXT_USER_DATA
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -31,6 +39,7 @@ typedef struct {
     const char * bind_format;
     lv_obj_t * img_icon;
     lv_obj_t * lv_label_0;
+    ICON_TEXT_USER_DATA
 } icon_text_t;
 
 extern const lv_obj_class_t icon_text_class;

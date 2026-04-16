@@ -14,12 +14,20 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lvgl_private.h"
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+    #include "lvgl_private.h"
+#else
+    #include "lvgl_private.h"
+#endif
 #include "analog_hand.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#ifndef ANALOG_HAND_USER_DATA
+#define ANALOG_HAND_USER_DATA
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -31,6 +39,7 @@ typedef struct {
     int32_t pivot_x;
     int32_t pivot_y;
     int32_t offset;
+    ANALOG_HAND_USER_DATA
 } analog_hand_t;
 
 extern const lv_obj_class_t analog_hand_class;

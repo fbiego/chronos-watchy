@@ -14,12 +14,20 @@ extern "C" {
  *      INCLUDES
  *********************/
 
-#include "lvgl_private.h"
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+    #include "lvgl_private.h"
+#else
+    #include "lvgl_private.h"
+#endif
 #include "weather_icon.h"
 
 /*********************
  *      DEFINES
  *********************/
+
+#ifndef WEATHER_ICON_USER_DATA
+#define WEATHER_ICON_USER_DATA
+#endif
 
 /**********************
  *      TYPEDEFS
@@ -44,6 +52,7 @@ typedef struct {
     lv_obj_t * img_tornado;
     lv_obj_t * img_wind;
     lv_obj_t * img_haze;
+    WEATHER_ICON_USER_DATA
 } weather_icon_t;
 
 extern const lv_obj_class_t weather_icon_class;

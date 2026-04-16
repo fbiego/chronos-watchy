@@ -8,7 +8,7 @@
  *********************/
 
 #include "music_gen.h"
-#include "watchy_ui.h"
+#include "../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -50,7 +50,7 @@ lv_obj_t * music_create(void)
     lv_obj_set_name_static(lv_obj_0, "music_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
+    status_bar_create(lv_obj_0);
     
     lv_obj_t * lv_label_0 = lv_label_create(lv_obj_0);
     lv_obj_set_width(lv_label_0, 180);

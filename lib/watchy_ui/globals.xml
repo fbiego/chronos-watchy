@@ -49,7 +49,7 @@
 		<int name="subject_navigation" value="1" />
 		<string name="subject_address" value="AA:45:45:24:35:DC" />
 		<string name="subject_ble_name" value="Watchy" />
-		<int name="subject_settings_index" value="0" min_value="0" max_value="4" />
+		<int name="subject_settings_index" value="0" min_value="0" max_value="5" />
 		<int name="subject_settings_view" value="0" />
 		<int name="subject_music_view" value="0" min_value="0" max_value="1" />
 		<string name="subject_camera_state" value="Ready" />
@@ -127,6 +127,8 @@
 		<data name="ic_facebook" src_path="images/icon_facebook.png" color_format="i1" />
 		<data name="ic_previous" src_path="images/icon_previous.png" color_format="i1" />
 		<data name="ic_low_battery" src_path="images/icon_low_battery.png" color_format="i1" />
+		<data name="ic_shutdown" src_path="images/icon_shutdown.png" color_format="i1" />
+		<data name="ic_shutdown_mode" src_path="images/icon_shutdown_mode.png" color_format="i1" />
 	</images>
 
 	<fonts>

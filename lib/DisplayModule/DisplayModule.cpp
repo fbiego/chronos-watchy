@@ -8,22 +8,24 @@
 
 static DisplayModule *instance = nullptr;
 
+void watchy_shutdown(bool low);
+
 /**
  * @brief Constructor for DisplayModule
  *
  */
-DisplayModule::DisplayModule(DeviceModule &device, HealthModule &health) : GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT>(GxEPD2_154_D67(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY)), mDevice(device), mHealth(health)
-{
-	instance = this;
+DisplayModule::DisplayModule(DeviceModule &device, HealthModule &health)
+    : GxEPD2_BW<GxEPD2_154_D67, GxEPD2_154_D67::HEIGHT>(
+          GxEPD2_154_D67(EPD_CS, EPD_DC, EPD_RST, EPD_BUSY)),
+      mDevice(device), mHealth(health) {
+  instance = this;
 }
 
 /**
  * @brief Destructor for DisplayModule
  *
  */
-DisplayModule::~DisplayModule()
-{
-}
+DisplayModule::~DisplayModule() {}
 
 #if LV_USE_LOG != 0
 /**
@@ -31,9 +33,8 @@ DisplayModule::~DisplayModule()
  * @param level the log level
  * @param buf the log buffer to print
  */
-void DisplayModule::lv_log_print(lv_log_level_t level, const char *buf)
-{
-	Serial.write(buf);
+void DisplayModule::lv_log_print(lv_log_level_t level, const char *buf) {
+  Serial.write(buf);
 }
 #endif
 
@@ -42,124 +43,117 @@ void DisplayModule::lv_log_print(lv_log_level_t level, const char *buf)
  * Initialize the e-paper display, lvgl and screens
  * @param full_refresh whether to fully refresh the display
  */
-void DisplayModule::begin(bool full_refresh)
-{
-	// Initialize display
+void DisplayModule::begin(bool full_refresh) {
+  // Initialize display
 
-	pinMode(EPD_CS, OUTPUT);
-	pinMode(EPD_DC, OUTPUT);
-	pinMode(EPD_RST, OUTPUT);
+  pinMode(EPD_CS, OUTPUT);
+  pinMode(EPD_DC, OUTPUT);
+  pinMode(EPD_RST, OUTPUT);
 
-	GxEPD2_BW::init(0, full_refresh, 2, true);
+  GxEPD2_BW::init(0, full_refresh, 2, true);
 
-	lv_init();
+  lv_init();
 
-	lv_tick_set_cb(my_tick);
+  lv_tick_set_cb(my_tick);
 
 #if LV_USE_LOG != 0
-	lv_log_register_print_cb(lv_log_print);
+  lv_log_register_print_cb(lv_log_print);
 #endif
 
-	lv_display_t *lv_display = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
-	lv_display_set_flush_cb(lv_display, my_disp_flush);
-	uint8_t *lv_buffer = (uint8_t *)malloc(LV_BUFFER);
-	lv_display_set_buffers(lv_display, lv_buffer, NULL, LV_BUFFER, LV_DISPLAY_RENDER_MODE_PARTIAL);
+  lv_display_t *lv_display = lv_display_create(SCREEN_WIDTH, SCREEN_HEIGHT);
+  lv_display_set_flush_cb(lv_display, my_disp_flush);
+  uint8_t *lv_buffer = (uint8_t *)malloc(LV_BUFFER);
+  lv_display_set_buffers(lv_display, lv_buffer, NULL, LV_BUFFER,
+                         LV_DISPLAY_RENDER_MODE_PARTIAL);
 
-	watchy_ui_init("");
+  watchy_ui_init("");
 
-	home_screen = home_create();
-	menu_screen = menu_create();
-	info_screen = info_create();
-	notification_screen = notification_create();
-	weather_screen = weather_create();
-	activity_screen = activity_create();
-	pairing_screen = pairing_create();
-	navigation_screen = navigation_create();
-	settings_screen = settings_create();
-	music_screen = music_create();
-	contacts_screen = contacts_create();
-	control_screen = control_create();
-	qr_screen = qr_create();
-	xml_screen = loader_create();
-	selector_screen = selector_create();
+  home_screen = home_create();
+  menu_screen = menu_create();
+  info_screen = info_create();
+  notification_screen = notification_create();
+  weather_screen = weather_create();
+  activity_screen = activity_create();
+  pairing_screen = pairing_create();
+  navigation_screen = navigation_create();
+  settings_screen = settings_create();
+  music_screen = music_create();
+  contacts_screen = contacts_create();
+  control_screen = control_create();
+  qr_screen = qr_create();
+  xml_screen = loader_create();
+  selector_screen = selector_create();
 
-	lv_obj_add_event_cb(navigation_screen, screen_events_cb, LV_EVENT_ALL, NULL);
-	lv_obj_add_event_cb(music_screen, screen_events_cb, LV_EVENT_ALL, NULL);
-	lv_obj_add_event_cb(control_screen, screen_events_cb, LV_EVENT_ALL, NULL);
+  lv_obj_add_event_cb(navigation_screen, screen_events_cb, LV_EVENT_ALL, NULL);
+  lv_obj_add_event_cb(music_screen, screen_events_cb, LV_EVENT_ALL, NULL);
+  lv_obj_add_event_cb(control_screen, screen_events_cb, LV_EVENT_ALL, NULL);
 
-	lv_obj_t *n_icon = lv_obj_find_by_name(navigation_screen, "n_icon");
-	if (n_icon)
-	{
-		LV_DRAW_BUF_DEFINE_STATIC(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_COLOR_FORMAT_I2);
-		LV_DRAW_BUF_INIT_STATIC(cbuf);
+  lv_obj_t *n_icon = lv_obj_find_by_name(navigation_screen, "n_icon");
+  if (n_icon) {
+    LV_DRAW_BUF_DEFINE_STATIC(cbuf, CANVAS_WIDTH, CANVAS_HEIGHT,
+                              LV_COLOR_FORMAT_I2);
+    LV_DRAW_BUF_INIT_STATIC(cbuf);
 
-		lv_obj_t *canvas = lv_canvas_create(n_icon);
-		lv_obj_set_name(canvas, "canvas");
-		lv_canvas_set_draw_buf(canvas, &cbuf);
-		lv_obj_set_size(canvas, CANVAS_WIDTH, CANVAS_HEIGHT);
-		lv_obj_set_align(canvas, LV_ALIGN_TOP_MID);
-		lv_obj_remove_flag(canvas, LV_OBJ_FLAG_SCROLLABLE); /// Flags
-		lv_obj_set_style_radius(canvas, 0, 0);
-		lv_obj_set_style_bg_color(canvas, lv_color_hex(0xFFFFFF), 0);
-		lv_obj_set_style_bg_opa(canvas, 255, 0);
-		lv_obj_set_style_border_width(canvas, 0, 0);
-		lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
-		lv_canvas_set_palette(canvas, 0, lv_color32_make(0, 0, 0, 255));
-		lv_canvas_set_palette(canvas, 1, lv_color32_make(255, 255, 255, 255));
-		lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
-	}
+    lv_obj_t *canvas = lv_canvas_create(n_icon);
+    lv_obj_set_name(canvas, "canvas");
+    lv_canvas_set_draw_buf(canvas, &cbuf);
+    lv_obj_set_size(canvas, CANVAS_WIDTH, CANVAS_HEIGHT);
+    lv_obj_set_align(canvas, LV_ALIGN_TOP_MID);
+    lv_obj_remove_flag(canvas, LV_OBJ_FLAG_SCROLLABLE); /// Flags
+    lv_obj_set_style_radius(canvas, 0, 0);
+    lv_obj_set_style_bg_color(canvas, lv_color_hex(0xFFFFFF), 0);
+    lv_obj_set_style_bg_opa(canvas, 255, 0);
+    lv_obj_set_style_border_width(canvas, 0, 0);
+    lv_canvas_fill_bg(canvas, lv_color_white(), LV_OPA_COVER);
+    lv_canvas_set_palette(canvas, 0, lv_color32_make(0, 0, 0, 255));
+    lv_canvas_set_palette(canvas, 1, lv_color32_make(255, 255, 255, 255));
+    lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
+  }
 
-	navigationDataCallback("Navigation\nInactive", "Chronos", "Start navigation on the connected phone", false);
-	lv_subject_set_int(&subject_navigation, 0);
+  navigationDataCallback("Navigation\nInactive", "Chronos",
+                         "Start navigation on the connected phone", false);
+  lv_subject_set_int(&subject_navigation, 0);
 }
 
 /**
  * Configure display mode
  */
-void DisplayModule::configure()
-{
-	setInvert(mDevice.getInvertDisplay());
+void DisplayModule::configure() {
+  setInvert(mDevice.getInvertDisplay());
 
-	String face = mDevice.getWatchface();
-	Timber.i("Using Watchface: " + face);
-	if (face == "default")
-	{
-		lv_screen_load(home_screen);
-	}
-	else
-	{
-		load_watchface_from_path(face);
-	}
+  String face = mDevice.getWatchface();
+  Timber.i("Using Watchface: " + face);
+  if (face == "default") {
+    lv_screen_load(home_screen);
+  } else {
+    load_watchface_from_path(face);
+  }
 }
 
 /**
  * Set info to the info screen
  * @param info info to show
  */
-void DisplayModule::setInfo(String info)
-{
-	lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
-	if (info_label)
-	{
-		lv_label_set_text(info_label, info.c_str());
-	}
+void DisplayModule::setInfo(String info) {
+  lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
+  if (info_label) {
+    lv_label_set_text(info_label, info.c_str());
+  }
 }
 
 /**
  * Set the display back to home screen
  */
-void DisplayModule::timeout()
-{
-	lv_subject_set_int(&subject_bluetooth, 0);
-	lv_subject_copy_string(&subject_power_off, "");
+void DisplayModule::timeout() {
+  lv_subject_set_int(&subject_bluetooth, 0);
+  lv_subject_copy_string(&subject_power_off, "");
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != home_screen)
-	{
-		lv_screen_load(home_screen);
-	}
-	lv_timer_handler();
-	lv_refr_now(NULL);
+  lv_obj_t *active = lv_screen_active();
+  if (active != home_screen) {
+    lv_screen_load(home_screen);
+  }
+  lv_timer_handler();
+  lv_refr_now(NULL);
 }
 
 /**
@@ -167,95 +161,147 @@ void DisplayModule::timeout()
  * @param hour hour
  * @param minute minute
  */
-void DisplayModule::sleepMode(int hour, int minute)
-{
-	lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
-	if (info_label)
-	{
-		lv_label_set_text_fmt(info_label, "Watchy is sleeping until %02d:%02d. You can wake it up by pressing any button.", hour, minute);
-	}
-	lv_screen_load(info_screen);
-	lv_timer_handler();
-	lv_refr_now(NULL);
+void DisplayModule::sleepMode(int hour, int minute) {
+  lv_obj_t *info_icon = lv_obj_find_by_name(info_screen, "info_icon");
+  if (info_icon) {
+    lv_image_set_src(info_icon, ic_sleep_mode);
+  }
+  lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
+  if (info_label) {
+    lv_label_set_text_fmt(info_label,
+                          "Watchy is sleeping until %02d:%02d. You can wake it "
+                          "up by pressing any button.",
+                          hour, minute);
+  }
+  lv_screen_load(info_screen);
+  lv_timer_handler();
+  lv_refr_now(NULL);
+}
+
+/**
+ * Set the display to shutdown mode screen
+ */
+void DisplayModule::shutdownMode() {
+  lv_obj_t *info_icon = lv_obj_find_by_name(info_screen, "info_icon");
+  if (info_icon) {
+    lv_image_set_src(info_icon, ic_shutdown_mode);
+  }
+  lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
+  if (info_label) {
+    lv_label_set_text(info_label, "Watchy is powered off. Turn it on "
+                                  "by pressing any button.");
+  }
+  lv_screen_load(info_screen);
+  lv_timer_handler();
+  lv_refr_now(NULL);
+}
+
+/**
+ * Set the display to low battery mode screen
+ */
+void DisplayModule::lowBatteryMode() {
+  lv_obj_t *info_icon = lv_obj_find_by_name(info_screen, "info_icon");
+  if (info_icon) {
+    lv_image_set_src(info_icon, ic_low_battery);
+  }
+  lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
+  if (info_label) {
+    lv_label_set_text(info_label, "Watchy is battery is too low. "
+                                  "Please charge it.");
+  }
+  lv_screen_load(info_screen);
+  lv_timer_handler();
+  lv_refr_now(NULL);
 }
 
 /**
  * Update the display data and lvgl timer handler
  */
-void DisplayModule::update()
-{
+void DisplayModule::update() {
 
-	uint32_t steps = mDevice.mMotion.getCurrentSteps();
+  uint32_t steps = mDevice.mMotion.getCurrentSteps();
 
-	String time = mDevice.mWatch.getHourZ() + mDevice.mWatch.getTime(":%M ") + mDevice.mWatch.getAmPmC(false);
-	lv_subject_copy_string(&subject_time, time.c_str());
-	lv_subject_copy_string(&subject_date, mDevice.mWatch.getTime("%a %d %b").c_str());
-	lv_subject_set_int(&subject_hour, mDevice.mWatch.getHourC());
-	lv_subject_set_int(&subject_minute, mDevice.mWatch.getMinute());
-	lv_subject_set_int(&subject_hour_analog, (mDevice.mWatch.getHour() * 300) + (mDevice.mWatch.getMinute() * 5));
-	lv_subject_set_int(&subject_minute_analog, mDevice.mWatch.getMinute() * 60);
+  String time = mDevice.mWatch.getHourZ() + mDevice.mWatch.getTime(":%M ") +
+                mDevice.mWatch.getAmPmC(false);
+  lv_subject_copy_string(&subject_time, time.c_str());
+  lv_subject_copy_string(&subject_date,
+                         mDevice.mWatch.getTime("%a %d %b").c_str());
+  lv_subject_set_int(&subject_hour, mDevice.mWatch.getHourC());
+  lv_subject_set_int(&subject_minute, mDevice.mWatch.getMinute());
+  lv_subject_set_int(&subject_hour_analog,
+                     (mDevice.mWatch.getHour() * 300) +
+                         (mDevice.mWatch.getMinute() * 5));
+  lv_subject_set_int(&subject_minute_analog, mDevice.mWatch.getMinute() * 60);
 
-	lv_subject_set_int(&subject_day, mDevice.mWatch.getDay());
-	lv_subject_set_int(&subject_month, mDevice.mWatch.getMonth() + 1);
-	lv_subject_set_int(&subject_year, mDevice.mWatch.getYear());
-	lv_subject_set_int(&subject_weekday, mDevice.mWatch.getDayofWeek());
-	lv_subject_copy_string(&subject_am_pm, mDevice.mWatch.getAmPmC(false).c_str());
-	lv_subject_copy_string(&subject_month_short, mDevice.mWatch.getTime("%b").c_str());
-	lv_subject_copy_string(&subject_month_long, mDevice.mWatch.getTime("%B").c_str());
-	lv_subject_copy_string(&subject_weekday_short, mDevice.mWatch.getTime("%a").c_str());
-	lv_subject_copy_string(&subject_weekday_long, mDevice.mWatch.getTime("%A").c_str());
+  lv_subject_set_int(&subject_day, mDevice.mWatch.getDay());
+  lv_subject_set_int(&subject_month, mDevice.mWatch.getMonth() + 1);
+  lv_subject_set_int(&subject_year, mDevice.mWatch.getYear());
+  lv_subject_set_int(&subject_weekday, mDevice.mWatch.getDayofWeek());
+  lv_subject_copy_string(&subject_am_pm,
+                         mDevice.mWatch.getAmPmC(false).c_str());
+  lv_subject_copy_string(&subject_month_short,
+                         mDevice.mWatch.getTime("%b").c_str());
+  lv_subject_copy_string(&subject_month_long,
+                         mDevice.mWatch.getTime("%B").c_str());
+  lv_subject_copy_string(&subject_weekday_short,
+                         mDevice.mWatch.getTime("%a").c_str());
+  lv_subject_copy_string(&subject_weekday_long,
+                         mDevice.mWatch.getTime("%A").c_str());
 
-	lv_subject_copy_string(&subject_power_off, mDevice.sleepTimerLeft().c_str());
+  lv_subject_copy_string(&subject_power_off, mDevice.sleepTimerLeft().c_str());
 
-	lv_subject_set_int(&subject_bluetooth, mDevice.mWatch.isConnected() ? 2 : mDevice.mWatch.isRunning() ? 1
-																										 : 0);
-	lv_subject_set_int(&subject_voltage, (int)mDevice.getMillitVolts());
-	lv_subject_set_int(&subject_steps, steps);
-	lv_subject_set_int(&subject_calories, mHealth.calculateCalories(steps));
-	lv_subject_set_int(&subject_battery, mDevice.getBattery());
-	lv_subject_set_int(&subject_phone_battery, mDevice.getPhoneBattery());
-	lv_subject_copy_string(&subject_last_sync, mDevice.getLastSync().c_str());
+  lv_subject_set_int(&subject_bluetooth, mDevice.mWatch.isConnected() ? 2
+                                         : mDevice.mWatch.isRunning() ? 1
+                                                                      : 0);
+  lv_subject_set_int(&subject_voltage, (int)mDevice.getMillitVolts());
+  lv_subject_set_int(&subject_steps, steps);
+  lv_subject_set_int(&subject_calories, mHealth.calculateCalories(steps));
+  lv_subject_set_int(&subject_battery, mDevice.getBattery());
+  lv_subject_set_int(&subject_phone_battery, mDevice.getPhoneBattery());
+  lv_subject_copy_string(&subject_last_sync, mDevice.getLastSync().c_str());
 
-	lv_subject_copy_string(&subject_bluetooth_state, mDevice.mWatch.isConnected() ? "Connected" : "Disconnected");
-	lv_subject_copy_string(&subject_camera_state, mDevice.mWatch.isCameraReady() ? "Ready" : "Inactive");
+  lv_subject_copy_string(&subject_bluetooth_state, mDevice.mWatch.isConnected()
+                                                       ? "Connected"
+                                                       : "Disconnected");
+  lv_subject_copy_string(&subject_camera_state,
+                         mDevice.mWatch.isCameraReady() ? "Ready" : "Inactive");
 
-	lv_subject_copy_string(&subject_distance, String(mHealth.calculateDistance(steps, mDevice.getUnits() == UT_METRIC), 2).c_str());
-	lv_subject_copy_string(&subject_distance_unit, mDevice.getDistanceUnit().c_str());
-	lv_subject_copy_string(&subject_temp_unit, mDevice.getTempUnit().c_str());
+  lv_subject_copy_string(
+      &subject_distance,
+      String(mHealth.calculateDistance(steps, mDevice.getUnits() == UT_METRIC),
+             2)
+          .c_str());
+  lv_subject_copy_string(&subject_distance_unit,
+                         mDevice.getDistanceUnit().c_str());
+  lv_subject_copy_string(&subject_temp_unit, mDevice.getTempUnit().c_str());
 
-	Weather w = mDevice.getCurrent();
-	lv_subject_set_int(&subject_temperature, mDevice.convertTemp(w.temp));
-	lv_subject_set_int(&subject_weather_icon, w.icon);
-	lv_obj_t *icon = lv_obj_find_by_name(home_screen, "h_icon");
-	if (icon)
-	{
-		lv_image_set_src(icon, getWeatherIcon(w.icon));
-	}
-	lv_subject_set_int(&subject_navigation, mDevice.isNavigationActive() ? 1 : 0);
+  Weather w = mDevice.getCurrent();
+  lv_subject_set_int(&subject_temperature, mDevice.convertTemp(w.temp));
+  lv_subject_set_int(&subject_weather_icon, w.icon);
+  lv_obj_t *icon = lv_obj_find_by_name(home_screen, "h_icon");
+  if (icon) {
+    lv_image_set_src(icon, getWeatherIcon(w.icon));
+  }
+  lv_subject_set_int(&subject_navigation, mDevice.isNavigationActive() ? 1 : 0);
 
-	lv_timer_handler();
+  lv_timer_handler();
 }
 
 /**
  * Set whether to invert the display
  * @param invert invert mode
  */
-void DisplayModule::setInvert(bool invert)
-{
-	inverted = invert;
-	if (home_screen)
-	{
-		lv_obj_invalidate(lv_screen_active());
-	}
+void DisplayModule::setInvert(bool invert) {
+  inverted = invert;
+  if (home_screen) {
+    lv_obj_invalidate(lv_screen_active());
+  }
 }
 
 /**
  * LVGL Tick handler
  */
-uint32_t DisplayModule::my_tick(void)
-{
-	return millis();
-}
+uint32_t DisplayModule::my_tick(void) { return millis(); }
 
 /**
  * LVGL display flush callback
@@ -263,730 +309,591 @@ uint32_t DisplayModule::my_tick(void)
  * @param area the update area
  * @param data the data to send
  */
-void DisplayModule::my_disp_flush(lv_display_t *disp, const lv_area_t *area, unsigned char *data)
-{
-	uint32_t width = lv_area_get_width(area);
-	uint32_t height = lv_area_get_height(area);
-	instance->GxEPD2_BW::drawImage((uint8_t *)data + 8, area->x1, area->y1, width, height, instance->inverted);
-	lv_display_flush_ready(disp);
+void DisplayModule::my_disp_flush(lv_display_t *disp, const lv_area_t *area,
+                                  unsigned char *data) {
+  uint32_t width = lv_area_get_width(area);
+  uint32_t height = lv_area_get_height(area);
+  instance->GxEPD2_BW::drawImage((uint8_t *)data + 8, area->x1, area->y1, width,
+                                 height, instance->inverted);
+  lv_display_flush_ready(disp);
 }
 
 /**
  * LVGL screen events callback
  * @param e lvgl event
  */
-void DisplayModule::screen_events_cb(lv_event_t *e)
-{
-	lv_event_code_t code = lv_event_get_code(e);
-	lv_obj_t *target = (lv_obj_t *)lv_event_get_target(e);
-	if (code == LV_EVENT_SCREEN_UNLOADED)
-	{
-		if (target == instance->navigation_screen)
-		{
-			if (!instance->mDevice.isNavigationActive())
-			{
-				instance->mDevice.sleepTimerStart(60);
-			}
-		}
-		else if (target == instance->control_screen)
-		{
-			instance->mDevice.sleepTimerStart(60);
-			if (instance->find_phone)
-			{
-				instance->find_phone = false;
-				instance->mDevice.mWatch.findPhone(instance->find_phone);
-			}
-		}
-		else if (target == instance->music_screen)
-		{
-			instance->mDevice.sleepTimerStart(60);
-		}
-	}
+void DisplayModule::screen_events_cb(lv_event_t *e) {
+  lv_event_code_t code = lv_event_get_code(e);
+  lv_obj_t *target = (lv_obj_t *)lv_event_get_target(e);
+  if (code == LV_EVENT_SCREEN_UNLOADED) {
+    if (target == instance->navigation_screen) {
+      if (!instance->mDevice.isNavigationActive()) {
+        instance->mDevice.sleepTimerStart(60);
+      }
+    } else if (target == instance->control_screen) {
+      instance->mDevice.sleepTimerStart(60);
+      if (instance->find_phone) {
+        instance->find_phone = false;
+        instance->mDevice.mWatch.findPhone(instance->find_phone);
+      }
+    } else if (target == instance->music_screen) {
+      instance->mDevice.sleepTimerStart(60);
+    }
+  }
 }
 
 /**
  * Callback to delete the temporary screen
  * @param e event type
  */
-void DisplayModule::temp_delete_cb(lv_event_t *e)
-{
-	if (instance->temp_screen)
-	{
-		lv_obj_delete(instance->temp_screen);
-	}
-	instance->temp_screen = NULL;
+void DisplayModule::temp_delete_cb(lv_event_t *e) {
+  if (instance->temp_screen) {
+    lv_obj_delete(instance->temp_screen);
+  }
+  instance->temp_screen = NULL;
 }
 
 /**
  * Handle the button events to trigger screen actions
  * @param buttonEvent the button event
  */
-void DisplayModule::handleButtons(ButtonEvent buttonEvent)
-{
-	lv_obj_t *active = lv_screen_active();
+void DisplayModule::handleButtons(ButtonEvent buttonEvent) {
+  lv_obj_t *active = lv_screen_active();
 
-	if (buttonEvent.click == single_click)
-	{
-		switch (buttonEvent.type)
-		{
-		case BT_MENU:
-			if (active == selector_screen)
-			{
-				if (face_max > 1)
-				{
-					if (face_index == 0)
-					{
-						lv_obj_delete(home_screen);
-						home_screen = home_create();
-						lv_screen_load(home_screen);
-						mDevice.setWatchface("default");
-					}
-					else
-					{
-						JsonArray array = face_list.as<JsonArray>();
-						load_watchface_from_info(array[face_index - 1]);
-					}
-				}
-			}
-			if (active == home_screen)
-			{
-				load_menu_screen();
-			}
-			if (active == notification_screen)
-			{
-				n_size = 0;
-				n_index = -1;
-				mDevice.clearNotifications();
-				load_notifications_screen();
-			}
-			if (active == menu_screen)
-			{
-				switch (currentApp)
-				{
-				case ACTIVITY:
-					activity_day = 0;
-					load_activity_screen();
-					break;
-				case NOTIFICATIONS:
-					n_size = mDevice.getNotifications(notifications, MAX_NOTIFICATIONS);
-					n_index = 0;
-					load_notifications_screen();
-					break;
-				case WEATHER:
-					load_weather_screen();
-					break;
-				case PAIRING:
-					load_pairing_screen();
-					break;
-				case NAVIGATION:
-					lv_screen_load(navigation_screen);
-					mDevice.sleepTimerStart(TIMER_INFINITE);
-					break;
-				case SETTINGS:
-					load_settings_screen();
-					break;
-				case CONTROLS:
-					lv_screen_load(control_screen);
-					mDevice.sleepTimerStart(TIMER_INFINITE);
-					break;
-				case MUSIC:
-					lv_screen_load(music_screen);
-					mDevice.sleepTimerStart(TIMER_INFINITE);
-					break;
-				case QR_CODES:
-					load_qr_screen();
-					break;
-				case CONTACTS:
-					load_contacts_screen();
-					break;
-				case XML_LOADER:
-					back_folder = "/";
-					xml_folder = String(LV_FS_ARDUINO_ESP_LITTLEFS_PATH) + "/";
-					load_xml_screen();
-					break;
-				default:
-					break;
-				}
-			}
-			if (active == settings_screen)
-			{
-				if (lv_subject_get_int(&subject_settings_view) == 0)
-				{
-					int index = lv_subject_get_int(&subject_settings_index);
-					lv_subject_set_int(&subject_settings_view, index + 1);
-					load_settings_screen();
-				}
-			}
-			if (active == music_screen)
-			{
-				if (lv_subject_get_int(&subject_music_view) == 0)
-				{
-					mDevice.mWatch.musicControl(MUSIC_TOGGLE);
-				}
-				else
-				{
-					mDevice.mWatch.musicControl(VOLUME_MUTE);
-				}
-			}
-			if (active == control_screen)
-			{
-				mDevice.mWatch.capturePhoto();
-			}
-			if (active == xml_screen)
-			{
-				if (xml_max == 0)
-				{
-					Timber.i("No files found");
-				}
-				else
-				{
-					int i = 0;
-					if (back_folder != "/")
-					{
-						if (xml_index == 0)
-						{
-							Timber.i("Navigate back to " + back_folder);
-							xml_folder = back_folder;
-							back_folder = mDevice.mStorage.getParentFolder(xml_folder);
-							load_xml_screen();
-							return;
-						}
-						i = 1;
-					}
-					JsonArray array = xmls.as<JsonArray>();
-					String relative = array[xml_index - i].as<String>();
-					String path = array[xml_index - i].as<String>();
-					path.replace("/lvgl", "C:");
-					String name = mDevice.mStorage.getFileName(path, false);
+  if (buttonEvent.click == single_click) {
+    switch (buttonEvent.type) {
+    case BT_MENU:
+      if (active == selector_screen) {
+        if (face_max > 1) {
+          if (face_index == 0) {
+            lv_obj_delete(home_screen);
+            home_screen = home_create();
+            lv_screen_load(home_screen);
+            mDevice.setWatchface("default");
+          } else {
+            JsonArray array = face_list.as<JsonArray>();
+            load_watchface_from_info(array[face_index - 1]);
+          }
+        }
+      }
+      if (active == home_screen) {
+        load_menu_screen();
+      }
+      if (active == notification_screen) {
+        n_size = 0;
+        n_index = -1;
+        mDevice.clearNotifications();
+        load_notifications_screen();
+      }
+      if (active == menu_screen) {
+        switch (currentApp) {
+        case ACTIVITY:
+          activity_day = 0;
+          load_activity_screen();
+          break;
+        case NOTIFICATIONS:
+          n_size = mDevice.getNotifications(notifications, MAX_NOTIFICATIONS);
+          n_index = 0;
+          load_notifications_screen();
+          break;
+        case WEATHER:
+          load_weather_screen();
+          break;
+        case PAIRING:
+          load_pairing_screen();
+          break;
+        case NAVIGATION:
+          lv_screen_load(navigation_screen);
+          mDevice.sleepTimerStart(TIMER_INFINITE);
+          break;
+        case SETTINGS:
+          load_settings_screen();
+          break;
+        case CONTROLS:
+          lv_screen_load(control_screen);
+          mDevice.sleepTimerStart(TIMER_INFINITE);
+          break;
+        case MUSIC:
+          lv_screen_load(music_screen);
+          mDevice.sleepTimerStart(TIMER_INFINITE);
+          break;
+        case QR_CODES:
+          load_qr_screen();
+          break;
+        case CONTACTS:
+          load_contacts_screen();
+          break;
+        case XML_LOADER:
+          back_folder = "/";
+          xml_folder = String(LV_FS_ARDUINO_ESP_LITTLEFS_PATH) + "/";
+          load_xml_screen();
+          break;
+        default:
+          break;
+        }
+      }
+      if (active == settings_screen) {
+        if (lv_subject_get_int(&subject_settings_view) == 0) {
+          int index = lv_subject_get_int(&subject_settings_index);
 
-					if (path.endsWith(".xml"))
-					{
-						Timber.i("Opening xml file " + path);
-						lv_xml_register_component_from_file(path.c_str());
-						temp_screen = (lv_obj_t *)lv_xml_create(NULL, name.c_str(), NULL);
-						if (temp_screen)
-						{
-							lv_screen_load(temp_screen);
-							lv_obj_add_event_cb(temp_screen, temp_delete_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
-						}
-						else
-						{
-							Timber.e("Failed to load component");
-						}
-					}
-					else if (path.endsWith(".bin"))
-					{
-						Timber.i("Opening bin file " + path);
+          if (index == 5) {
+            watchy_shutdown(false);
+            return;
+          }
+          lv_subject_set_int(&subject_settings_view, index + 1);
+          load_settings_screen();
+        }
+      }
+      if (active == music_screen) {
+        if (lv_subject_get_int(&subject_music_view) == 0) {
+          mDevice.mWatch.musicControl(MUSIC_TOGGLE);
+        } else {
+          mDevice.mWatch.musicControl(VOLUME_MUTE);
+        }
+      }
+      if (active == control_screen) {
+        mDevice.mWatch.capturePhoto();
+      }
+      if (active == xml_screen) {
+        if (xml_max == 0) {
+          Timber.i("No files found");
+        } else {
+          int i = 0;
+          if (back_folder != "/") {
+            if (xml_index == 0) {
+              Timber.i("Navigate back to " + back_folder);
+              xml_folder = back_folder;
+              back_folder = mDevice.mStorage.getParentFolder(xml_folder);
+              load_xml_screen();
+              return;
+            }
+            i = 1;
+          }
+          JsonArray array = xmls.as<JsonArray>();
+          String relative = array[xml_index - i].as<String>();
+          String path = array[xml_index - i].as<String>();
+          path.replace("/lvgl", "C:");
+          String name = mDevice.mStorage.getFileName(path, false);
 
-						temp_screen = lv_obj_create(NULL);
+          if (path.endsWith(".xml")) {
+            Timber.i("Opening xml file " + path);
+            lv_xml_register_component_from_file(path.c_str());
+            temp_screen = (lv_obj_t *)lv_xml_create(NULL, name.c_str(), NULL);
+            if (temp_screen) {
+              lv_screen_load(temp_screen);
+              lv_obj_add_event_cb(temp_screen, temp_delete_cb,
+                                  LV_EVENT_SCREEN_UNLOADED, NULL);
+            } else {
+              Timber.e("Failed to load component");
+            }
+          } else if (path.endsWith(".bin")) {
+            Timber.i("Opening bin file " + path);
 
-						lv_obj_t *image = lv_image_create(temp_screen);
-						lv_obj_set_align(image, LV_ALIGN_CENTER);
-						lv_image_set_src(image, path.c_str());
+            temp_screen = lv_obj_create(NULL);
 
-						lv_screen_load(temp_screen);
-						lv_obj_add_event_cb(temp_screen, temp_delete_cb, LV_EVENT_SCREEN_UNLOADED, NULL);
-					}
-					else if (path.endsWith("/"))
-					{
-						Timber.i("Opening folder " + relative);
-						back_folder = mDevice.mStorage.getParentFolder(relative);
-						xml_folder = relative;
-						load_xml_screen();
-					}
-					else
-					{
-						Timber.e("Cannot open " + path + " Unknown format");
-					}
-				}
-			}
-			break;
-		case BT_BACK:
-			if (active == home_screen)
-			{
-				go_home = true;
-				load_qr_screen();
-			}
-			else if (active == menu_screen || go_home)
-			{
-				go_home = false;
-				lv_screen_load(home_screen);
-			}
-			else if (active == settings_screen)
-			{
-				if (lv_subject_get_int(&subject_settings_view) == 0)
-				{
-					load_menu_screen();
-				}
-				else
-				{
-					lv_subject_set_int(&subject_settings_view, 0);
-				}
-			}
-			else if (active == temp_screen)
-			{
-				lv_screen_load(xml_screen);
-			}
-			else if (active == selector_screen)
-			{
-				lv_screen_load(home_screen);
-			}
-			else
-			{
-				load_menu_screen();
-			}
-			break;
-		case BT_UP:
-			if (active == home_screen)
-			{
-				go_home = true;
-				load_weather_screen();
-			}
-			if (active == notification_screen)
-			{
-				n_index--;
-				if (n_index < 0)
-				{
-					n_index = n_size - 1;
-				}
-				load_notifications_screen();
-			}
-			if (active == activity_screen)
-			{
-				activity_day--;
-				if (activity_day <= -7)
-				{
-					activity_day = 0;
-				}
-				load_activity_screen();
-			}
-			if (active == menu_screen)
-			{
-				currentApp = previousApp(currentApp);
-				load_menu_screen();
-			}
-			if (active == settings_screen)
-			{
-				if (lv_subject_get_int(&subject_settings_view) == LIST_VIEW)
-				{
-					int index = lv_subject_get_int(&subject_settings_index);
-					index--;
-					if (index < 0)
-					{
-						index = 4;
-					}
-					lv_subject_set_int(&subject_settings_index, index);
-				}
-				else if (lv_subject_get_int(&subject_settings_view) == INTERVAL_VIEW)
-				{
-					int current = mDevice.getBLEInterval() / 5;
-					current--;
-					if (current == 5)
-					{
-						current = 4;
-					}
-					else if (current <= 0)
-					{
-						current = 1;
-					}
-					mDevice.setBLEInterval(current * 5);
-					load_settings_screen();
-				}
-				else if (lv_subject_get_int(&subject_settings_view) == CONFIGS_VIEW)
-				{
-					bool state = mDevice.getInvertDisplay();
-					state = !state;
-					mDevice.setInvertDisplay(state);
-					setInvert(state);
-					load_settings_screen();
-				}
-				else if (lv_subject_get_int(&subject_settings_view) == BATTERY_VIEW)
-				{
-					battery_day--;
-					if (battery_day <= -7)
-					{
-						battery_day = 0;
-					}
-					load_settings_screen();
-				}
-			}
-			if (active == qr_screen)
-			{
-				qr_index--;
-				if (qr_index < 0)
-				{
-					qr_index = QR_SIZE - 1;
-				}
-				load_qr_screen();
-			}
-			if (active == music_screen)
-			{
-				if (lv_subject_get_int(&subject_music_view) == 0)
-				{
-					mDevice.mWatch.musicControl(MUSIC_PREVIOUS);
-				}
-				else
-				{
-					mDevice.mWatch.musicControl(VOLUME_UP);
-				}
-			}
-			if (active == control_screen)
-			{
-				find_phone = !find_phone;
-				if (!mDevice.mWatch.isConnected())
-				{
-					find_phone = false;
-				}
-				mDevice.mWatch.findPhone(find_phone);
-			}
-			if (active == weather_screen)
-			{
-				lv_obj_t *forecast = lv_obj_find_by_name(weather_screen, "w_forecast");
-				if (forecast)
-				{
-					scroll_list(forecast, -1);
-				}
-			}
-			if (active == contacts_screen)
-			{
-				lv_obj_t *c_list = lv_obj_find_by_name(contacts_screen, "c_list");
-				if (c_list)
-				{
-					if (!lv_obj_has_flag(c_list, LV_OBJ_FLAG_HIDDEN))
-					{
-						scroll_list(c_list, -1);
-					}
-				}
-			}
-			if (active == xml_screen)
-			{
-				xml_index--;
-				if (xml_index < 0)
-				{
-					xml_index = 0;
-				}
-				lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
-				if (file_list)
-				{
-					set_selected_item_index(file_list, xml_index, true);
-				}
-			}
-			if (active == selector_screen)
-			{
-				face_index--;
-				if (face_index < 0)
-				{
-					face_index = 0;
-				}
-				if (face_max > 0)
-				{
-					lv_obj_scroll_to_view(lv_obj_get_child(selector_screen, face_index), LV_ANIM_OFF);
-				}
-			}
-			break;
-		case BT_DOWN:
-			if (active == home_screen)
-			{
-				go_home = true;
-				n_size = mDevice.getNotifications(notifications, MAX_NOTIFICATIONS);
-				n_index = 0;
-				load_notifications_screen();
-			}
-			if (active == notification_screen)
-			{
-				n_index++;
-				if (n_index >= n_size)
-				{
-					n_index = 0;
-				}
-				load_notifications_screen();
-			}
-			if (active == activity_screen)
-			{
-				activity_day++;
-				if (activity_day > 0)
-				{
-					activity_day = -7;
-				}
-				load_activity_screen();
-			}
-			if (active == menu_screen)
-			{
-				currentApp = nextApp(currentApp);
-				load_menu_screen();
-			}
-			if (active == settings_screen)
-			{
-				if (lv_subject_get_int(&subject_settings_view) == LIST_VIEW)
-				{
-					int index = lv_subject_get_int(&subject_settings_index);
-					index++;
-					if (index >= 5)
-					{
-						index = 0;
-					}
-					lv_subject_set_int(&subject_settings_index, index);
-				}
-				else if (lv_subject_get_int(&subject_settings_view) == INTERVAL_VIEW)
-				{
-					int current = mDevice.getBLEInterval() / 5;
-					current++;
-					if (current == 5)
-					{
-						current = 6;
-					}
-					else if (current > 6)
-					{
-						current = 6;
-					}
-					mDevice.setBLEInterval(current * 5);
-					load_settings_screen();
-				}
-				else if (lv_subject_get_int(&subject_settings_view) == CONFIGS_VIEW)
-				{
-					bool state = mDevice.getInvertDisplay();
-					state = !state;
-					mDevice.setInvertDisplay(state);
-					setInvert(state);
-					load_settings_screen();
-				}
-				else if (lv_subject_get_int(&subject_settings_view) == BATTERY_VIEW)
-				{
-					battery_day++;
-					if (battery_day > 0)
-					{
-						battery_day = -7;
-					}
-					load_settings_screen();
-				}
-			}
-			if (active == qr_screen)
-			{
-				qr_index++;
-				if (qr_index >= QR_SIZE)
-				{
-					qr_index = 0;
-				}
-				load_qr_screen();
-			}
-			if (active == music_screen)
-			{
-				if (lv_subject_get_int(&subject_music_view) == 0)
-				{
-					mDevice.mWatch.musicControl(MUSIC_NEXT);
-				}
-				else
-				{
-					mDevice.mWatch.musicControl(VOLUME_DOWN);
-				}
-			}
-			if (active == control_screen)
-			{
-				mDevice.mWatch.capturePhoto();
-			}
-			if (active == weather_screen)
-			{
-				lv_obj_t *forecast = lv_obj_find_by_name(weather_screen, "w_forecast");
-				if (forecast)
-				{
-					scroll_list(forecast, 1);
-				}
-			}
-			if (active == contacts_screen)
-			{
-				lv_obj_t *c_list = lv_obj_find_by_name(contacts_screen, "c_list");
-				if (c_list)
-				{
-					if (!lv_obj_has_flag(c_list, LV_OBJ_FLAG_HIDDEN))
-					{
-						scroll_list(c_list, 1);
-					}
-				}
-			}
-			if (active == xml_screen)
-			{
-				xml_index++;
-				if (xml_index >= xml_max)
-				{
-					xml_index = xml_max - 1;
-				}
-				lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
-				if (file_list)
-				{
-					set_selected_item_index(file_list, xml_index, true);
-				}
-			}
-			if (active == selector_screen)
-			{
-				face_index++;
-				if (face_index >= face_max)
-				{
-					face_index = face_max - 1;
-				}
-				if (face_max > 0)
-				{
-					lv_obj_scroll_to_view(lv_obj_get_child(selector_screen, face_index), LV_ANIM_OFF);
-				}
-			}
-			break;
-		}
-	}
-	else if (buttonEvent.click == double_click)
-	{
-		switch (buttonEvent.type)
-		{
-		case BT_MENU:
-			break;
-		case BT_BACK:
-			break;
-		case BT_UP:
-			break;
-		case BT_DOWN:
-			break;
-		}
-	}
-	else if (buttonEvent.click == long_click)
-	{
-		switch (buttonEvent.type)
-		{
-		case BT_MENU:
-			if (active == activity_screen)
-			{
-				DateTime now = mDevice.getDateTime();
-				DateTime date = mDevice.getDateDifference(now, activity_day);
-				String path = mDevice.mStorage.filePath(STEPS_FOLDER, date.year, date.month, date.day);
-				mDevice.mStorage.deleteFile(path);
-			}
-			if (active == home_screen)
-			{
-				load_selector_screen();
-			}
-			if (active == music_screen)
-			{
-				int v = lv_subject_get_int(&subject_music_view);
-				v++;
-				if (v > 1)
-				{
-					v = 0;
-				}
-				lv_subject_set_int(&subject_music_view, v);
-			}
-			if (active == settings_screen)
-			{
-				if (lv_subject_get_int(&subject_settings_view) == STORAGE_VIEW)
-				{
-					mDevice.houseKeeping();
-				}
-			}
-			break;
-		case BT_BACK:
-			if (active != home_screen)
-			{
-				go_home = false;
-				lv_screen_load(home_screen);
-			}
-			break;
-		case BT_UP:
-			if (active == settings_screen)
-			{
-				if (lv_subject_get_int(&subject_settings_view) == 4)
-				{
-					mDevice.houseKeeping();
-				}
-			}
-			if (active == music_screen)
-			{
-				int v = lv_subject_get_int(&subject_music_view);
-				v++;
-				if (v > 1)
-				{
-					v = 0;
-				}
-				lv_subject_set_int(&subject_music_view, v);
-			}
-			break;
-		case BT_DOWN:
-			if (active == music_screen)
-			{
-				int v = lv_subject_get_int(&subject_music_view);
-				v++;
-				if (v > 1)
-				{
-					v = 0;
-				}
-				lv_subject_set_int(&subject_music_view, v);
-			}
-			break;
-		}
-	}
+            lv_obj_t *image = lv_image_create(temp_screen);
+            lv_obj_set_align(image, LV_ALIGN_CENTER);
+            lv_image_set_src(image, path.c_str());
+
+            lv_screen_load(temp_screen);
+            lv_obj_add_event_cb(temp_screen, temp_delete_cb,
+                                LV_EVENT_SCREEN_UNLOADED, NULL);
+          } else if (path.endsWith("/")) {
+            Timber.i("Opening folder " + relative);
+            back_folder = mDevice.mStorage.getParentFolder(relative);
+            xml_folder = relative;
+            load_xml_screen();
+          } else {
+            Timber.e("Cannot open " + path + " Unknown format");
+          }
+        }
+      }
+      break;
+    case BT_BACK:
+      if (active == home_screen) {
+        go_home = true;
+        load_qr_screen();
+      } else if (active == menu_screen || go_home) {
+        go_home = false;
+        lv_screen_load(home_screen);
+      } else if (active == settings_screen) {
+        if (lv_subject_get_int(&subject_settings_view) == 0) {
+          load_menu_screen();
+        } else {
+          lv_subject_set_int(&subject_settings_view, 0);
+        }
+      } else if (active == temp_screen) {
+        lv_screen_load(xml_screen);
+      } else if (active == selector_screen) {
+        lv_screen_load(home_screen);
+      } else {
+        load_menu_screen();
+      }
+      break;
+    case BT_UP:
+      if (active == home_screen) {
+        go_home = true;
+        load_weather_screen();
+      }
+      if (active == notification_screen) {
+        n_index--;
+        if (n_index < 0) {
+          n_index = n_size - 1;
+        }
+        load_notifications_screen();
+      }
+      if (active == activity_screen) {
+        activity_day--;
+        if (activity_day <= -7) {
+          activity_day = 0;
+        }
+        load_activity_screen();
+      }
+      if (active == menu_screen) {
+        currentApp = previousApp(currentApp);
+        load_menu_screen();
+      }
+      if (active == settings_screen) {
+        if (lv_subject_get_int(&subject_settings_view) == LIST_VIEW) {
+          int index = lv_subject_get_int(&subject_settings_index);
+          index--;
+          if (index < 0) {
+            index = 5;
+          }
+          lv_subject_set_int(&subject_settings_index, index);
+          lv_obj_t *setting_list =
+              lv_obj_find_by_name(settings_screen, "settings_main_list");
+          if (setting_list) {
+            scroll_to_checked(setting_list);
+          }
+        } else if (lv_subject_get_int(&subject_settings_view) ==
+                   INTERVAL_VIEW) {
+          int current = mDevice.getBLEInterval() / 5;
+          current--;
+          if (current == 5) {
+            current = 4;
+          } else if (current <= 0) {
+            current = 1;
+          }
+          mDevice.setBLEInterval(current * 5);
+          load_settings_screen();
+        } else if (lv_subject_get_int(&subject_settings_view) == CONFIGS_VIEW) {
+          bool state = mDevice.getInvertDisplay();
+          state = !state;
+          mDevice.setInvertDisplay(state);
+          setInvert(state);
+          load_settings_screen();
+        } else if (lv_subject_get_int(&subject_settings_view) == BATTERY_VIEW) {
+          battery_day--;
+          if (battery_day <= -7) {
+            battery_day = 0;
+          }
+          load_settings_screen();
+        }
+      }
+      if (active == qr_screen) {
+        qr_index--;
+        if (qr_index < 0) {
+          qr_index = QR_SIZE - 1;
+        }
+        load_qr_screen();
+      }
+      if (active == music_screen) {
+        if (lv_subject_get_int(&subject_music_view) == 0) {
+          mDevice.mWatch.musicControl(MUSIC_PREVIOUS);
+        } else {
+          mDevice.mWatch.musicControl(VOLUME_UP);
+        }
+      }
+      if (active == control_screen) {
+        find_phone = !find_phone;
+        if (!mDevice.mWatch.isConnected()) {
+          find_phone = false;
+        }
+        mDevice.mWatch.findPhone(find_phone);
+      }
+      if (active == weather_screen) {
+        lv_obj_t *forecast = lv_obj_find_by_name(weather_screen, "w_forecast");
+        if (forecast) {
+          scroll_list(forecast, -1);
+        }
+      }
+      if (active == contacts_screen) {
+        lv_obj_t *c_list = lv_obj_find_by_name(contacts_screen, "c_list");
+        if (c_list) {
+          if (!lv_obj_has_flag(c_list, LV_OBJ_FLAG_HIDDEN)) {
+            scroll_list(c_list, -1);
+          }
+        }
+      }
+      if (active == xml_screen) {
+        xml_index--;
+        if (xml_index < 0) {
+          xml_index = 0;
+        }
+        lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
+        if (file_list) {
+          set_selected_item_index(file_list, xml_index, true);
+        }
+      }
+      if (active == selector_screen) {
+        face_index--;
+        if (face_index < 0) {
+          face_index = 0;
+        }
+        if (face_max > 0) {
+          lv_obj_scroll_to_view(lv_obj_get_child(selector_screen, face_index),
+                                LV_ANIM_OFF);
+        }
+      }
+      break;
+    case BT_DOWN:
+      if (active == home_screen) {
+        go_home = true;
+        n_size = mDevice.getNotifications(notifications, MAX_NOTIFICATIONS);
+        n_index = 0;
+        load_notifications_screen();
+      }
+      if (active == notification_screen) {
+        n_index++;
+        if (n_index >= n_size) {
+          n_index = 0;
+        }
+        load_notifications_screen();
+      }
+      if (active == activity_screen) {
+        activity_day++;
+        if (activity_day > 0) {
+          activity_day = -7;
+        }
+        load_activity_screen();
+      }
+      if (active == menu_screen) {
+        currentApp = nextApp(currentApp);
+        load_menu_screen();
+      }
+      if (active == settings_screen) {
+        if (lv_subject_get_int(&subject_settings_view) == LIST_VIEW) {
+          int index = lv_subject_get_int(&subject_settings_index);
+          index++;
+          if (index >= 6) {
+            index = 0;
+          }
+          lv_subject_set_int(&subject_settings_index, index);
+
+          lv_obj_t *setting_list =
+              lv_obj_find_by_name(settings_screen, "settings_main_list");
+          if (setting_list) {
+            scroll_to_checked(setting_list);
+          }
+        } else if (lv_subject_get_int(&subject_settings_view) ==
+                   INTERVAL_VIEW) {
+          int current = mDevice.getBLEInterval() / 5;
+          current++;
+          if (current == 5) {
+            current = 6;
+          } else if (current > 6) {
+            current = 6;
+          }
+          mDevice.setBLEInterval(current * 5);
+          load_settings_screen();
+        } else if (lv_subject_get_int(&subject_settings_view) == CONFIGS_VIEW) {
+          bool state = mDevice.getInvertDisplay();
+          state = !state;
+          mDevice.setInvertDisplay(state);
+          setInvert(state);
+          load_settings_screen();
+        } else if (lv_subject_get_int(&subject_settings_view) == BATTERY_VIEW) {
+          battery_day++;
+          if (battery_day > 0) {
+            battery_day = -7;
+          }
+          load_settings_screen();
+        }
+      }
+      if (active == qr_screen) {
+        qr_index++;
+        if (qr_index >= QR_SIZE) {
+          qr_index = 0;
+        }
+        load_qr_screen();
+      }
+      if (active == music_screen) {
+        if (lv_subject_get_int(&subject_music_view) == 0) {
+          mDevice.mWatch.musicControl(MUSIC_NEXT);
+        } else {
+          mDevice.mWatch.musicControl(VOLUME_DOWN);
+        }
+      }
+      if (active == control_screen) {
+        mDevice.mWatch.capturePhoto();
+      }
+      if (active == weather_screen) {
+        lv_obj_t *forecast = lv_obj_find_by_name(weather_screen, "w_forecast");
+        if (forecast) {
+          scroll_list(forecast, 1);
+        }
+      }
+      if (active == contacts_screen) {
+        lv_obj_t *c_list = lv_obj_find_by_name(contacts_screen, "c_list");
+        if (c_list) {
+          if (!lv_obj_has_flag(c_list, LV_OBJ_FLAG_HIDDEN)) {
+            scroll_list(c_list, 1);
+          }
+        }
+      }
+      if (active == xml_screen) {
+        xml_index++;
+        if (xml_index >= xml_max) {
+          xml_index = xml_max - 1;
+        }
+        lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
+        if (file_list) {
+          set_selected_item_index(file_list, xml_index, true);
+        }
+      }
+      if (active == selector_screen) {
+        face_index++;
+        if (face_index >= face_max) {
+          face_index = face_max - 1;
+        }
+        if (face_max > 0) {
+          lv_obj_scroll_to_view(lv_obj_get_child(selector_screen, face_index),
+                                LV_ANIM_OFF);
+        }
+      }
+      break;
+    }
+  } else if (buttonEvent.click == double_click) {
+    switch (buttonEvent.type) {
+    case BT_MENU:
+      break;
+    case BT_BACK:
+      break;
+    case BT_UP:
+      break;
+    case BT_DOWN:
+      break;
+    }
+  } else if (buttonEvent.click == long_click) {
+    switch (buttonEvent.type) {
+    case BT_MENU:
+      if (active == activity_screen) {
+        DateTime now = mDevice.getDateTime();
+        DateTime date = mDevice.getDateDifference(now, activity_day);
+        String path = mDevice.mStorage.filePath(STEPS_FOLDER, date.year,
+                                                date.month, date.day);
+        mDevice.mStorage.deleteFile(path);
+      }
+      if (active == home_screen) {
+        load_selector_screen();
+      }
+      if (active == music_screen) {
+        int v = lv_subject_get_int(&subject_music_view);
+        v++;
+        if (v > 1) {
+          v = 0;
+        }
+        lv_subject_set_int(&subject_music_view, v);
+      }
+      if (active == settings_screen) {
+        if (lv_subject_get_int(&subject_settings_view) == STORAGE_VIEW) {
+          mDevice.houseKeeping();
+        }
+      }
+      break;
+    case BT_BACK:
+      if (active != home_screen) {
+        go_home = false;
+        lv_screen_load(home_screen);
+      }
+      break;
+    case BT_UP:
+      if (active == settings_screen) {
+        if (lv_subject_get_int(&subject_settings_view) == 4) {
+          mDevice.houseKeeping();
+        }
+      }
+      if (active == music_screen) {
+        int v = lv_subject_get_int(&subject_music_view);
+        v++;
+        if (v > 1) {
+          v = 0;
+        }
+        lv_subject_set_int(&subject_music_view, v);
+      }
+      break;
+    case BT_DOWN:
+      if (active == music_screen) {
+        int v = lv_subject_get_int(&subject_music_view);
+        v++;
+        if (v > 1) {
+          v = 0;
+        }
+        lv_subject_set_int(&subject_music_view, v);
+      }
+      break;
+    }
+  }
 }
 
 /**
  * Handle the motion interrupt events
  * @param irq the irq flags
  */
-void DisplayModule::handleMotionInterrupt(uint16_t irq)
-{
-	lv_obj_t *active = lv_screen_active();
+void DisplayModule::handleMotionInterrupt(uint16_t irq) {
+  lv_obj_t *active = lv_screen_active();
 
-	if (irq & WAKEUP_INT)
-	{
-		if (active == notification_screen)
-		{
-			n_index++;
-			if (n_index >= n_size)
-			{
-				n_index = 0;
-			}
-			load_notifications_screen();
-		}
-		if (active == control_screen)
-		{
-			mDevice.mWatch.capturePhoto();
-		}
-		if (active == music_screen)
-		{
-			mDevice.mWatch.musicControl(MUSIC_NEXT);
-		}
-		if (active == qr_screen)
-		{
-			qr_index++;
-			if (qr_index >= QR_SIZE)
-			{
-				qr_index = 0;
-			}
-			load_qr_screen();
-		}
-	}
+  if (irq & WAKEUP_INT) {
+    if (active == notification_screen) {
+      n_index++;
+      if (n_index >= n_size) {
+        n_index = 0;
+      }
+      load_notifications_screen();
+    }
+    if (active == control_screen) {
+      mDevice.mWatch.capturePhoto();
+    }
+    if (active == music_screen) {
+      mDevice.mWatch.musicControl(MUSIC_NEXT);
+    }
+    if (active == qr_screen) {
+      qr_index++;
+      if (qr_index >= QR_SIZE) {
+        qr_index = 0;
+      }
+      load_qr_screen();
+    }
+  }
 }
 
 /**
- * Navigation Icon callback, sets the navigation icon data to the navigation screen
+ * Navigation Icon callback, sets the navigation icon data to the navigation
+ * screen
  * @param data icon data
  * @param icon whether icon is enabled
  */
-void DisplayModule::navigationIconCallback(uint8_t *data, bool icon)
-{
-	if (!navigation_screen)
-	{
-		return;
-	}
-	lv_obj_t *canvas = lv_obj_find_by_name(navigation_screen, "canvas");
-	if (canvas)
-	{
-		lv_obj_set_flag(canvas, LV_OBJ_FLAG_HIDDEN, !icon);
+void DisplayModule::navigationIconCallback(uint8_t *data, bool icon) {
+  if (!navigation_screen) {
+    return;
+  }
+  lv_obj_t *canvas = lv_obj_find_by_name(navigation_screen, "canvas");
+  if (canvas) {
+    lv_obj_set_flag(canvas, LV_OBJ_FLAG_HIDDEN, !icon);
 
-		for (int y = 0; y < 48; y++)
-		{
-			for (int x = 0; x < 48; x++)
-			{
-				int byte_index = (y * 48 + x) / 8;
-				int bit_pos = 7 - (x % 8);
-				bool px_on = (data[byte_index] >> bit_pos) & 0x01;
-				lv_canvas_set_px(canvas, x, y, px_on ? lv_color_make(0, 0, 0) : lv_color_make(255, 255, 255), LV_OPA_COVER);
-			}
-		}
-	}
+    for (int y = 0; y < 48; y++) {
+      for (int x = 0; x < 48; x++) {
+        int byte_index = (y * 48 + x) / 8;
+        int bit_pos = 7 - (x % 8);
+        bool px_on = (data[byte_index] >> bit_pos) & 0x01;
+        lv_canvas_set_px(canvas, x, y,
+                         px_on ? lv_color_make(0, 0, 0)
+                               : lv_color_make(255, 255, 255),
+                         LV_OPA_COVER);
+      }
+    }
+  }
 }
 
 /**
@@ -996,645 +903,581 @@ void DisplayModule::navigationIconCallback(uint8_t *data, bool icon)
  * @param directions navigation directions
  * @param icon whether icon is enabled
  */
-void DisplayModule::navigationDataCallback(String text, String title, String directions, bool icon)
-{
-	if (!navigation_screen)
-	{
-		return;
-	}
-	lv_obj_t *canvas = lv_obj_find_by_name(navigation_screen, "canvas");
-	if (canvas)
-	{
-		lv_obj_set_flag(canvas, LV_OBJ_FLAG_HIDDEN, !icon);
-	}
-	lv_obj_t *n_text = lv_obj_find_by_name(navigation_screen, "n_text");
-	if (n_text)
-	{
-		lv_label_set_text(n_text, text.c_str());
-	}
-	lv_obj_t *n_distance = lv_obj_find_by_name(navigation_screen, "n_distance");
-	if (n_distance)
-	{
-		lv_label_set_text(n_distance, title.c_str());
-	}
-	lv_obj_t *n_direction = lv_obj_find_by_name(navigation_screen, "n_direction");
-	if (n_direction)
-	{
-		lv_label_set_text(n_direction, directions.c_str());
-	}
+void DisplayModule::navigationDataCallback(String text, String title,
+                                           String directions, bool icon) {
+  if (!navigation_screen) {
+    return;
+  }
+  lv_obj_t *canvas = lv_obj_find_by_name(navigation_screen, "canvas");
+  if (canvas) {
+    lv_obj_set_flag(canvas, LV_OBJ_FLAG_HIDDEN, !icon);
+  }
+  lv_obj_t *n_text = lv_obj_find_by_name(navigation_screen, "n_text");
+  if (n_text) {
+    lv_label_set_text(n_text, text.c_str());
+  }
+  lv_obj_t *n_distance = lv_obj_find_by_name(navigation_screen, "n_distance");
+  if (n_distance) {
+    lv_label_set_text(n_distance, title.c_str());
+  }
+  lv_obj_t *n_direction = lv_obj_find_by_name(navigation_screen, "n_direction");
+  if (n_direction) {
+    lv_label_set_text(n_direction, directions.c_str());
+  }
 }
 
 /**
  * Load the notification screen
  */
-void DisplayModule::load_notifications_screen()
-{
-	if (!notification_screen)
-	{
-		return;
-	}
+void DisplayModule::load_notifications_screen() {
+  if (!notification_screen) {
+    return;
+  }
 
-	lv_obj_t *icon = lv_obj_find_by_name(notification_screen, "n_icon");
-	if (icon)
-	{
-		lv_image_set_src(icon, getAppIcon(n_size > 0 ? notifications[n_index].icon : 0));
-	}
-	lv_obj_t *title = lv_obj_find_by_name(notification_screen, "n_title");
-	if (title)
-	{
-		lv_label_set_text(title, n_size > 0 ? notifications[n_index].title.c_str() : "");
-	}
-	lv_obj_t *message = lv_obj_find_by_name(notification_screen, "n_message");
-	if (message)
-	{
-		lv_label_set_text(message, n_size > 0 ? notifications[n_index].message.c_str() : "No notifications, check back later");
-	}
-	lv_obj_t *time = lv_obj_find_by_name(notification_screen, "n_time");
-	if (time)
-	{
-		lv_label_set_text(time, n_size > 0 ? notifications[n_index].time.c_str() : "");
-	}
+  lv_obj_t *icon = lv_obj_find_by_name(notification_screen, "n_icon");
+  if (icon) {
+    lv_image_set_src(icon,
+                     getAppIcon(n_size > 0 ? notifications[n_index].icon : 0));
+  }
+  lv_obj_t *title = lv_obj_find_by_name(notification_screen, "n_title");
+  if (title) {
+    lv_label_set_text(title,
+                      n_size > 0 ? notifications[n_index].title.c_str() : "");
+  }
+  lv_obj_t *message = lv_obj_find_by_name(notification_screen, "n_message");
+  if (message) {
+    lv_label_set_text(message, n_size > 0
+                                   ? notifications[n_index].message.c_str()
+                                   : "No notifications, check back later");
+  }
+  lv_obj_t *time = lv_obj_find_by_name(notification_screen, "n_time");
+  if (time) {
+    lv_label_set_text(time,
+                      n_size > 0 ? notifications[n_index].time.c_str() : "");
+  }
 
-	lv_obj_t *count = lv_obj_find_by_name(notification_screen, "n_count");
-	String c = String(n_index + 1) + "/" + String(n_size);
-	if (n_size == -1)
-	{
-		c = "";
-	}
-	if (count)
-	{
-		lv_label_set_text(count, c.c_str());
-	}
+  lv_obj_t *count = lv_obj_find_by_name(notification_screen, "n_count");
+  String c = String(n_index + 1) + "/" + String(n_size);
+  if (n_size == -1) {
+    c = "";
+  }
+  if (count) {
+    lv_label_set_text(count, c.c_str());
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != notification_screen)
-	{
-		lv_screen_load(notification_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != notification_screen) {
+    lv_screen_load(notification_screen);
+  }
 }
 
 /**
  * Load the weather screen
  */
-void DisplayModule::load_weather_screen()
-{
-	if (!weather_screen)
-	{
-		return;
-	}
+void DisplayModule::load_weather_screen() {
+  if (!weather_screen) {
+    return;
+  }
 
-	lv_obj_t *city = lv_obj_find_by_name(weather_screen, "w_city");
-	if (city)
-	{
-		lv_label_set_text(city, mDevice.getCity().c_str());
-	}
+  lv_obj_t *city = lv_obj_find_by_name(weather_screen, "w_city");
+  if (city) {
+    lv_label_set_text(city, mDevice.getCity().c_str());
+  }
 
-	Weather w = mDevice.getCurrent();
-	lv_subject_set_int(&subject_temperature, w.temp);
-	lv_obj_t *icon = lv_obj_find_by_name(weather_screen, "w_icon");
-	if (icon)
-	{
-		lv_image_set_src(icon, getWeatherIcon(w.icon));
-	}
+  Weather w = mDevice.getCurrent();
+  lv_subject_set_int(&subject_temperature, w.temp);
+  lv_obj_t *icon = lv_obj_find_by_name(weather_screen, "w_icon");
+  if (icon) {
+    lv_image_set_src(icon, getWeatherIcon(w.icon));
+  }
 
-	lv_obj_t *forecast = lv_obj_find_by_name(weather_screen, "w_forecast");
-	if (forecast)
-	{
-		lv_obj_clean(forecast);
-		Weather forecasts[6]; // Up to 6 days ahead (excluding today)
-		int n = mDevice.getForecast(forecasts, 6);
-		for (int i = 0; i < n; i++)
-		{
-			forecast_create(forecast, mDevice.getDay(forecasts[i].day).c_str(), getWeatherIcon(forecasts[i].icon), String(mDevice.convertTemp(forecasts[i].temp)).c_str());
-		}
-	}
+  lv_obj_t *forecast = lv_obj_find_by_name(weather_screen, "w_forecast");
+  if (forecast) {
+    lv_obj_clean(forecast);
+    Weather forecasts[6]; // Up to 6 days ahead (excluding today)
+    int n = mDevice.getForecast(forecasts, 6);
+    for (int i = 0; i < n; i++) {
+      forecast_create(forecast, mDevice.getDay(forecasts[i].day).c_str(),
+                      getWeatherIcon(forecasts[i].icon),
+                      String(mDevice.convertTemp(forecasts[i].temp)).c_str());
+    }
+  }
 
-	lv_screen_load(weather_screen);
+  lv_screen_load(weather_screen);
 }
 
 /**
  * Load the activity screen
  */
-void DisplayModule::load_activity_screen()
-{
-	if (!activity_screen)
-	{
-		return;
-	}
+void DisplayModule::load_activity_screen() {
+  if (!activity_screen) {
+    return;
+  }
 
-	DateTime now = mDevice.getDateTime();
-	DateTime date = mDevice.getDateDifference(now, activity_day);
-	int32_t totalSteps = 0;
+  DateTime now = mDevice.getDateTime();
+  DateTime date = mDevice.getDateDifference(now, activity_day);
+  int32_t totalSteps = 0;
 
-	lv_obj_t *day = lv_obj_find_by_name(activity_screen, "a_date");
-	if (day)
-	{
-		if (activity_day == 0)
-		{
-			lv_label_set_text(day, "Today");
-		}
-		else if (activity_day == -1)
-		{
-			lv_label_set_text(day, "Yesterday");
-		}
-		else
-		{
-			lv_label_set_text_fmt(day, "%02d/%02d/%04d", date.day, date.month, date.year);
-		}
-	}
+  lv_obj_t *day = lv_obj_find_by_name(activity_screen, "a_date");
+  if (day) {
+    if (activity_day == 0) {
+      lv_label_set_text(day, "Today");
+    } else if (activity_day == -1) {
+      lv_label_set_text(day, "Yesterday");
+    } else {
+      lv_label_set_text_fmt(day, "%02d/%02d/%04d", date.day, date.month,
+                            date.year);
+    }
+  }
 
-	lv_obj_t *bar_chart = lv_obj_find_by_name(activity_screen, "bar_chart");
-	if (bar_chart)
-	{
-		lv_chart_set_type(bar_chart, LV_CHART_TYPE_BAR);
-		lv_chart_series_t *series = lv_chart_get_series_next(bar_chart, NULL);
+  lv_obj_t *bar_chart = lv_obj_find_by_name(activity_screen, "bar_chart");
+  if (bar_chart) {
+    lv_chart_set_type(bar_chart, LV_CHART_TYPE_BAR);
+    lv_chart_series_t *series = lv_chart_get_series_next(bar_chart, NULL);
 
-		int32_t array[17];
-		int32_t highest = mDevice.getStepsRecords(array, 6, 17, date.year, date.month, date.day);
+    int32_t array[17];
+    int32_t highest =
+        mDevice.getStepsRecords(array, 6, 17, date.year, date.month, date.day);
 
-		for (int i = 0; i < 17; i++)
-		{
-			lv_chart_set_series_value_by_id(bar_chart, series, i, array[i] == 0 ? LV_CHART_POINT_NONE : array[i]);
-			totalSteps += array[i];
-		}
-		lv_chart_set_axis_max_value(bar_chart, LV_CHART_AXIS_PRIMARY_Y, highest > 500 ? highest : 500);
-		lv_obj_set_flag(bar_chart, LV_OBJ_FLAG_HIDDEN, highest == 0);
-	}
-	lv_obj_t *steps = lv_obj_find_by_name(activity_screen, "a_steps");
-	if (steps)
-	{
-		lv_label_set_text_fmt(steps, "%d", totalSteps);
-	}
-	lv_obj_t *calories = lv_obj_find_by_name(activity_screen, "a_calories");
-	if (calories)
-	{
-		lv_label_set_text_fmt(calories, "%d", mHealth.calculateCalories(totalSteps));
-	}
-	lv_obj_t *distance = lv_obj_find_by_name(activity_screen, "a_distance");
-	if (distance)
-	{
-		lv_label_set_text(distance, String(mHealth.calculateDistance(totalSteps, mDevice.getUnits()), 2).c_str());
-	}
+    for (int i = 0; i < 17; i++) {
+      lv_chart_set_series_value_by_id(
+          bar_chart, series, i, array[i] == 0 ? LV_CHART_POINT_NONE : array[i]);
+      totalSteps += array[i];
+    }
+    lv_chart_set_axis_max_value(bar_chart, LV_CHART_AXIS_PRIMARY_Y,
+                                highest > 500 ? highest : 500);
+    lv_obj_set_flag(bar_chart, LV_OBJ_FLAG_HIDDEN, highest == 0);
+  }
+  lv_obj_t *steps = lv_obj_find_by_name(activity_screen, "a_steps");
+  if (steps) {
+    lv_label_set_text_fmt(steps, "%d", totalSteps);
+  }
+  lv_obj_t *calories = lv_obj_find_by_name(activity_screen, "a_calories");
+  if (calories) {
+    lv_label_set_text_fmt(calories, "%d",
+                          mHealth.calculateCalories(totalSteps));
+  }
+  lv_obj_t *distance = lv_obj_find_by_name(activity_screen, "a_distance");
+  if (distance) {
+    lv_label_set_text(
+        distance,
+        String(mHealth.calculateDistance(totalSteps, mDevice.getUnits()), 2)
+            .c_str());
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != activity_screen)
-	{
-		lv_screen_load(activity_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != activity_screen) {
+    lv_screen_load(activity_screen);
+  }
 }
 
 /**
  * Load the menu screen
  */
-void DisplayModule::load_menu_screen()
-{
-	if (!menu_screen)
-	{
-		return;
-	}
+void DisplayModule::load_menu_screen() {
+  if (!menu_screen) {
+    return;
+  }
 
-	IconText app = getApp(currentApp);
+  IconText app = getApp(currentApp);
 
-	lv_obj_t *text = lv_obj_find_by_name(menu_screen, "m_text");
-	lv_obj_t *icon = lv_obj_find_by_name(menu_screen, "m_icon");
-	if (text)
-	{
-		lv_label_set_text(text, app.text);
-	}
-	if (icon)
-	{
-		lv_image_set_src(icon, app.icon);
-	}
+  lv_obj_t *text = lv_obj_find_by_name(menu_screen, "m_text");
+  lv_obj_t *icon = lv_obj_find_by_name(menu_screen, "m_icon");
+  if (text) {
+    lv_label_set_text(text, app.text);
+  }
+  if (icon) {
+    lv_image_set_src(icon, app.icon);
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != menu_screen)
-	{
-		lv_screen_load(menu_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != menu_screen) {
+    lv_screen_load(menu_screen);
+  }
 }
 
 /**
  * Load the pairing screen
  */
-void DisplayModule::load_pairing_screen()
-{
-	if (!pairing_screen)
-	{
-		return;
-	}
-	JsonDocument info;
-	info["Name"] = WATCH_NAME;
-	info["Mac"] = mDevice.getAddress();
-	String inf;
-	serializeJson(info, inf);
+void DisplayModule::load_pairing_screen() {
+  if (!pairing_screen) {
+    return;
+  }
+  JsonDocument info;
+  info["Name"] = WATCH_NAME;
+  info["Mac"] = mDevice.getAddress();
+  String inf;
+  serializeJson(info, inf);
 
-	lv_subject_copy_string(&subject_address, mDevice.getAddress().c_str());
-	lv_subject_copy_string(&subject_ble_name, WATCH_NAME);
+  lv_subject_copy_string(&subject_address, mDevice.getAddress().c_str());
+  lv_subject_copy_string(&subject_ble_name, WATCH_NAME);
 
-	lv_obj_t *qr = lv_obj_find_by_name(pairing_screen, "p_qr");
-	if (qr)
-	{
-		lv_qrcode_set_data(qr, inf.c_str());
-	}
+  lv_obj_t *qr = lv_obj_find_by_name(pairing_screen, "p_qr");
+  if (qr) {
+    lv_qrcode_set_data(qr, inf.c_str());
+  }
 
-	lv_screen_load(pairing_screen);
-	mDevice.sleepTimerStart(MINUTE_TO_S(5));
+  lv_screen_load(pairing_screen);
+  mDevice.sleepTimerStart(MINUTE_TO_S(5));
 }
 
 /**
  * Load the settings screen
  */
-void DisplayModule::load_settings_screen()
-{
-	if (!settings_screen)
-	{
-		return;
-	}
+void DisplayModule::load_settings_screen() {
+  if (!settings_screen) {
+    return;
+  }
 
-	/* INTERVAL */
-	if (lv_subject_get_int(&subject_settings_view) == 1)
-	{
-		lv_obj_t *s_interval = lv_obj_find_by_name(settings_screen, "s_interval");
-		if (s_interval)
-		{
-			lv_label_set_text_fmt(s_interval, "%d mins", mDevice.getBLEInterval());
-		}
-	}
+  /* INTERVAL */
+  if (lv_subject_get_int(&subject_settings_view) == 1) {
+    lv_obj_t *s_interval = lv_obj_find_by_name(settings_screen, "s_interval");
+    if (s_interval) {
+      lv_label_set_text_fmt(s_interval, "%d mins", mDevice.getBLEInterval());
+    }
+  }
 
-	/* CONFIGS */
-	if (lv_subject_get_int(&subject_settings_view) == 2)
-	{
-		lv_obj_t *s_configs = lv_obj_find_by_name(settings_screen, "s_configs");
-		if (s_configs)
-		{
-			String confs;
-			confs += "Sleep time: ";
-			SettingTime slp = mDevice.getSettings(ST_SLEEP);
-			if (slp.enabled)
-			{
-				confs += "%02d:%02d - %02d:%02d\n";
-			}
-			else
-			{
-				confs += "Disabled\n";
-			}
-			confs += mDevice.get24hr() ? "24 hour mode\n" : "12 hour mode\n";
-			confs += "Temp units: " + mDevice.getTempUnit() + "\n";
-			confs += "Distance units: " + mDevice.getDistanceUnit() + "\n";
-			confs += "Display: " + String(mDevice.getInvertDisplay() ? "Dark" : "Light");
-			lv_label_set_text_fmt(s_configs, confs.c_str(), slp.startHour, slp.startMinute, slp.endHour, slp.endMinute);
-		}
-	}
+  /* CONFIGS */
+  if (lv_subject_get_int(&subject_settings_view) == 2) {
+    lv_obj_t *s_configs = lv_obj_find_by_name(settings_screen, "s_configs");
+    if (s_configs) {
+      String confs;
+      confs += "Sleep time: ";
+      SettingTime slp = mDevice.getSettings(ST_SLEEP);
+      if (slp.enabled) {
+        confs += "%02d:%02d - %02d:%02d\n";
+      } else {
+        confs += "Disabled\n";
+      }
+      confs += mDevice.get24hr() ? "24 hour mode\n" : "12 hour mode\n";
+      confs += "Temp units: " + mDevice.getTempUnit() + "\n";
+      confs += "Distance units: " + mDevice.getDistanceUnit() + "\n";
+      confs +=
+          "Display: " + String(mDevice.getInvertDisplay() ? "Dark" : "Light");
+      lv_label_set_text_fmt(s_configs, confs.c_str(), slp.startHour,
+                            slp.startMinute, slp.endHour, slp.endMinute);
+    }
+  }
 
-	/* BATTERY */
-	if (lv_subject_get_int(&subject_settings_view) == 3)
-	{
-		DateTime now = mDevice.getDateTime();
-		DateTime date = mDevice.getDateDifference(now, battery_day);
-		lv_obj_t *day = lv_obj_find_by_name(settings_screen, "a_date");
-		if (day)
-		{
-			if (battery_day == 0)
-			{
-				lv_label_set_text(day, "Today");
-			}
-			else if (battery_day == -1)
-			{
-				lv_label_set_text(day, "Yesterday");
-			}
-			else
-			{
-				lv_label_set_text_fmt(day, "%02d/%02d/%04d", date.day, date.month, date.year);
-			}
-		}
-		lv_obj_t *bar_chart = lv_obj_find_by_name(settings_screen, "bar_chart");
-		if (bar_chart)
-		{
-			lv_chart_set_type(bar_chart, LV_CHART_TYPE_BAR);
-			lv_chart_series_t *series = lv_chart_get_series_next(bar_chart, NULL);
+  /* BATTERY */
+  if (lv_subject_get_int(&subject_settings_view) == 3) {
+    DateTime now = mDevice.getDateTime();
+    DateTime date = mDevice.getDateDifference(now, battery_day);
+    lv_obj_t *day = lv_obj_find_by_name(settings_screen, "a_date");
+    if (day) {
+      if (battery_day == 0) {
+        lv_label_set_text(day, "Today");
+      } else if (battery_day == -1) {
+        lv_label_set_text(day, "Yesterday");
+      } else {
+        lv_label_set_text_fmt(day, "%02d/%02d/%04d", date.day, date.month,
+                              date.year);
+      }
+    }
+    lv_obj_t *bar_chart = lv_obj_find_by_name(settings_screen, "bar_chart");
+    if (bar_chart) {
+      lv_chart_set_type(bar_chart, LV_CHART_TYPE_BAR);
+      lv_chart_series_t *series = lv_chart_get_series_next(bar_chart, NULL);
 
-			int32_t array[24];
-			int32_t highest = mDevice.getBatteryRecords(array, 0, 24, date.year, date.month, date.day);
+      int32_t array[24];
+      int32_t highest = mDevice.getBatteryRecords(array, 0, 24, date.year,
+                                                  date.month, date.day);
 
-			for (int i = 0; i < 24; i++)
-			{
-				lv_chart_set_series_value_by_id(bar_chart, series, i, array[i] == 0 ? LV_CHART_POINT_NONE : array[i]);
-			}
-		}
-	}
+      for (int i = 0; i < 24; i++) {
+        lv_chart_set_series_value_by_id(bar_chart, series, i,
+                                        array[i] == 0 ? LV_CHART_POINT_NONE
+                                                      : array[i]);
+      }
+    }
+  }
 
-	/* STORAGE */
-	if (lv_subject_get_int(&subject_settings_view) == 4)
-	{
-		size_t total = mDevice.mStorage.getTotalBytes();
-		size_t used = mDevice.mStorage.getUsedBytes();
-		size_t free = total - used;
-		lv_obj_t *s_total = lv_obj_find_by_name(settings_screen, "s_total");
-		if (s_total)
-		{
-			lv_label_set_text(s_total, (String((total / 1024.0), 1) + "kB").c_str());
-		}
-		lv_obj_t *s_used = lv_obj_find_by_name(settings_screen, "s_used");
-		if (s_used)
-		{
-			lv_label_set_text(s_used, (String((used / 1024.0), 1) + "kB\nused").c_str());
-		}
-		lv_obj_t *s_free = lv_obj_find_by_name(settings_screen, "s_free");
-		if (s_free)
-		{
-			lv_label_set_text(s_free, (String(((total - used) / 1024.0), 1) + "kB\nfree").c_str());
-		}
-		lv_obj_t *s_bar = lv_obj_find_by_name(settings_screen, "s_bar");
-		if (s_bar)
-		{
-			lv_bar_set_value(s_bar, (used * 1.0 / total * 100), LV_ANIM_OFF);
-		}
-		lv_obj_t *s_steps = lv_obj_find_by_name(settings_screen, "s_steps");
-		if (s_steps)
-		{
-			lv_label_set_text_fmt(s_steps, "Steps\n%d", mDevice.mStorage.countFiles(STEPS_FOLDER));
-		}
-		lv_obj_t *s_battery = lv_obj_find_by_name(settings_screen, "s_battery");
-		if (s_battery)
-		{
-			lv_label_set_text_fmt(s_battery, "Battery\n%d", mDevice.mStorage.countFiles(BATTERY_FOLDER));
-		}
-	}
+  /* STORAGE */
+  if (lv_subject_get_int(&subject_settings_view) == 4) {
+    size_t total = mDevice.mStorage.getTotalBytes();
+    size_t used = mDevice.mStorage.getUsedBytes();
+    size_t free = total - used;
+    lv_obj_t *s_total = lv_obj_find_by_name(settings_screen, "s_total");
+    if (s_total) {
+      lv_label_set_text(s_total, (String((total / 1024.0), 1) + "kB").c_str());
+    }
+    lv_obj_t *s_used = lv_obj_find_by_name(settings_screen, "s_used");
+    if (s_used) {
+      lv_label_set_text(s_used,
+                        (String((used / 1024.0), 1) + "kB\nused").c_str());
+    }
+    lv_obj_t *s_free = lv_obj_find_by_name(settings_screen, "s_free");
+    if (s_free) {
+      lv_label_set_text(
+          s_free, (String(((total - used) / 1024.0), 1) + "kB\nfree").c_str());
+    }
+    lv_obj_t *s_bar = lv_obj_find_by_name(settings_screen, "s_bar");
+    if (s_bar) {
+      lv_bar_set_value(s_bar, (used * 1.0 / total * 100), LV_ANIM_OFF);
+    }
+    lv_obj_t *s_steps = lv_obj_find_by_name(settings_screen, "s_steps");
+    if (s_steps) {
+      lv_label_set_text_fmt(s_steps, "Steps\n%d",
+                            mDevice.mStorage.countFiles(STEPS_FOLDER));
+    }
+    lv_obj_t *s_battery = lv_obj_find_by_name(settings_screen, "s_battery");
+    if (s_battery) {
+      lv_label_set_text_fmt(s_battery, "Battery\n%d",
+                            mDevice.mStorage.countFiles(BATTERY_FOLDER));
+    }
+  }
 
-	/* ABOUT */
-	if (lv_subject_get_int(&subject_settings_view) == 5)
-	{
-		lv_subject_copy_string(&subject_address, mDevice.getAddress().c_str());
-		lv_obj_t *about_version = lv_obj_find_by_name(settings_screen, "about_version");
-		if (about_version)
-		{
-			lv_label_set_text(about_version, (mDevice.getVersion() + " (" + mDevice.getBuild() + ")").c_str());
-		}
-		lv_obj_t *about_ch_esp = lv_obj_find_by_name(settings_screen, "about_ch_esp");
-		if (about_ch_esp)
-		{
-			lv_label_set_text_fmt(about_ch_esp, "ChronosESP32 v%d.%d.%d", CHRONOSESP_VERSION_MAJOR, CHRONOSESP_VERSION_MINOR, CHRONOSESP_VERSION_PATCH);
-		}
-		lv_obj_t *about_ch_app = lv_obj_find_by_name(settings_screen, "about_ch_app");
-		if (about_ch_app)
-		{
-			lv_label_set_text(about_ch_app, ("Chronos v" + mDevice.getAppVersion() + " (" + mDevice.getAppCode() + ")\nLast sync: " + mDevice.getLastSync() + " ago").c_str());
-		}
-	}
+  /* ABOUT */
+  if (lv_subject_get_int(&subject_settings_view) == 5) {
+    lv_subject_copy_string(&subject_address, mDevice.getAddress().c_str());
+    lv_obj_t *about_version =
+        lv_obj_find_by_name(settings_screen, "about_version");
+    if (about_version) {
+      lv_label_set_text(
+          about_version,
+          (mDevice.getVersion() + " (" + mDevice.getBuild() + ")").c_str());
+    }
+    lv_obj_t *about_ch_esp =
+        lv_obj_find_by_name(settings_screen, "about_ch_esp");
+    if (about_ch_esp) {
+      lv_label_set_text_fmt(about_ch_esp, "ChronosESP32 v%d.%d.%d",
+                            CHRONOSESP_VERSION_MAJOR, CHRONOSESP_VERSION_MINOR,
+                            CHRONOSESP_VERSION_PATCH);
+    }
+    lv_obj_t *about_ch_app =
+        lv_obj_find_by_name(settings_screen, "about_ch_app");
+    if (about_ch_app) {
+      lv_label_set_text(about_ch_app,
+                        ("Chronos v" + mDevice.getAppVersion() + " (" +
+                         mDevice.getAppCode() +
+                         ")\nLast sync: " + mDevice.getLastSync() + " ago")
+                            .c_str());
+    }
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != settings_screen)
-	{
-		lv_screen_load(settings_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != settings_screen) {
+    lv_screen_load(settings_screen);
+  }
 }
 
 /**
  * Load the contacts screen
  */
-void DisplayModule::load_contacts_screen()
-{
-	if (!contacts_screen)
-	{
-		return;
-	}
+void DisplayModule::load_contacts_screen() {
+  if (!contacts_screen) {
+    return;
+  }
 
-	Contact contacts[8];
-	int sos;
-	int count = mDevice.getContacts(contacts, &sos, 8);
-	lv_obj_t *c_info = lv_obj_find_by_name(contacts_screen, "c_info");
-	if (c_info)
-	{
-		lv_obj_set_flag(c_info, LV_OBJ_FLAG_HIDDEN, count != 0);
-	}
-	lv_obj_t *c_list = lv_obj_find_by_name(contacts_screen, "c_list");
-	if (c_list)
-	{
-		lv_obj_set_flag(c_list, LV_OBJ_FLAG_HIDDEN, count == 0);
-		lv_obj_clean(c_list);
-		for (int i = 0; i < count; i++)
-		{
-			contact_item_create(c_list, contacts[i].name.c_str(), contacts[i].number.c_str(), i != sos);
-		}
-	}
+  Contact contacts[8];
+  int sos;
+  int count = mDevice.getContacts(contacts, &sos, 8);
+  lv_obj_t *c_info = lv_obj_find_by_name(contacts_screen, "c_info");
+  if (c_info) {
+    lv_obj_set_flag(c_info, LV_OBJ_FLAG_HIDDEN, count != 0);
+  }
+  lv_obj_t *c_list = lv_obj_find_by_name(contacts_screen, "c_list");
+  if (c_list) {
+    lv_obj_set_flag(c_list, LV_OBJ_FLAG_HIDDEN, count == 0);
+    lv_obj_clean(c_list);
+    for (int i = 0; i < count; i++) {
+      contact_item_create(c_list, contacts[i].name.c_str(),
+                          contacts[i].number.c_str(), i != sos);
+    }
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != contacts_screen)
-	{
-		lv_screen_load(contacts_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != contacts_screen) {
+    lv_screen_load(contacts_screen);
+  }
 }
 
 /**
  * Load the contacts screen
  */
-void DisplayModule::load_qr_screen()
-{
-	if (!qr_screen)
-	{
-		return;
-	}
+void DisplayModule::load_qr_screen() {
+  if (!qr_screen) {
+    return;
+  }
 
-	Contact links[QR_SIZE];
-	int count = mDevice.getQR(links, QR_SIZE);
-	if (count == 0)
-	{
-		qr_index = 0;
-		/* The data below will never be shown */
-		links[qr_index].name = "Watchy";
-		links[qr_index].number = "https://github.com/fbiego/chronos-watchy";
-	}
-	lv_obj_t *q_app = lv_obj_find_by_name(qr_screen, "q_app");
-	if (q_app)
-	{
-		lv_label_set_text(q_app, links[qr_index].name.c_str());
-		lv_obj_set_flag(q_app, LV_OBJ_FLAG_HIDDEN, count == 0);
-	}
-	lv_obj_t *q_link = lv_obj_find_by_name(qr_screen, "q_link");
-	if (q_link)
-	{
-		lv_qrcode_set_data(q_link, links[qr_index].number.c_str());
-		lv_obj_set_flag(q_link, LV_OBJ_FLAG_HIDDEN, count == 0);
-	}
+  Contact links[QR_SIZE];
+  int count = mDevice.getQR(links, QR_SIZE);
+  if (count == 0) {
+    qr_index = 0;
+    /* The data below will never be shown */
+    links[qr_index].name = "Watchy";
+    links[qr_index].number = "https://github.com/fbiego/chronos-watchy";
+  }
+  lv_obj_t *q_app = lv_obj_find_by_name(qr_screen, "q_app");
+  if (q_app) {
+    lv_label_set_text(q_app, links[qr_index].name.c_str());
+    lv_obj_set_flag(q_app, LV_OBJ_FLAG_HIDDEN, count == 0);
+  }
+  lv_obj_t *q_link = lv_obj_find_by_name(qr_screen, "q_link");
+  if (q_link) {
+    lv_qrcode_set_data(q_link, links[qr_index].number.c_str());
+    lv_obj_set_flag(q_link, LV_OBJ_FLAG_HIDDEN, count == 0);
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != qr_screen)
-	{
-		lv_screen_load(qr_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != qr_screen) {
+    lv_screen_load(qr_screen);
+  }
 }
 
 /**
  * Load the xml screen
  */
-void DisplayModule::load_xml_screen()
-{
-	if (!xml_screen)
-	{
-		return;
-	}
+void DisplayModule::load_xml_screen() {
+  if (!xml_screen) {
+    return;
+  }
 
-	lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
-	if (file_list)
-	{
-		lv_obj_clean(file_list);
-		xmls = mDevice.mStorage.listFiles(xml_folder, false);
-		JsonArray array = xmls.as<JsonArray>();
-		xml_index = 0;
-		xml_max = 0;
-		if (back_folder != "/")
-		{
-			file_item_create(file_list, ic_file_back, mDevice.mStorage.getFileName(back_folder).c_str(), "");
-			xml_max++;
-		}
-		for (JsonVariant v : array)
-		{
-			String file = v.as<String>();
-			file_item_create(file_list, getFileIcon(file), mDevice.mStorage.getFileName(file).c_str(), "");
-			xml_max++;
-		}
-		set_selected_item_index(file_list, xml_index, true);
-		lv_obj_set_flag(file_list, LV_OBJ_FLAG_HIDDEN, xml_max == 0);
-	}
+  lv_obj_t *file_list = lv_obj_find_by_name(xml_screen, "file_list");
+  if (file_list) {
+    lv_obj_clean(file_list);
+    xmls = mDevice.mStorage.listFiles(xml_folder, false);
+    JsonArray array = xmls.as<JsonArray>();
+    xml_index = 0;
+    xml_max = 0;
+    if (back_folder != "/") {
+      file_item_create(file_list, ic_file_back,
+                       mDevice.mStorage.getFileName(back_folder).c_str(), "");
+      xml_max++;
+    }
+    for (JsonVariant v : array) {
+      String file = v.as<String>();
+      file_item_create(file_list, getFileIcon(file),
+                       mDevice.mStorage.getFileName(file).c_str(), "");
+      xml_max++;
+    }
+    set_selected_item_index(file_list, xml_index, true);
+    lv_obj_set_flag(file_list, LV_OBJ_FLAG_HIDDEN, xml_max == 0);
+  }
 
-	lv_obj_t *active = lv_screen_active();
-	if (active != xml_screen)
-	{
-		lv_screen_load(xml_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != xml_screen) {
+    lv_screen_load(xml_screen);
+  }
 }
 
 /**
  * Load the watchface selector screen
  */
-void DisplayModule::load_selector_screen()
-{
-	if (!selector_screen)
-	{
-		return;
-	}
+void DisplayModule::load_selector_screen() {
+  if (!selector_screen) {
+    return;
+  }
 
-	lv_obj_clean(selector_screen);
+  if (face_max == -1) {
+    /* Load the face list once */
+    lv_obj_clean(selector_screen);
+    face_item_create(selector_screen, watchface_default, "Default");
+    face_list = mDevice.mStorage.listFaces();
+    JsonArray array = face_list.as<JsonArray>();
+    String current = mDevice.getWatchface();
+    face_index = 0;
+    face_max = 1;
+    for (JsonVariant v : array) {
+      JsonObject file = v.as<JsonObject>();
+      String name = v["name"].as<String>();
+      String preview = v["preview"].as<String>();
+      String path = v["path"].as<String>();
+      lv_obj_t *face_item =
+          face_item_create(selector_screen, preview.c_str(), name.c_str());
+      if (current == path) {
+        lv_obj_scroll_to_view(face_item, LV_ANIM_OFF);
+        face_index = face_max;
+      }
+      face_max++;
+    }
+  }
 
-	face_item_create(selector_screen, watchface_default, "Default");
-	face_list = mDevice.mStorage.listFaces();
-	JsonArray array = face_list.as<JsonArray>();
-	String current = mDevice.getWatchface();
-	face_index = 0;
-	face_max = 1;
-	for (JsonVariant v : array)
-	{
-		JsonObject file = v.as<JsonObject>();
-		String name = v["name"].as<String>();
-		String preview = v["preview"].as<String>();
-		String path = v["path"].as<String>();
-		lv_obj_t *face_item = face_item_create(selector_screen, preview.c_str(), name.c_str());
-		if (current == path)
-		{
-			lv_obj_scroll_to_view(face_item, LV_ANIM_OFF);
-			face_index = face_max;
-		}
-		face_max++;
-	}
-
-	lv_obj_t *active = lv_screen_active();
-	if (active != selector_screen)
-	{
-		lv_screen_load(selector_screen);
-	}
+  lv_obj_t *active = lv_screen_active();
+  if (active != selector_screen) {
+    lv_screen_load(selector_screen);
+  }
 }
 
 /**
  * Load a custom watchface from info json
  * @param info the json data from the info file
  */
-void DisplayModule::load_watchface_from_info(JsonDocument info)
-{
+void DisplayModule::load_watchface_from_info(JsonDocument info) {
 
-	/* First clear the existing home screen */
-	if (home_screen)
-	{
-		lv_obj_delete(home_screen);
-	}
+  /* First clear the existing home screen */
+  if (home_screen) {
+    lv_obj_delete(home_screen);
+  }
 
-	/* Register fonts used by watchface */
-	JsonArray font_array = info["fonts"].as<JsonArray>();
-	for (JsonVariant v : font_array)
-	{
-		String file = v.as<String>();
-		String nm = mDevice.mStorage.getFileName(file, false);
-		lv_font_t *font = lv_binfont_create(file.c_str());
-		if (font)
-		{
-			lv_xml_register_font(NULL, nm.c_str(), font);
-		}
-		else
-		{
-			Timber.e("Failed to load font " + file);
-		}
-	}
+  /* Register fonts used by watchface */
+  JsonArray font_array = info["fonts"].as<JsonArray>();
+  for (JsonVariant v : font_array) {
+    String file = v.as<String>();
+    String nm = mDevice.mStorage.getFileName(file, false);
+    lv_font_t *font = lv_binfont_create(file.c_str());
+    if (font) {
+      lv_xml_register_font(NULL, nm.c_str(), font);
+    } else {
+      Timber.e("Failed to load font " + file);
+    }
+  }
 
-	/* Register images used by watchface */
-	JsonArray image_array = info["images"].as<JsonArray>();
-	for (JsonVariant v : image_array)
-	{
-		String file = v.as<String>();
-		String nm = mDevice.mStorage.getFileName(file, false);
-		lv_xml_register_image(NULL, nm.c_str(), file.c_str());
-	}
+  /* Register images used by watchface */
+  JsonArray image_array = info["images"].as<JsonArray>();
+  for (JsonVariant v : image_array) {
+    String file = v.as<String>();
+    String nm = mDevice.mStorage.getFileName(file, false);
+    lv_xml_register_image(NULL, nm.c_str(), file.c_str());
+  }
 
-	/* Update the watchface path if necessary */
-	String path = info["path"].as<String>();
-	if (mDevice.getWatchface() != path)
-	{
-		mDevice.setWatchface(path);
-	}
+  /* Update the watchface path if necessary */
+  String path = info["path"].as<String>();
+  if (mDevice.getWatchface() != path) {
+    mDevice.setWatchface(path);
+  }
 
-	/* Get the main xml watchface to load */
-	String main = info["main"].as<String>();
-	String name = mDevice.mStorage.getFileName(main, false);
-	lv_xml_register_component_from_file(main.c_str());
+  /* Get the main xml watchface to load */
+  String main = info["main"].as<String>();
+  String name = mDevice.mStorage.getFileName(main, false);
+  lv_xml_register_component_from_file(main.c_str());
 
-	/* Attempt to create the wachface from xml to the home screen object */
-	home_screen = (lv_obj_t *)lv_xml_create(NULL, name.c_str(), NULL);
-	if (!home_screen)
-	{
-		Timber.e("Failed to create watchface, using deafult");
-		mDevice.setWatchface("default");
-		home_screen = home_create(); /* Load the deafult watchface if failed */
-	}
-	lv_screen_load(home_screen);
+  /* Attempt to create the wachface from xml to the home screen object */
+  home_screen = (lv_obj_t *)lv_xml_create(NULL, name.c_str(), NULL);
+  if (!home_screen) {
+    Timber.e("Failed to create watchface, using default");
+    mDevice.setWatchface("default");
+    home_screen = home_create(); /* Load the default watchface if failed */
+  }
+  lv_screen_load(home_screen);
 }
 
 /**
  * Load a custom watchface from a path
  * @param path the path to info.json of the watchface
  */
-void DisplayModule::load_watchface_from_path(String path)
-{
-	JsonDocument info;
-	mDevice.mStorage.readFile(path, info);
-	info["path"] = path;
-	load_watchface_from_info(info);
+void DisplayModule::load_watchface_from_path(String path) {
+  JsonDocument info;
+  mDevice.mStorage.readFile(path, info);
+  info["path"] = path;
+  load_watchface_from_info(info);
 }
 
 /**
  * Helper function to set and load a watchface from path
  * @param path path to the watchface info.json
  */
-void DisplayModule::loadFace(String path)
-{
-	if (instance == nullptr)
-		return; // safety check
+void DisplayModule::loadFace(String path) {
+  if (instance == nullptr)
+    return; // safety check
 
-	// Defer LVGL work to main LVGL context
-	lv_async_call([](void *data)
-				  {
-					  String *pathPtr = static_cast<String *>(data);
-					  instance->load_watchface_from_path(*pathPtr);
-					  delete pathPtr; // free after use
-				  },
-				  new String(path));
+  // Defer LVGL work to main LVGL context
+  lv_async_call(
+      [](void *data) {
+        String *pathPtr = static_cast<String *>(data);
+        instance->load_watchface_from_path(*pathPtr);
+        delete pathPtr; // free after use
+      },
+      new String(path));
 }
 
 /**
@@ -1642,30 +1485,28 @@ void DisplayModule::loadFace(String path)
  * @param id icon id
  * @return icon descriptor
  */
-const void *DisplayModule::getWeatherIcon(int id)
-{
-	switch (id)
-	{
-	case 0:
-		return ic_sun_cloud;
-	case 1:
-		return ic_sunny;
-	case 2:
-		return ic_snow;
-	case 3:
-		return ic_rainy;
-	case 4:
-		return ic_cloud;
-	case 5:
-		return ic_tornado;
-	case 6:
-		return ic_wind;
-	case 7:
-		return ic_haze;
-	default:
-		return ic_no_weather;
-	}
-	return ic_no_weather;
+const void *DisplayModule::getWeatherIcon(int id) {
+  switch (id) {
+  case 0:
+    return ic_sun_cloud;
+  case 1:
+    return ic_sunny;
+  case 2:
+    return ic_snow;
+  case 3:
+    return ic_rainy;
+  case 4:
+    return ic_cloud;
+  case 5:
+    return ic_tornado;
+  case 6:
+    return ic_wind;
+  case 7:
+    return ic_haze;
+  default:
+    return ic_no_weather;
+  }
+  return ic_no_weather;
 }
 
 /**
@@ -1673,44 +1514,42 @@ const void *DisplayModule::getWeatherIcon(int id)
  * @param id icon id
  * @return icon descriptor
  */
-const void *DisplayModule::getAppIcon(int id)
-{
-	switch (id)
-	{
-	case 0x04:
-	case 0x0B:
-		return ic_mail;
-	case 0x08:
-		return ic_skype;
-	case 0x09:
-		return ic_wechat;
-	case 0x0A:
-	case 0x20:
-		return ic_whatsapp;
-	case 0x0E:
-		return ic_line;
-	case 0x0F:
-		return ic_twitter;
-	case 0x10:
-		return ic_facebook;
-	case 0x11:
-		return ic_messenger;
-	case 0x12:
-		return ic_instagram;
-	case 0x13:
-		return ic_weibo;
-	case 0x14:
-		return ic_kakao_talk;
-	case 0x16:
-		return ic_viber;
-	case 0x17:
-		return ic_vkontakte;
-	case 0x18:
-		return ic_telegram;
-	default:
-		return ic_message;
-	}
-	return ic_message;
+const void *DisplayModule::getAppIcon(int id) {
+  switch (id) {
+  case 0x04:
+  case 0x0B:
+    return ic_mail;
+  case 0x08:
+    return ic_skype;
+  case 0x09:
+    return ic_wechat;
+  case 0x0A:
+  case 0x20:
+    return ic_whatsapp;
+  case 0x0E:
+    return ic_line;
+  case 0x0F:
+    return ic_twitter;
+  case 0x10:
+    return ic_facebook;
+  case 0x11:
+    return ic_messenger;
+  case 0x12:
+    return ic_instagram;
+  case 0x13:
+    return ic_weibo;
+  case 0x14:
+    return ic_kakao_talk;
+  case 0x16:
+    return ic_viber;
+  case 0x17:
+    return ic_vkontakte;
+  case 0x18:
+    return ic_telegram;
+  default:
+    return ic_message;
+  }
+  return ic_message;
 }
 
 /**
@@ -1718,36 +1557,34 @@ const void *DisplayModule::getAppIcon(int id)
  * @param app app eg ACTIVITY
  * @return the app data (icon descriptor and name)
  */
-IconText DisplayModule::getApp(AppList app)
-{
-	switch (app)
-	{
-	case ACTIVITY:
-		return {ic_activity, "Activity"};
-	case NOTIFICATIONS:
-		return {ic_notifications, "Notifications"};
-	case MUSIC:
-		return {ic_music, "Music"};
-	case WEATHER:
-		return {ic_weather, "Weather"};
-	case PAIRING:
-		return {ic_pairing, "Pairing"};
-	case SETTINGS:
-		return {ic_settings, "Settings"};
-	case NAVIGATION:
-		return {ic_navigation, "Navigation"};
-	case QR_CODES:
-		return {ic_qr_codes, "QR Links"};
-	case CONTROLS:
-		return {ic_controls, "Controls"};
-	case CONTACTS:
-		return {ic_contacts, "Contacts"};
-	case XML_LOADER:
-		return {ic_xml, "LVGL Files"};
-	default:
-		return {NULL, "Unknown"};
-	}
-	return {NULL, "Unknown"};
+IconText DisplayModule::getApp(AppList app) {
+  switch (app) {
+  case ACTIVITY:
+    return {ic_activity, "Activity"};
+  case NOTIFICATIONS:
+    return {ic_notifications, "Notifications"};
+  case MUSIC:
+    return {ic_music, "Music"};
+  case WEATHER:
+    return {ic_weather, "Weather"};
+  case PAIRING:
+    return {ic_pairing, "Pairing"};
+  case SETTINGS:
+    return {ic_settings, "Settings"};
+  case NAVIGATION:
+    return {ic_navigation, "Navigation"};
+  case QR_CODES:
+    return {ic_qr_codes, "QR Links"};
+  case CONTROLS:
+    return {ic_controls, "Controls"};
+  case CONTACTS:
+    return {ic_contacts, "Contacts"};
+  case XML_LOADER:
+    return {ic_xml, "LVGL Files"};
+  default:
+    return {NULL, "Unknown"};
+  }
+  return {NULL, "Unknown"};
 }
 
 /**
@@ -1755,12 +1592,11 @@ IconText DisplayModule::getApp(AppList app)
  * @param app current app
  * @return next app
  */
-AppList DisplayModule::nextApp(AppList app)
-{
-	app = static_cast<AppList>(app + 1);
-	if (app >= APP_COUNT)
-		app = ACTIVITY; // wrap around
-	return app;
+AppList DisplayModule::nextApp(AppList app) {
+  app = static_cast<AppList>(app + 1);
+  if (app >= APP_COUNT)
+    app = ACTIVITY; // wrap around
+  return app;
 }
 
 /**
@@ -1768,13 +1604,12 @@ AppList DisplayModule::nextApp(AppList app)
  * @param app current app
  * @return previous app
  */
-AppList DisplayModule::previousApp(AppList app)
-{
-	if (app == ACTIVITY)
-		app = static_cast<AppList>(APP_COUNT - 1);
-	else
-		app = static_cast<AppList>(app - 1);
-	return app;
+AppList DisplayModule::previousApp(AppList app) {
+  if (app == ACTIVITY)
+    app = static_cast<AppList>(APP_COUNT - 1);
+  else
+    app = static_cast<AppList>(app - 1);
+  return app;
 }
 
 /**
@@ -1783,42 +1618,39 @@ AppList DisplayModule::previousApp(AppList app)
  * @param direction direction of scroll
  * @param scroll_one scroll one item at a time or multiple visible
  */
-void DisplayModule::scroll_list(lv_obj_t *obj, int direction, bool scroll_one)
-{
-	if (obj == NULL)
-		return;
+void DisplayModule::scroll_list(lv_obj_t *obj, int direction, bool scroll_one) {
+  if (obj == NULL)
+    return;
 
-	int total_h = lv_obj_get_height(obj);		   // Visible height of container
-	int scroll_y = lv_obj_get_scroll_y(obj);	   // Current scroll position
-	int child_count = lv_obj_get_child_count(obj); // Number of items
-	if (child_count == 0)
-		return;
+  int total_h = lv_obj_get_height(obj);          // Visible height of container
+  int scroll_y = lv_obj_get_scroll_y(obj);       // Current scroll position
+  int child_count = lv_obj_get_child_count(obj); // Number of items
+  if (child_count == 0)
+    return;
 
-	int item_h = lv_obj_get_height(lv_obj_get_child(obj, 0)); // Assume uniform item height
-	int scroll_step = 0;
+  int item_h =
+      lv_obj_get_height(lv_obj_get_child(obj, 0)); // Assume uniform item height
+  int scroll_step = 0;
 
-	if (scroll_one)
-	{
-		// Scroll by one item
-		scroll_step = item_h;
-	}
-	else
-	{
-		// Scroll by number of visible items
-		scroll_step = ((int)(total_h / item_h) * item_h);
-	}
+  if (scroll_one) {
+    // Scroll by one item
+    scroll_step = item_h;
+  } else {
+    // Scroll by number of visible items
+    scroll_step = ((int)(total_h / item_h) * item_h);
+  }
 
-	// Direction: +1 = down, -1 = up
-	int new_y = scroll_y + (scroll_step * direction);
+  // Direction: +1 = down, -1 = up
+  int new_y = scroll_y + (scroll_step * direction);
 
-	// Clamp scroll position within limits
-	int content_h = child_count * item_h;
-	if (new_y < 0)
-		new_y = 0;
-	if (new_y > content_h - total_h)
-		new_y = content_h - total_h;
+  // Clamp scroll position within limits
+  int content_h = child_count * item_h;
+  if (new_y < 0)
+    new_y = 0;
+  if (new_y > content_h - total_h)
+    new_y = content_h - total_h;
 
-	lv_obj_scroll_to_y(obj, new_y, LV_ANIM_OFF);
+  lv_obj_scroll_to_y(obj, new_y, LV_ANIM_OFF);
 }
 
 /**
@@ -1827,45 +1659,54 @@ void DisplayModule::scroll_list(lv_obj_t *obj, int direction, bool scroll_one)
  * @param index the index of the item to highlight
  * @param scroll scroll the item to view
  */
-void DisplayModule::set_selected_item_index(lv_obj_t *list, int index, bool scroll)
-{
-	if (!list)
-		return;
+void DisplayModule::set_selected_item_index(lv_obj_t *list, int index,
+                                            bool scroll) {
+  if (!list)
+    return;
 
-	int count = lv_obj_get_child_count(list);
-	if (!count)
-		return;
-	for (int i = 0; i < count; i++)
-	{
-		lv_obj_t *child = lv_obj_get_child(list, i);
-		lv_obj_set_state(child, LV_STATE_CHECKED, i == index);
-		if (scroll && i == index)
-		{
-			lv_obj_scroll_to_view(child, LV_ANIM_OFF);
-		}
-	}
+  int count = lv_obj_get_child_count(list);
+  if (!count)
+    return;
+  for (int i = 0; i < count; i++) {
+    lv_obj_t *child = lv_obj_get_child(list, i);
+    lv_obj_set_state(child, LV_STATE_CHECKED, i == index);
+    if (scroll && i == index) {
+      lv_obj_scroll_to_view(child, LV_ANIM_OFF);
+    }
+  }
+}
+
+/**
+ * Scroll the checked item to view
+ * @param list the list object
+ */
+void DisplayModule::scroll_to_checked(lv_obj_t *list) {
+  if (!list)
+    return;
+  int count = lv_obj_get_child_count(list);
+  if (!count)
+    return;
+  for (int i = 0; i < count; i++) {
+    lv_obj_t *child = lv_obj_get_child(list, i);
+    if (lv_obj_has_state(child, LV_STATE_CHECKED)) {
+      lv_obj_scroll_to_view(child, LV_ANIM_OFF);
+      return;
+    }
+  }
 }
 
 /**
  * Get the file icon
  * @param path the file path
  */
-const void *DisplayModule::getFileIcon(String path)
-{
-	if (path.endsWith(".xml"))
-	{
-		return ic_file_xml;
-	}
-	else if (path.endsWith(".bin"))
-	{
-		return ic_file_bin;
-	}
-	else if (path.endsWith("/"))
-	{
-		return ic_file_dir;
-	}
-	else
-	{
-		return ic_file_unknown;
-	}
+const void *DisplayModule::getFileIcon(String path) {
+  if (path.endsWith(".xml")) {
+    return ic_file_xml;
+  } else if (path.endsWith(".bin")) {
+    return ic_file_bin;
+  } else if (path.endsWith("/")) {
+    return ic_file_dir;
+  } else {
+    return ic_file_unknown;
+  }
 }

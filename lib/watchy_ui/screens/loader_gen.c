@@ -8,7 +8,7 @@
  *********************/
 
 #include "loader_gen.h"
-#include "watchy_ui.h"
+#include "../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -65,7 +65,7 @@ lv_obj_t * loader_create(void)
     lv_obj_set_name_static(lv_obj_0, "loader_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
+    status_bar_create(lv_obj_0);
     
     lv_obj_t * c_info = lv_label_create(lv_obj_0);
     lv_obj_set_name(c_info, "c_info");
@@ -83,17 +83,17 @@ lv_obj_t * loader_create(void)
     lv_obj_t * file_item_0 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
     lv_obj_set_state(file_item_0, LV_STATE_CHECKED, true);
     
-    lv_obj_t * file_item_1 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
+    file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
     
-    lv_obj_t * file_item_2 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
+    file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
     
-    lv_obj_t * file_item_3 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
+    file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
     
-    lv_obj_t * file_item_4 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
+    file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
     
-    lv_obj_t * file_item_5 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
+    file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
     
-    lv_obj_t * file_item_6 = file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
+    file_item_create(file_list, ic_steps, "Bluetooth", "12kb");
 
     LV_TRACE_OBJ_CREATE("finished");
 

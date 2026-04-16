@@ -16,35 +16,31 @@ RTC_DATA_ATTR uint8_t lastDay = 0xFF;
  * @param motion Reference to Motion Module instance
  * @param health Reference to Health Module instance
  */
-DeviceModule::DeviceModule(ChronosESP32 &watch, StorageModule &storage, MotionModule &motion, HealthModule &health) : mWatch(watch), mStorage(storage), mMotion(motion), mHealth(health)
-{
-	lastRead = 1000 * READ_INTERVAL_SEC * -1;
+DeviceModule::DeviceModule(ChronosESP32 &watch, StorageModule &storage,
+                           MotionModule &motion, HealthModule &health)
+    : mWatch(watch), mStorage(storage), mMotion(motion), mHealth(health) {
+  lastRead = 1000 * READ_INTERVAL_SEC * -1;
 }
 
 /**
  * @brief  Destructor for DeviceModule
  *
  */
-DeviceModule::~DeviceModule()
-{
-}
+DeviceModule::~DeviceModule() {}
 
 /**
  * Get the current build (date)
  * @return build name eg 20251018
  */
-String DeviceModule::getBuild()
-{
-	return CHRONOS_WATCHY_BUILD;
-}
+String DeviceModule::getBuild() { return CHRONOS_WATCHY_BUILD; }
 
 /**
  * Get the current firmware version
  * @return version eg v1.0.0
  */
-String DeviceModule::getVersion()
-{
-	return "v" + String(CHRONOS_WATCHY_MAJOR) + "." + String(CHRONOS_WATCHY_MINOR) + "." + String(CHRONOS_WATCHY_PATCH);
+String DeviceModule::getVersion() {
+  return "v" + String(CHRONOS_WATCHY_MAJOR) + "." +
+         String(CHRONOS_WATCHY_MINOR) + "." + String(CHRONOS_WATCHY_PATCH);
 }
 
 /**
@@ -52,48 +48,42 @@ String DeviceModule::getVersion()
  * Initialize rtc & set time, read configs from storage
  *
  */
-void DeviceModule::begin()
-{
-	if (!rtc.begin(Wire))
-	{
-		Timber.e("Failed to find PCF85063 - check your wiring!");
-	}
+void DeviceModule::begin() {
+  if (!rtc.begin(Wire)) {
+    Timber.e("Failed to find PCF85063 - check your wiring!");
+  }
 
-	if (!mStorage.readFile(SETTINGS_FILE, settingsDoc))
-	{
-	}
-	if (!mStorage.readFile(NOTIFICATIONS_FILE, notificationsDoc))
-	{
-		notificationsDoc.clear();
-		notificationsUpdated = true;
-	}
-	if (!mStorage.readFile(WEATHER_FILE, weatherDoc))
-	{
-	}
-	if (!mStorage.readFile(QR_FILE, qrDoc))
-	{
-	}
-	if (!mStorage.readFile(CONTACTS_FILE, contactsDoc))
-	{
-		contactsDoc.clear();
-	}
+  if (!mStorage.readFile(SETTINGS_FILE, settingsDoc)) {
+  }
+  if (!mStorage.readFile(NOTIFICATIONS_FILE, notificationsDoc)) {
+    notificationsDoc.clear();
+    notificationsUpdated = true;
+  }
+  if (!mStorage.readFile(WEATHER_FILE, weatherDoc)) {
+  }
+  if (!mStorage.readFile(QR_FILE, qrDoc)) {
+  }
+  if (!mStorage.readFile(CONTACTS_FILE, contactsDoc)) {
+    contactsDoc.clear();
+  }
 
-	mWatch.clearNotifications();
+  mWatch.clearNotifications();
 
-	RTC_DateTime dt = rtc.getDateTime();
-	mWatch.setTime(dt.getSecond(), dt.getMinute(), dt.getHour(), dt.getDay(), dt.getMonth(), dt.getYear());
-	rtc.resetAlarm();
-	rtc.disableAlarm();
-	mWatch.setName(WATCH_NAME);
-	// mWatch.setScreen((ChronosScreen)0x80);
-	mWatch.set24Hour(get24hr());
+  RTC_DateTime dt = rtc.getDateTime();
+  mWatch.setTime(dt.getSecond(), dt.getMinute(), dt.getHour(), dt.getDay(),
+                 dt.getMonth(), dt.getYear());
+  rtc.resetAlarm();
+  rtc.disableAlarm();
+  mWatch.setName(WATCH_NAME);
+  // mWatch.setScreen((ChronosScreen)0x80);
+  mWatch.set24Hour(get24hr());
 
-	milliVolts = (analogReadMilliVolts(BATT_ADC_PIN) * 2.0f) - 120.0;
+  milliVolts = (analogReadMilliVolts(BATT_ADC_PIN) * 2.0f) - 120.0;
 
-	mWatch.setBattery(getBattery());
+  mWatch.setBattery(getBattery());
 
 #ifdef LV_FS_ARDUINO_ESP_LITTLEFS_PATH
-	mStorage.createDir(LV_FS_ARDUINO_ESP_LITTLEFS_PATH);
+  mStorage.createDir(LV_FS_ARDUINO_ESP_LITTLEFS_PATH);
 #endif
 }
 
@@ -101,243 +91,218 @@ void DeviceModule::begin()
  * @brief update
  * Read battery voltage preiodically & update navigation info
  */
-void DeviceModule::update()
-{
-	if (millis() > lastRead + (1000 * READ_INTERVAL_SEC))
-	{
-		milliVolts = (analogReadMilliVolts(BATT_ADC_PIN) * 2.0f) - 120.0;
-		lastRead = millis();
-	}
-	if (navChanged)
-	{
-		navChanged = false;
-		nav = mWatch.getNavigation();
-		if (!nav.active)
-		{
-			nav.directions = "Start navigation on Google maps";
-			nav.title = "Chronos";
-			nav.duration = mWatch.isConnected() ? "Inactive" : "Disconnected";
-			nav.eta = "Navigation";
-			nav.distance = "";
-			navIcCRC = 0xFFFFFFFF;
-			sleepTimerStart(60);
-		}
-		else
-		{
-			sleepTimerStart(TIMER_INFINITE);
-		}
+void DeviceModule::update() {
+  if (millis() > lastRead + (1000 * READ_INTERVAL_SEC)) {
+    milliVolts = (analogReadMilliVolts(BATT_ADC_PIN) * 2.0f) - 120.0;
+    lastRead = millis();
+  }
+  if (navChanged) {
+    navChanged = false;
+    nav = mWatch.getNavigation();
+    if (!nav.active) {
+      nav.directions = "Start navigation on Google maps";
+      nav.title = "Chronos";
+      nav.duration = mWatch.isConnected() ? "Inactive" : "Disconnected";
+      nav.eta = "Navigation";
+      nav.distance = "";
+      navIcCRC = 0xFFFFFFFF;
+      sleepTimerStart(60);
+    } else {
+      sleepTimerStart(TIMER_INFINITE);
+    }
 
-		if (!nav.isNavigation)
-		{
-			nav.directions = nav.title;
-			nav.title = "";
-		}
+    if (!nav.isNavigation) {
+      nav.directions = nav.title;
+      nav.title = "";
+    }
 
-		String navText = nav.eta + "\n" + nav.duration + " " + nav.distance;
-		if (navigationDataCallback)
-		{
-			navigationDataCallback(navText, nav.title, nav.directions, nav.active && nav.hasIcon);
-		}
-	}
-	if (navIcChanged)
-	{
-		navIcChanged = false;
-		nav = mWatch.getNavigation();
+    String navText = nav.eta + "\n" + nav.duration + " " + nav.distance;
+    if (navigationDataCallback) {
+      navigationDataCallback(navText, nav.title, nav.directions,
+                             nav.active && nav.hasIcon);
+    }
+  }
+  if (navIcChanged) {
+    navIcChanged = false;
+    nav = mWatch.getNavigation();
 
-		if (nav.iconCRC != navIcCRC)
-		{
-			navIcCRC = nav.iconCRC;
-			if (navigationIconCallback)
-			{
-				navigationIconCallback(nav.icon, nav.active && nav.hasIcon);
-			}
-		}
-	}
+    if (nav.iconCRC != navIcCRC) {
+      navIcCRC = nav.iconCRC;
+      if (navigationIconCallback) {
+        navigationIconCallback(nav.icon, nav.active && nav.hasIcon);
+      }
+    }
+  }
 
-	if (mWatch.isConnected())
-	{
-		if (millis() - lastUpdateTime >= 10000) // 10 seconds = 10000 ms
-		{
-			lastUpdateTime = millis(); // Reset timer
+  if (mWatch.isConnected()) {
+    if (millis() - lastUpdateTime >= 10000) // 10 seconds = 10000 ms
+    {
+      lastUpdateTime = millis(); // Reset timer
 
-			mWatch.setBattery(getBattery(), false);
-			mHealth.syncRealtime(mMotion.getCurrentSteps());
-		}
-		if (sync_data)
-		{
-			mHealth.syncData();
-			sync_data = false;
-		}
-	}
+      mWatch.setBattery(getBattery(), false);
+      mHealth.syncRealtime(mMotion.getCurrentSteps());
+    }
+    if (sync_data) {
+      mHealth.syncData();
+      sync_data = false;
+    }
+  }
 }
 
 /**
  * Initialize BLE
  */
-void DeviceModule::initBLE()
-{
-	if (!mWatch.isRunning())
-	{
-		mWatch.begin();
-	}
+void DeviceModule::initBLE() {
+  if (!mWatch.isRunning()) {
+    mWatch.begin();
+  }
 }
 
 /**
  * Check whether navigation is currently active
  * @return navigation state
  */
-bool DeviceModule::isNavigationActive()
-{
-	return nav.active;
-}
+bool DeviceModule::isNavigationActive() { return nav.active; }
 
 /**
  * Set the navigation icon callback function
  * @param callback function
  */
-void DeviceModule::setNavigationIconCallback(void (*callback)(uint8_t *, bool))
-{
-	navigationIconCallback = callback;
+void DeviceModule::setNavigationIconCallback(void (*callback)(uint8_t *,
+                                                              bool)) {
+  navigationIconCallback = callback;
 }
 
 /**
  * Set the navigation data callback function
  * @param callback function
  */
-void DeviceModule::setNavigationDataCallback(void (*callback)(String, String, String, bool))
-{
-	navigationDataCallback = callback;
+void DeviceModule::setNavigationDataCallback(void (*callback)(String, String,
+                                                              String, bool)) {
+  navigationDataCallback = callback;
 }
 
 /**
  * Get the device mac address
  * @return address in uppercase
  */
-String DeviceModule::getAddress()
-{
-	String address = mWatch.getAddress();
-	address.toUpperCase();
-	return address;
+String DeviceModule::getAddress() {
+  String address = mWatch.getAddress();
+  address.toUpperCase();
+  return address;
 }
 
 /**
  * Set an rtc alarm, this will trigger RTC_INT
  * @param dt DateTime object
  */
-void DeviceModule::setRTCAlarm(DateTime dt)
-{
-	RTC_Alarm alarm(dt.hour, dt.minute, dt.second, 0xFF, 0xFF);
-	rtc.setAlarm(alarm);
-	rtc.enableAlarm();
+void DeviceModule::setRTCAlarm(DateTime dt) {
+  RTC_Alarm alarm(dt.hour, dt.minute, dt.second, 0xFF, 0xFF);
+  rtc.setAlarm(alarm);
+  rtc.enableAlarm();
 }
 
 /**
  * Get the current voltage of the battery
  * @return millivolts
  */
-float DeviceModule::getMillitVolts()
-{
-	return milliVolts;
-}
+float DeviceModule::getMillitVolts() { return milliVolts; }
 
 /**
  * Calculate the current battery percentage based on millivolts
  * @return the battery percentage
  * @note algorithm may not be accurate
  */
-int DeviceModule::getBattery()
-{
-	float v = getMillitVolts() / 1000.0; // convert to volts
-	float percent = (v - 3.3) / (4.2 - 3.3) * 100.0;
-	if (percent > 100)
-		percent = 100;
-	if (percent < 0)
-		percent = 0;
-	return int(percent);
+int DeviceModule::getBattery() {
+  float v = getMillitVolts() / 1000.0; // convert to volts
+  float percent = (v - 3.3) / (4.2 - 3.3) * 100.0;
+  if (percent > 100)
+    percent = 100;
+  if (percent < 0)
+    percent = 0;
+  return int(percent);
+}
+
+/**
+ * Update the battery millivolts by reading ADC
+ */
+void DeviceModule::updateBattery() {
+  milliVolts = (analogReadMilliVolts(BATT_ADC_PIN) * 2.0f) - 120.0;
 }
 
 /**
  * Set the RTC module with the current ESP32 time from the watch object
  * Typically should be called after time is set from BLE
  */
-void DeviceModule::setRTC()
-{
-	rtc.setDateTime(mWatch.getYear(), mWatch.getMonth() + 1, mWatch.getDay(), mWatch.getHour(true), mWatch.getMinute(), mWatch.getSecond());
+void DeviceModule::setRTC() {
+  rtc.setDateTime(mWatch.getYear(), mWatch.getMonth() + 1, mWatch.getDay(),
+                  mWatch.getHour(true), mWatch.getMinute(), mWatch.getSecond());
 }
 
 /**
  * Start a sleep timer, when the timer ends the ESP32 will go to deep sleep
  * @param seconds time in seconds
- * @note TIMER_INFINITE can also be passed if the device should never go to sleep
- * Example scenario is when navigation is active (data needs to be received from the phone instantly)
+ * @note TIMER_INFINITE can also be passed if the device should never go to
+ * sleep Example scenario is when navigation is active (data needs to be
+ * received from the phone instantly)
  */
-void DeviceModule::sleepTimerStart(long seconds)
-{
-	sleepTimer.duration = seconds == TIMER_INFINITE ? TIMER_INFINITE : SECONDS_TO_MS(seconds);
-	sleepTimer.time = millis();
-	sleepTimer.active = seconds != TIMER_INFINITE;
+void DeviceModule::sleepTimerStart(long seconds) {
+  sleepTimer.duration =
+      seconds == TIMER_INFINITE ? TIMER_INFINITE : SECONDS_TO_MS(seconds);
+  sleepTimer.time = millis();
+  sleepTimer.active = seconds != TIMER_INFINITE;
 }
 
 /**
  * Stop the sleep timer
  * @return true if timer was active
  */
-bool DeviceModule::sleepTimerStop()
-{
-	if (sleepTimer.active)
-	{
-		sleepTimer.active = false;
-		return true;
-	}
-	return false;
+bool DeviceModule::sleepTimerStop() {
+  if (sleepTimer.active) {
+    sleepTimer.active = false;
+    return true;
+  }
+  return false;
 }
 
 /**
- * Check if the sleep timer duration has ended and whether ESP32 should go to sleep
- * @return true if timer was active and has ended, false if timer was not active or has not ended
+ * Check if the sleep timer duration has ended and whether ESP32 should go to
+ * sleep
+ * @return true if timer was active and has ended, false if timer was not active
+ * or has not ended
  */
-bool DeviceModule::sleepTimerEnded()
-{
-	if (sleepTimer.active && sleepTimer.time + sleepTimer.duration < millis())
-	{
-		sleepTimer.active = false;
-		return true;
-	}
-	return false;
+bool DeviceModule::sleepTimerEnded() {
+  if (sleepTimer.active && sleepTimer.time + sleepTimer.duration < millis()) {
+    sleepTimer.active = false;
+    return true;
+  }
+  return false;
 }
 
 /**
  * Get the currently set timer duration
  * @return the time in ms, or TIMER_INFINITE
  */
-long DeviceModule::sleepTimerDuration()
-{
-	return sleepTimer.duration;
-}
+long DeviceModule::sleepTimerDuration() { return sleepTimer.duration; }
 
 /**
  * Get the remaining time to sleep
  * @return the time left in m:s or -1 if infinite
  */
-String DeviceModule::sleepTimerLeft()
-{
-	if (sleepTimerDuration() == TIMER_INFINITE)
-	{
-		return "-1";
-	}
-	if (!sleepTimer.active)
-	{
-		return "";
-	}
-	else
-	{
-		long elapsed = millis() - sleepTimer.time;
-		long remaining = sleepTimer.duration - elapsed;
-		if (remaining < 0)
-			remaining = 0;
-		return String(remaining / 1000);
-	}
-	return "";
+String DeviceModule::sleepTimerLeft() {
+  if (sleepTimerDuration() == TIMER_INFINITE) {
+    return "-1";
+  }
+  if (!sleepTimer.active) {
+    return "";
+  } else {
+    long elapsed = millis() - sleepTimer.time;
+    long remaining = sleepTimer.duration - elapsed;
+    if (remaining < 0)
+      remaining = 0;
+    return String(remaining / 1000);
+  }
+  return "";
 }
 
 /**
@@ -345,60 +310,42 @@ String DeviceModule::sleepTimerLeft()
  * @note from Chronos App via BLE
  * @param enabled whether is enabled
  */
-void DeviceModule::setHourly(bool enabled)
-{
-	settingsDoc["hourly"] = enabled;
-}
+void DeviceModule::setHourly(bool enabled) { settingsDoc["hourly"] = enabled; }
 
 /**
  * Set whether 24 hour mode is enabled
  * @note from Chronos App via BLE
  * @param enabled whether is enabled
  */
-void DeviceModule::set24hr(bool enabled)
-{
-	settingsDoc["hr24"] = enabled;
-}
+void DeviceModule::set24hr(bool enabled) { settingsDoc["hr24"] = enabled; }
 
 /**
  * Set language ID
  * @note from Chronos App via BLE
  * @param id language id
  */
-void DeviceModule::setLanguage(uint8_t id)
-{
-	settingsDoc["language"] = id;
-}
+void DeviceModule::setLanguage(uint8_t id) { settingsDoc["language"] = id; }
 
 /**
  * Set whether raise to wake is enabled
  * @note from Chronos App via BLE
  * @param enabled whether is enabled
  */
-void DeviceModule::setRTW(bool enabled)
-{
-	settingsDoc["rtw"] = enabled;
-}
+void DeviceModule::setRTW(bool enabled) { settingsDoc["rtw"] = enabled; }
 
 /**
  * Set temperature units
  * @note from Chronos App via BLE
  * @param unit temperature units
  */
-void DeviceModule::setTempUnit(Temperature unit)
-{
-	settingsDoc["temp"] = unit;
-}
+void DeviceModule::setTempUnit(Temperature unit) { settingsDoc["temp"] = unit; }
 
 /**
  * Set unit mode
  * @note from Chronos App via BLE
  * @param unit units
  */
-void DeviceModule::setUnits(Units unit)
-{
-	settingsDoc["unit"] = unit;
-}
+void DeviceModule::setUnits(Units unit) { settingsDoc["unit"] = unit; }
 
 /**
  * Set various settings time
@@ -406,61 +353,48 @@ void DeviceModule::setUnits(Units unit)
  * @param type settings type eg ST_SLEEP
  * @param setting the settings object with time, interval & state
  */
-void DeviceModule::setSettings(SettingsType type, SettingTime setting)
-{
-	settingsDoc["setting"][settingName(type)]["startHour"] = setting.startHour;
-	settingsDoc["setting"][settingName(type)]["startMinute"] = setting.startMinute;
-	settingsDoc["setting"][settingName(type)]["endHour"] = setting.endHour;
-	settingsDoc["setting"][settingName(type)]["endMinute"] = setting.endMinute;
-	settingsDoc["setting"][settingName(type)]["interval"] = setting.interval;
-	settingsDoc["setting"][settingName(type)]["enabled"] = setting.enabled;
+void DeviceModule::setSettings(SettingsType type, SettingTime setting) {
+  settingsDoc["setting"][settingName(type)]["startHour"] = setting.startHour;
+  settingsDoc["setting"][settingName(type)]["startMinute"] =
+      setting.startMinute;
+  settingsDoc["setting"][settingName(type)]["endHour"] = setting.endHour;
+  settingsDoc["setting"][settingName(type)]["endMinute"] = setting.endMinute;
+  settingsDoc["setting"][settingName(type)]["interval"] = setting.interval;
+  settingsDoc["setting"][settingName(type)]["enabled"] = setting.enabled;
 }
 
 /**
  * Get the hourly measurements state
  * @return state
  */
-bool DeviceModule::getHourly()
-{
-	return settingsDoc["hourly"] | false;
-}
+bool DeviceModule::getHourly() { return settingsDoc["hourly"] | false; }
 
 /**
  * Get the 24 hour mode state
  * @return state
  */
-bool DeviceModule::get24hr()
-{
-	return settingsDoc["hr24"] | true;
-}
+bool DeviceModule::get24hr() { return settingsDoc["hr24"] | true; }
 
 /**
  * Get the language ID
  * @return id
  */
-uint8_t DeviceModule::getLanguage()
-{
-	return settingsDoc["language"] | 1;
-}
+uint8_t DeviceModule::getLanguage() { return settingsDoc["language"] | 1; }
 
 /**
  * Get the raise to wake state
  * @return state
  */
-bool DeviceModule::getRTW()
-{
-	return settingsDoc["rtw"] | false;
-}
+bool DeviceModule::getRTW() { return settingsDoc["rtw"] | false; }
 
 /**
  * Get the temperature units string
  * @return units string
  */
-String DeviceModule::getTempUnit()
-{
-	Temperature unit = (Temperature)(settingsDoc["temp"] | TP_CELSIUS);
+String DeviceModule::getTempUnit() {
+  Temperature unit = (Temperature)(settingsDoc["temp"] | TP_CELSIUS);
 
-	return unit == TP_CELSIUS ? "°C" : "°F";
+  return unit == TP_CELSIUS ? "°C" : "°F";
 }
 
 /**
@@ -468,36 +402,32 @@ String DeviceModule::getTempUnit()
  * @param degrees temperature in celsius
  * @return temperature in celsius or temperature in farenheit
  */
-int DeviceModule::convertTemp(int degrees)
-{
-	Temperature unit = (Temperature)(settingsDoc["temp"] | TP_CELSIUS);
+int DeviceModule::convertTemp(int degrees) {
+  Temperature unit = (Temperature)(settingsDoc["temp"] | TP_CELSIUS);
 
-	if (unit == TP_FARENHEIT)
-	{
-		// Convert Celsius → Fahrenheit
-		return (int)round(degrees * 9.0 / 5.0 + 32);
-	}
+  if (unit == TP_FARENHEIT) {
+    // Convert Celsius → Fahrenheit
+    return (int)round(degrees * 9.0 / 5.0 + 32);
+  }
 
-	// Default: Celsius (no conversion)
-	return degrees;
+  // Default: Celsius (no conversion)
+  return degrees;
 }
 
 /**
  * Get the current unit
  * @return units
  */
-Units DeviceModule::getUnits()
-{
-	return (Units)(settingsDoc["unit"] | UT_METRIC);
+Units DeviceModule::getUnits() {
+  return (Units)(settingsDoc["unit"] | UT_METRIC);
 }
 
 /**
  * Get the distance units string
  * @return units string
  */
-String DeviceModule::getDistanceUnit()
-{
-	return getUnits() == UT_METRIC ? "km" : "miles";
+String DeviceModule::getDistanceUnit() {
+  return getUnits() == UT_METRIC ? "km" : "miles";
 }
 
 /**
@@ -505,166 +435,153 @@ String DeviceModule::getDistanceUnit()
  * @param type settings type eg ST_SLEEP
  * @return settings type
  */
-SettingTime DeviceModule::getSettings(SettingsType type)
-{
-	SettingTime setting;
-	setting.startHour = settingsDoc["setting"][settingName(type)]["startHour"] | 0;
-	setting.startMinute = settingsDoc["setting"][settingName(type)]["startMinute"] | 0;
-	setting.endHour = settingsDoc["setting"][settingName(type)]["endHour"] | 0;
-	setting.endMinute = settingsDoc["setting"][settingName(type)]["endMinute"] | 0;
-	setting.interval = settingsDoc["setting"][settingName(type)]["interval"] | 0;
-	setting.enabled = settingsDoc["setting"][settingName(type)]["enabled"] | false;
-	return setting;
+SettingTime DeviceModule::getSettings(SettingsType type) {
+  SettingTime setting;
+  setting.startHour =
+      settingsDoc["setting"][settingName(type)]["startHour"] | 0;
+  setting.startMinute =
+      settingsDoc["setting"][settingName(type)]["startMinute"] | 0;
+  setting.endHour = settingsDoc["setting"][settingName(type)]["endHour"] | 0;
+  setting.endMinute =
+      settingsDoc["setting"][settingName(type)]["endMinute"] | 0;
+  setting.interval = settingsDoc["setting"][settingName(type)]["interval"] | 0;
+  setting.enabled =
+      settingsDoc["setting"][settingName(type)]["enabled"] | false;
+  return setting;
 }
 
 /**
- * Check whether the specified unit is currently active, ie it's enabled and time is within the set interval
+ * Check whether the specified unit is currently active, ie it's enabled and
+ * time is within the set interval
  * @param type setting type eg ST_SLEEP
  * @return state
  */
-bool DeviceModule::isSettingActive(SettingsType type)
-{
-	SettingTime setting = getSettings(type);
-	if (!setting.enabled)
-		return false;
+bool DeviceModule::isSettingActive(SettingsType type) {
+  SettingTime setting = getSettings(type);
+  if (!setting.enabled)
+    return false;
 
-	// Convert all times to minutes since midnight
-	uint16_t startMins = setting.startHour * 60 + setting.startMinute;
-	uint16_t endMins = setting.endHour * 60 + setting.endMinute;
-	uint16_t currMins = mWatch.getHour(true) * 60 + mWatch.getMinute();
+  // Convert all times to minutes since midnight
+  uint16_t startMins = setting.startHour * 60 + setting.startMinute;
+  uint16_t endMins = setting.endHour * 60 + setting.endMinute;
+  uint16_t currMins = mWatch.getHour(true) * 60 + mWatch.getMinute();
 
-	if (startMins == endMins)
-	{
-		// Same start and end means always inactive (or always active — you can choose)
-		return false;
-	}
+  if (startMins == endMins) {
+    // Same start and end means always inactive (or always active — you can
+    // choose)
+    return false;
+  }
 
-	if (startMins < endMins)
-	{
-		// Normal case (same day)
-		return (currMins >= startMins && currMins < endMins);
-	}
-	else
-	{
-		// Overnight case (e.g. 22:00 → 06:00)
-		return (currMins >= startMins || currMins < endMins);
-	}
+  if (startMins < endMins) {
+    // Normal case (same day)
+    return (currMins >= startMins && currMins < endMins);
+  } else {
+    // Overnight case (e.g. 22:00 → 06:00)
+    return (currMins >= startMins || currMins < endMins);
+  }
 }
 
 /**
  * Get the settings name
  * @return name
  */
-String DeviceModule::settingName(SettingsType type)
-{
-	String stName;
-	switch (type)
-	{
-#define ENUM_CASE(x) \
-	case ST_##x:     \
-		stName = #x; \
-		break
-		ENUM_CASE(QUIET);
-		ENUM_CASE(SLEEP);
-		ENUM_CASE(SEDENTARY);
-		ENUM_CASE(WATER);
+String DeviceModule::settingName(SettingsType type) {
+  String stName;
+  switch (type) {
+#define ENUM_CASE(x)                                                           \
+  case ST_##x:                                                                 \
+    stName = #x;                                                               \
+    break
+    ENUM_CASE(QUIET);
+    ENUM_CASE(SLEEP);
+    ENUM_CASE(SEDENTARY);
+    ENUM_CASE(WATER);
 #undef ENUM_CASE
-	default:
-		stName = "UNKNOWN";
-		break;
-	}
-	return stName;
+  default:
+    stName = "UNKNOWN";
+    break;
+  }
+  return stName;
 }
 
 /**
  * Save the settingsDoc to storage if settings has changed
  */
-void DeviceModule::saveSettings()
-{
-	if (!settingsUpdated)
-	{
-		return;
-	}
-	mStorage.writeFile(SETTINGS_FILE, settingsDoc);
-	settingsUpdated = false;
+void DeviceModule::saveSettings() {
+  if (!settingsUpdated) {
+    return;
+  }
+  mStorage.writeFile(SETTINGS_FILE, settingsDoc);
+  settingsUpdated = false;
 }
 
 /**
  * Update the weatherDoc if new data has been received ie from BLE
  */
-void DeviceModule::refreshWeather()
-{
-	if (!weatherUpdated)
-	{
-		return;
-	}
+void DeviceModule::refreshWeather() {
+  if (!weatherUpdated) {
+    return;
+  }
 
-	weatherDoc["updateDay"] = yearDay();
-	weatherDoc["updateTime"] = mWatch.getWeatherTime();
-	weatherDoc["city"] = mWatch.getWeatherCity();
+  weatherDoc["updateDay"] = yearDay();
+  weatherDoc["updateTime"] = mWatch.getWeatherTime();
+  weatherDoc["city"] = mWatch.getWeatherCity();
 
-	for (int i = 0; i < mWatch.getWeatherCount(); i++)
-	{
-		Weather w = mWatch.getWeatherAt(i);
-		weatherDoc["daily"][String(i)]["day"] = w.day;
-		weatherDoc["daily"][String(i)]["icon"] = w.icon;
-		weatherDoc["daily"][String(i)]["temp"] = w.temp;
-		weatherDoc["daily"][String(i)]["high"] = w.high;
-		weatherDoc["daily"][String(i)]["low"] = w.low;
-		weatherDoc["daily"][String(i)]["pressure"] = w.pressure;
-		weatherDoc["daily"][String(i)]["uv"] = w.uv;
-	}
+  for (int i = 0; i < mWatch.getWeatherCount(); i++) {
+    Weather w = mWatch.getWeatherAt(i);
+    weatherDoc["daily"][String(i)]["day"] = w.day;
+    weatherDoc["daily"][String(i)]["icon"] = w.icon;
+    weatherDoc["daily"][String(i)]["temp"] = w.temp;
+    weatherDoc["daily"][String(i)]["high"] = w.high;
+    weatherDoc["daily"][String(i)]["low"] = w.low;
+    weatherDoc["daily"][String(i)]["pressure"] = w.pressure;
+    weatherDoc["daily"][String(i)]["uv"] = w.uv;
+  }
 
-	weatherDoc["hourly"].clear();
-	for (int h = mWatch.getHour(true); h < 24; h++)
-	{
-		HourlyForecast hf = mWatch.getForecastHour(h);
-		weatherDoc["hourly"][String(h)]["hour"] = hf.hour;
-		weatherDoc["hourly"][String(h)]["icon"] = hf.icon;
-		weatherDoc["hourly"][String(h)]["temp"] = hf.temp;
-		weatherDoc["hourly"][String(h)]["humidity"] = hf.humidity;
-		weatherDoc["hourly"][String(h)]["wind"] = hf.wind;
-		weatherDoc["hourly"][String(h)]["uv"] = hf.uv;
-	}
+  weatherDoc["hourly"].clear();
+  for (int h = mWatch.getHour(true); h < 24; h++) {
+    HourlyForecast hf = mWatch.getForecastHour(h);
+    weatherDoc["hourly"][String(h)]["hour"] = hf.hour;
+    weatherDoc["hourly"][String(h)]["icon"] = hf.icon;
+    weatherDoc["hourly"][String(h)]["temp"] = hf.temp;
+    weatherDoc["hourly"][String(h)]["humidity"] = hf.humidity;
+    weatherDoc["hourly"][String(h)]["wind"] = hf.wind;
+    weatherDoc["hourly"][String(h)]["uv"] = hf.uv;
+  }
 }
 
 /**
  * Save the weatherDoc to storage if it has new data
  */
-void DeviceModule::saveWeather()
-{
+void DeviceModule::saveWeather() {
 
-	refreshWeather();
+  refreshWeather();
 
-	if (!weatherUpdated)
-	{
-		return;
-	}
+  if (!weatherUpdated) {
+    return;
+  }
 
-	mStorage.writeFile(WEATHER_FILE, weatherDoc);
-	weatherUpdated = false;
+  mStorage.writeFile(WEATHER_FILE, weatherDoc);
+  weatherUpdated = false;
 }
 
 /**
  * Update the contactsDoc if new data has been received ie from BLE
  */
-void DeviceModule::refreshContacts()
-{
-	if (!contactsUpdated)
-	{
-		return;
-	}
+void DeviceModule::refreshContacts() {
+  if (!contactsUpdated) {
+    return;
+  }
 
-	contactsDoc.clear();
-	for (int i = 0; i < mWatch.getContactCount(); i++)
-	{
-		JsonDocument contact;
-		Contact cn = mWatch.getContact(i);
-		contact["name"] = cn.name;
-		contact["number"] = cn.number;
-		contact["sos"] = mWatch.getSOSContactIndex() == i;
-		contactsDoc.add(contact);
-	}
+  contactsDoc.clear();
+  for (int i = 0; i < mWatch.getContactCount(); i++) {
+    JsonDocument contact;
+    Contact cn = mWatch.getContact(i);
+    contact["name"] = cn.name;
+    contact["number"] = cn.number;
+    contact["sos"] = mWatch.getSOSContactIndex() == i;
+    contactsDoc.add(contact);
+  }
 }
 
 /**
@@ -674,267 +591,246 @@ void DeviceModule::refreshContacts()
  * @param max the max contacts to get
  * @return the number of contacts retrieved
  */
-int DeviceModule::getContacts(Contact *array, int *sos, size_t max)
-{
-	refreshContacts();
+int DeviceModule::getContacts(Contact *array, int *sos, size_t max) {
+  refreshContacts();
 
-	JsonArray contacts = contactsDoc.as<JsonArray>();
-	int count = 0;
-	for (JsonVariant v : contacts)
-	{
-		JsonObject c = v.as<JsonObject>();
-		Contact cn;
-		cn.name = c["name"].as<String>();
-		cn.number = c["number"].as<String>();
-		array[count] = cn;
-		if (c["sos"].as<bool>())
-		{
-			*sos = count;
-		}
-		count++;
-		if (count >= max)
-		{
-			break;
-		}
-	}
-	return count;
+  JsonArray contacts = contactsDoc.as<JsonArray>();
+  int count = 0;
+  for (JsonVariant v : contacts) {
+    JsonObject c = v.as<JsonObject>();
+    Contact cn;
+    cn.name = c["name"].as<String>();
+    cn.number = c["number"].as<String>();
+    array[count] = cn;
+    if (c["sos"].as<bool>()) {
+      *sos = count;
+    }
+    count++;
+    if (count >= max) {
+      break;
+    }
+  }
+  return count;
 }
 
 /**
  * Save the contactsDoc to storage if it has new data
  */
-void DeviceModule::saveContacts()
-{
+void DeviceModule::saveContacts() {
 
-	refreshContacts();
-	if (!contactsUpdated)
-	{
-		return;
-	}
+  refreshContacts();
+  if (!contactsUpdated) {
+    return;
+  }
 
-	mStorage.writeFile(CONTACTS_FILE, contactsDoc);
-	contactsUpdated = false;
+  mStorage.writeFile(CONTACTS_FILE, contactsDoc);
+  contactsUpdated = false;
 }
 
 /**
  * Get the available qr code links
- * @param array the array to place the qr use Contact object (name->app and number->link)
+ * @param array the array to place the qr use Contact object (name->app and
+ * number->link)
  * @param max the max qr to get
  * @return the number of qr retrieved
  */
-int DeviceModule::getQR(Contact *array, size_t max)
-{
-	refreshQR();
+int DeviceModule::getQR(Contact *array, size_t max) {
+  refreshQR();
 
-	JsonArray links = qrDoc.as<JsonArray>();
-	int count = 0;
-	for (JsonVariant v : links)
-	{
-		JsonObject c = v.as<JsonObject>();
-		Contact cn;
-		cn.name = c["app"].as<String>();
-		cn.number = c["link"].as<String>();
-		array[count] = cn;
-		count++;
-		if (count >= max)
-		{
-			break;
-		}
-	}
-	return count;
+  JsonArray links = qrDoc.as<JsonArray>();
+  int count = 0;
+  for (JsonVariant v : links) {
+    JsonObject c = v.as<JsonObject>();
+    Contact cn;
+    cn.name = c["app"].as<String>();
+    cn.number = c["link"].as<String>();
+    array[count] = cn;
+    count++;
+    if (count >= max) {
+      break;
+    }
+  }
+  return count;
 }
 
 /**
  * Update the qrDoc if new data has been received from BLE
  */
-void DeviceModule::refreshQR()
-{
-	if (!qrUpdated)
-	{
-		return;
-	}
+void DeviceModule::refreshQR() {
+  if (!qrUpdated) {
+    return;
+  }
 
-	qrDoc.clear();
-	for (int i = 0; i < QR_SIZE; i++)
-	{
-		JsonDocument link;
-		link["app"] = getQrApp(i);
-		link["link"] = mWatch.getQrAt(i);
-		qrDoc.add(link);
-	}
+  qrDoc.clear();
+  for (int i = 0; i < QR_SIZE; i++) {
+    JsonDocument link;
+    link["app"] = getQrApp(i);
+    link["link"] = mWatch.getQrAt(i);
+    qrDoc.add(link);
+  }
 }
 
 /**
  * Save the qrDoc to storage if it has new data
  */
-void DeviceModule::saveQR()
-{
-	if (!qrUpdated)
-	{
-		return;
-	}
+void DeviceModule::saveQR() {
+  if (!qrUpdated) {
+    return;
+  }
 
-	mStorage.writeFile(QR_FILE, qrDoc);
-	qrUpdated = false;
+  mStorage.writeFile(QR_FILE, qrDoc);
+  qrUpdated = false;
 }
 
 /**
  * Get the weather city
  * @return city
  */
-String DeviceModule::getCity()
-{
-	refreshWeather();
-	String city = weatherDoc["city"] | "";
-	return city;
+String DeviceModule::getCity() {
+  refreshWeather();
+  String city = weatherDoc["city"] | "";
+  return city;
 }
 
 /**
  * Get the current weather object
  * @return weather object
  */
-Weather DeviceModule::getCurrent()
-{
-	refreshWeather();
+Weather DeviceModule::getCurrent() {
+  refreshWeather();
 
-	Weather w;
-	w.icon = -1;
-	w.temp = 0;
+  Weather w;
+  w.icon = -1;
+  w.temp = 0;
 
-	int updateDay = weatherDoc["updateDay"] | -1;
+  int updateDay = weatherDoc["updateDay"] | -1;
 
-	// No data or data too old (older than 6 days)
-	if (updateDay == -1 || updateDay < (yearDay() - 6))
-		return w;
+  // No data or data too old (older than 6 days)
+  if (updateDay == -1 || updateDay < (yearDay() - 6))
+    return w;
 
-	// If the data is for today, get the hourly forecast
-	if (updateDay == yearDay())
-	{
-		int h = mWatch.getHour(true);
-		w.icon = weatherDoc["hourly"][String(h)]["icon"] | -1;
-		w.temp = weatherDoc["hourly"][String(h)]["temp"] | 0;
-		return w;
-	}
+  // If the data is for today, get the hourly forecast
+  if (updateDay == yearDay()) {
+    int h = mWatch.getHour(true);
+    w.icon = weatherDoc["hourly"][String(h)]["icon"] | -1;
+    w.temp = weatherDoc["hourly"][String(h)]["temp"] | 0;
+    return w;
+  }
 
-	// Otherwise, determine how many days old the last update was
-	int d = yearDay() - updateDay;
+  // Otherwise, determine how many days old the last update was
+  int d = yearDay() - updateDay;
 
-	// If too far in the future or too old, ignore
-	if (d >= 7 || d < 0)
-		return w;
+  // If too far in the future or too old, ignore
+  if (d >= 7 || d < 0)
+    return w;
 
-	// Since daily[0] is "updateDay", and daily[1] = updateDay+1, etc.
-	// We want the offset between current day and updateDay
-	int index = d;
+  // Since daily[0] is "updateDay", and daily[1] = updateDay+1, etc.
+  // We want the offset between current day and updateDay
+  int index = d;
 
-	w.icon = weatherDoc["daily"][String(index)]["icon"] | -1;
-	w.temp = weatherDoc["daily"][String(index)]["temp"] | 0;
-	return w;
+  w.icon = weatherDoc["daily"][String(index)]["icon"] | -1;
+  w.temp = weatherDoc["daily"][String(index)]["temp"] | 0;
+  return w;
 }
 
 /**
  * Get the weather forecast data
  * @param array the out array to save data to
  * @param max max number of days for the forecast data
- * @return -1 if no data or out dated (past 7 days) or available number of forecast days
+ * @return -1 if no data or out dated (past 7 days) or available number of
+ * forecast days
  */
-int DeviceModule::getForecast(Weather *array, size_t max)
-{
-	refreshWeather(); // optional, ensures latest data
+int DeviceModule::getForecast(Weather *array, size_t max) {
+  refreshWeather(); // optional, ensures latest data
 
-	int updateDay = weatherDoc["updateDay"] | -1;
-	if (updateDay == -1)
-		return -1;
+  int updateDay = weatherDoc["updateDay"] | -1;
+  if (updateDay == -1)
+    return -1;
 
-	JsonObject daily = weatherDoc["daily"].as<JsonObject>();
-	if (daily.isNull())
-		return -1;
+  JsonObject daily = weatherDoc["daily"].as<JsonObject>();
+  if (daily.isNull())
+    return -1;
 
-	// Calculate how many days ahead we can safely read
-	int currentDay = yearDay();
-	int diff = currentDay - updateDay;
+  // Calculate how many days ahead we can safely read
+  int currentDay = yearDay();
+  int diff = currentDay - updateDay;
 
-	// If data is outdated or from the future, abort
-	if (diff < 0 || diff >= 7)
-		return -1;
+  // If data is outdated or from the future, abort
+  if (diff < 0 || diff >= 7)
+    return -1;
 
-	int count = 0;
-	// Skip daily[0] (today), start from tomorrow (daily[1])
-	for (int i = 1; i < 7 && count < (int)max; i++)
-	{
-		// Stop if entry missing
-		if (!daily[String(i)].is<JsonObject>())
-			break;
+  int count = 0;
+  // Skip daily[0] (today), start from tomorrow (daily[1])
+  for (int i = 1; i < 7 && count < (int)max; i++) {
+    // Stop if entry missing
+    if (!daily[String(i)].is<JsonObject>())
+      break;
 
-		Weather w;
-		w.day = weatherDoc["daily"][String(i)]["day"] | 0;
-		w.icon = weatherDoc["daily"][String(i)]["icon"] | -1;
-		w.temp = weatherDoc["daily"][String(i)]["temp"] | 0;
-		w.high = weatherDoc["daily"][String(i)]["high"] | 0;
-		w.low = weatherDoc["daily"][String(i)]["low"] | 0;
-		w.pressure = weatherDoc["daily"][String(i)]["pressure"] | 0;
-		w.uv = weatherDoc["daily"][String(i)]["uv"] | 0;
+    Weather w;
+    w.day = weatherDoc["daily"][String(i)]["day"] | 0;
+    w.icon = weatherDoc["daily"][String(i)]["icon"] | -1;
+    w.temp = weatherDoc["daily"][String(i)]["temp"] | 0;
+    w.high = weatherDoc["daily"][String(i)]["high"] | 0;
+    w.low = weatherDoc["daily"][String(i)]["low"] | 0;
+    w.pressure = weatherDoc["daily"][String(i)]["pressure"] | 0;
+    w.uv = weatherDoc["daily"][String(i)]["uv"] | 0;
 
-		array[count++] = w;
-	}
+    array[count++] = w;
+  }
 
-	return count > 0 ? count : -1;
+  return count > 0 ? count : -1;
 }
 
 /**
  * Handle the notification received from BLE
  * @param notification notification object
  */
-void DeviceModule::handleNotification(Notification notification)
-{
-	// TODO
+void DeviceModule::handleNotification(Notification notification) {
+  // TODO
 }
 
 /**
  * Update the notifications from the watch object
  */
-void DeviceModule::refreshNotifications()
-{
+void DeviceModule::refreshNotifications() {
 
-	bool updated = false;
+  bool updated = false;
 
-	for (int i = 0; i < mWatch.getNotificationCount(); i++)
-	{
-		Notification n = mWatch.getNotificationAt(i);
-		JsonDocument notif;
-		notif["time"] = n.time;
-		notif["icon"] = n.icon;
-		notif["title"] = n.title;
-		notif["message"] = n.message;
-		notif["date"] = mWatch.getTime("%d/%m");
-		notificationsDoc.add(notif);
+  for (int i = 0; i < mWatch.getNotificationCount(); i++) {
+    Notification n = mWatch.getNotificationAt(i);
+    JsonDocument notif;
+    notif["time"] = n.time;
+    notif["icon"] = n.icon;
+    notif["title"] = n.title;
+    notif["message"] = n.message;
+    notif["date"] = mWatch.getTime("%d/%m");
+    notificationsDoc.add(notif);
 
-		updated = true;
-	}
+    updated = true;
+  }
 
-	mWatch.clearNotifications(); // clear notifications from BLE
+  mWatch.clearNotifications(); // clear notifications from BLE
 
-	JsonArray array = notificationsDoc.as<JsonArray>();
-	// Trim if necessary
-	while (array.size() > MAX_NOTIFICATIONS)
-	{
-		array.remove(0);
-		updated = true;
-	}
+  JsonArray array = notificationsDoc.as<JsonArray>();
+  // Trim if necessary
+  while (array.size() > MAX_NOTIFICATIONS) {
+    array.remove(0);
+    updated = true;
+  }
 
-	if (updated)
-		notificationsUpdated = true;
+  if (updated)
+    notificationsUpdated = true;
 }
 
 /**
- * Clear the current notifications permanently (also will be cleared from storage)
+ * Clear the current notifications permanently (also will be cleared from
+ * storage)
  */
-void DeviceModule::clearNotifications()
-{
-	refreshNotifications();
-	JsonArray notifArray = notificationsDoc.as<JsonArray>();
-	notifArray.clear();
-	notificationsUpdated = true;
+void DeviceModule::clearNotifications() {
+  refreshNotifications();
+  JsonArray notifArray = notificationsDoc.as<JsonArray>();
+  notifArray.clear();
+  notificationsUpdated = true;
 }
 
 /**
@@ -943,60 +839,55 @@ void DeviceModule::clearNotifications()
  * @param max the number of notifications to read
  * @return -1 if no notifications are available or number of read notifications
  */
-int DeviceModule::getNotifications(Notification *array, size_t max)
-{
+int DeviceModule::getNotifications(Notification *array, size_t max) {
 
-	refreshNotifications();
+  refreshNotifications();
 
-	JsonArray notifArray = notificationsDoc.as<JsonArray>();
+  JsonArray notifArray = notificationsDoc.as<JsonArray>();
 
-	if (notifArray.isNull() || notifArray.size() == 0)
-		return -1;
+  if (notifArray.isNull() || notifArray.size() == 0)
+    return -1;
 
-	size_t count = notifArray.size();
-	if (count > max)
-		count = max; // prevent overflow
+  size_t count = notifArray.size();
+  if (count > max)
+    count = max; // prevent overflow
 
-	String today = mWatch.getTime("%d/%m");
+  String today = mWatch.getTime("%d/%m");
 
-	// Fill array in reverse order (latest notifications first)
-	for (size_t i = 0; i < count; i++)
-	{
-		size_t idx = notifArray.size() - 1 - i; // reverse index
-		JsonObject obj = notifArray[idx];
+  // Fill array in reverse order (latest notifications first)
+  for (size_t i = 0; i < count; i++) {
+    size_t idx = notifArray.size() - 1 - i; // reverse index
+    JsonObject obj = notifArray[idx];
 
-		array[i].time = obj["time"] | "";
-		array[i].icon = obj["icon"] | -1;
-		array[i].title = obj["title"] | "";
-		array[i].message = obj["message"] | "";
-		array[i].app = obj["date"] | "";
+    array[i].time = obj["time"] | "";
+    array[i].icon = obj["icon"] | -1;
+    array[i].title = obj["title"] | "";
+    array[i].message = obj["message"] | "";
+    array[i].app = obj["date"] | "";
 
-		if (array[i].app != today)
-		{
-			array[i].time += " " + array[i].app;
-			array[i].app = "";
-		}
-	}
+    if (array[i].app != today) {
+      array[i].time += " " + array[i].app;
+      array[i].app = "";
+    }
+  }
 
-	return count;
+  return count;
 }
 
 /**
  * Save notifications to storage
  */
-void DeviceModule::saveNotifications()
-{
+void DeviceModule::saveNotifications() {
 
-	refreshNotifications();
+  refreshNotifications();
 
-	if (!notificationsUpdated)
-	{
-		return;
-	}
+  if (!notificationsUpdated) {
+    return;
+  }
 
-	mStorage.writeFile(NOTIFICATIONS_FILE, notificationsDoc);
+  mStorage.writeFile(NOTIFICATIONS_FILE, notificationsDoc);
 
-	notificationsUpdated = false;
+  notificationsUpdated = false;
 }
 
 /**
@@ -1006,282 +897,260 @@ void DeviceModule::saveNotifications()
  * @param b b parameter
  * @note check ChronosESP32 library for more info
  */
-void DeviceModule::handleConfigs(Config config, uint32_t a, uint32_t b)
-{
+void DeviceModule::handleConfigs(Config config, uint32_t a, uint32_t b) {
 
-	SettingTime s;
-	switch (config)
-	{
-	case CF_RST:
-		ESP.restart();
-		break;
-	case CF_RTW:
-		setRTW(b);
-		settingsUpdated = true;
-		break;
-	case CF_QUIET:
-		s.startHour = uint8_t(b >> 24);
-		s.startMinute = uint8_t(b >> 16);
-		s.endHour = uint8_t(b >> 8);
-		s.endMinute = uint8_t(b);
-		s.enabled = a;
-		setSettings(ST_QUIET, s);
-		settingsUpdated = true;
-		break;
-	case CF_SLEEP:
-		s.startHour = uint8_t(b >> 24);
-		s.startMinute = uint8_t(b >> 16);
-		s.endHour = uint8_t(b >> 8);
-		s.endMinute = uint8_t(b);
-		s.enabled = a;
-		setSettings(ST_SLEEP, s);
-		settingsUpdated = true;
-		break;
-	case CF_SED:
-		s.startHour = uint8_t(b >> 24);
-		s.startMinute = uint8_t(b >> 16);
-		s.endHour = uint8_t(b >> 8);
-		s.endMinute = uint8_t(b);
-		s.enabled = (a & 0xFF);
-		s.interval = ((a >> 16) & 0xFFFF);
-		setSettings(ST_SEDENTARY, s);
-		settingsUpdated = true;
-		break;
-	case CF_WATER:
-		s.startHour = uint8_t(b >> 24);
-		s.startMinute = uint8_t(b >> 16);
-		s.endHour = uint8_t(b >> 8);
-		s.endMinute = uint8_t(b);
-		s.enabled = (a & 0xFF);
-		s.interval = ((a >> 16) & 0xFFFF);
-		setSettings(ST_WATER, s);
-		settingsUpdated = true;
-		break;
-	case CF_USER:
-		setUnits((uint8_t)(b >> 24) ? UT_METRIC : UT_IMPERIAL);
-		setTempUnit((uint8_t)(b >> 8) ? TP_FARENHEIT : TP_CELSIUS);
-		settingsUpdated = true;
-		break;
-	case CF_HOURLY:
-		setHourly(b);
-		settingsUpdated = true;
-		break;
-	case CF_HR24:
-		set24hr(b);
-		settingsUpdated = true;
-		break;
-	case CF_LANG:
-		setLanguage(b);
-		settingsUpdated = true;
-		break;
-	case CF_WEATHER:
-		if (a == 2)
-		{
-			weatherUpdated = true;
-		}
-		break;
-	case CF_NAV_DATA:
-		navChanged = true;
-		break;
-	case CF_NAV_ICON:
-		if (a == 2)
-		{
-			navIcChanged = true;
-		}
-		break;
-	case CF_PBAT:
-	case CF_APP:
-		setPhoneInfo();
-		settingsUpdated = true;
-		break;
-	case CF_CONTACT:
-		if (a == 1)
-		{
-			contactsUpdated = true;
-		}
-		break;
-	case CF_QR:
-		if (a == 1)
-		{
-			qrUpdated = true;
-		}
-		break;
-	}
+  SettingTime s;
+  switch (config) {
+  case CF_RST:
+    ESP.restart();
+    break;
+  case CF_RTW:
+    setRTW(b);
+    settingsUpdated = true;
+    break;
+  case CF_QUIET:
+    s.startHour = uint8_t(b >> 24);
+    s.startMinute = uint8_t(b >> 16);
+    s.endHour = uint8_t(b >> 8);
+    s.endMinute = uint8_t(b);
+    s.enabled = a;
+    setSettings(ST_QUIET, s);
+    settingsUpdated = true;
+    break;
+  case CF_SLEEP:
+    s.startHour = uint8_t(b >> 24);
+    s.startMinute = uint8_t(b >> 16);
+    s.endHour = uint8_t(b >> 8);
+    s.endMinute = uint8_t(b);
+    s.enabled = a;
+    setSettings(ST_SLEEP, s);
+    settingsUpdated = true;
+    break;
+  case CF_SED:
+    s.startHour = uint8_t(b >> 24);
+    s.startMinute = uint8_t(b >> 16);
+    s.endHour = uint8_t(b >> 8);
+    s.endMinute = uint8_t(b);
+    s.enabled = (a & 0xFF);
+    s.interval = ((a >> 16) & 0xFFFF);
+    setSettings(ST_SEDENTARY, s);
+    settingsUpdated = true;
+    break;
+  case CF_WATER:
+    s.startHour = uint8_t(b >> 24);
+    s.startMinute = uint8_t(b >> 16);
+    s.endHour = uint8_t(b >> 8);
+    s.endMinute = uint8_t(b);
+    s.enabled = (a & 0xFF);
+    s.interval = ((a >> 16) & 0xFFFF);
+    setSettings(ST_WATER, s);
+    settingsUpdated = true;
+    break;
+  case CF_USER:
+    setUnits((uint8_t)(b >> 24) ? UT_METRIC : UT_IMPERIAL);
+    setTempUnit((uint8_t)(b >> 8) ? TP_FARENHEIT : TP_CELSIUS);
+    settingsUpdated = true;
+    break;
+  case CF_HOURLY:
+    setHourly(b);
+    settingsUpdated = true;
+    break;
+  case CF_HR24:
+    set24hr(b);
+    settingsUpdated = true;
+    break;
+  case CF_LANG:
+    setLanguage(b);
+    settingsUpdated = true;
+    break;
+  case CF_WEATHER:
+    if (a == 2) {
+      weatherUpdated = true;
+    }
+    break;
+  case CF_NAV_DATA:
+    navChanged = true;
+    break;
+  case CF_NAV_ICON:
+    if (a == 2) {
+      navIcChanged = true;
+    }
+    break;
+  case CF_PBAT:
+  case CF_APP:
+    setPhoneInfo();
+    settingsUpdated = true;
+    break;
+  case CF_CONTACT:
+    if (a == 1) {
+      contactsUpdated = true;
+    }
+    break;
+  case CF_QR:
+    if (a == 1) {
+      qrUpdated = true;
+    }
+    break;
+  }
 }
 
 /**
  * Set the phone info received from Chronos App
  */
-void DeviceModule::setPhoneInfo()
-{
-	DateTime date = getDateTime();
-	settingsDoc["phoneInfo"]["second"] = date.second;
-	settingsDoc["phoneInfo"]["minute"] = date.minute;
-	settingsDoc["phoneInfo"]["hour"] = date.hour;
-	settingsDoc["phoneInfo"]["day"] = date.day;
-	settingsDoc["phoneInfo"]["month"] = date.month;
-	settingsDoc["phoneInfo"]["year"] = date.year;
-	settingsDoc["phoneInfo"]["code"] = mWatch.getAppCode();
-	settingsDoc["phoneInfo"]["version"] = mWatch.getAppVersion();
-	settingsDoc["phoneInfo"]["battery"] = mWatch.getPhoneBattery();
-	settingsDoc["phoneInfo"]["charging"] = mWatch.isPhoneCharging();
+void DeviceModule::setPhoneInfo() {
+  DateTime date = getDateTime();
+  settingsDoc["phoneInfo"]["second"] = date.second;
+  settingsDoc["phoneInfo"]["minute"] = date.minute;
+  settingsDoc["phoneInfo"]["hour"] = date.hour;
+  settingsDoc["phoneInfo"]["day"] = date.day;
+  settingsDoc["phoneInfo"]["month"] = date.month;
+  settingsDoc["phoneInfo"]["year"] = date.year;
+  settingsDoc["phoneInfo"]["code"] = mWatch.getAppCode();
+  settingsDoc["phoneInfo"]["version"] = mWatch.getAppVersion();
+  settingsDoc["phoneInfo"]["battery"] = mWatch.getPhoneBattery();
+  settingsDoc["phoneInfo"]["charging"] = mWatch.isPhoneCharging();
 }
 
 /**
  * Set the current watchface path
  * @param path the path to the watchface
  */
-void DeviceModule::setWatchface(String path)
-{
-	settingsDoc["watchface"] = path;
-	settingsUpdated = true;
+void DeviceModule::setWatchface(String path) {
+  settingsDoc["watchface"] = path;
+  settingsUpdated = true;
 }
 
 /**
  * Get the current watchface
  * @return the path to the watchface
  */
-String DeviceModule::getWatchface()
-{
-	return settingsDoc["watchface"] | "default";
+String DeviceModule::getWatchface() {
+  return settingsDoc["watchface"] | "default";
 }
 
 /**
  * Get the last sync time to Chronos App
  * @return datetime object
  */
-DateTime DeviceModule::getSyncTime()
-{
-	DateTime dt;
-	dt.second = settingsDoc["phoneInfo"]["second"] | -1;
-	dt.minute = settingsDoc["phoneInfo"]["minute"] | -1;
-	dt.hour = settingsDoc["phoneInfo"]["hour"] | -1;
-	dt.day = settingsDoc["phoneInfo"]["day"] | -1;
-	dt.month = settingsDoc["phoneInfo"]["month"] | -1;
-	dt.year = settingsDoc["phoneInfo"]["year"] | -1;
+DateTime DeviceModule::getSyncTime() {
+  DateTime dt;
+  dt.second = settingsDoc["phoneInfo"]["second"] | -1;
+  dt.minute = settingsDoc["phoneInfo"]["minute"] | -1;
+  dt.hour = settingsDoc["phoneInfo"]["hour"] | -1;
+  dt.day = settingsDoc["phoneInfo"]["day"] | -1;
+  dt.month = settingsDoc["phoneInfo"]["month"] | -1;
+  dt.year = settingsDoc["phoneInfo"]["year"] | -1;
 
-	return dt;
+  return dt;
 }
 
 /**
  * Set the BLE sync interval time
  * @param time in minutes
  */
-void DeviceModule::setBLEInterval(int minutes)
-{
-	settingsDoc["config"]["bleInterval"] = minutes;
-	settingsUpdated = true;
+void DeviceModule::setBLEInterval(int minutes) {
+  settingsDoc["config"]["bleInterval"] = minutes;
+  settingsUpdated = true;
 }
 
 /**
  * Get the BLE sync interval time in minutes
  */
-int DeviceModule::getBLEInterval()
-{
-	return settingsDoc["config"]["bleInterval"] | 10;
+int DeviceModule::getBLEInterval() {
+  return settingsDoc["config"]["bleInterval"] | 10;
 }
 
 /**
  * Set the display mode
  * @param invert invert display
  */
-void DeviceModule::setInvertDisplay(bool invert)
-{
-	settingsDoc["config"]["invertDisplay"] = invert;
-	settingsUpdated = true;
+void DeviceModule::setInvertDisplay(bool invert) {
+  settingsDoc["config"]["invertDisplay"] = invert;
+  settingsUpdated = true;
 }
 
 /**
  * Get the display invert mode
  * @return true if inverted or false
  */
-bool DeviceModule::getInvertDisplay()
-{
-	return settingsDoc["config"]["invertDisplay"] | false;
+bool DeviceModule::getInvertDisplay() {
+  return settingsDoc["config"]["invertDisplay"] | false;
 }
 
 /**
  * Get the last sync time to Chronos App formatted string
  * @return formatted string or N/A if not available
  */
-String DeviceModule::getLastSync()
-{
-	DateTime now = getDateTime();
-	DateTime date = getSyncTime();
+String DeviceModule::getLastSync() {
+  DateTime now = getDateTime();
+  DateTime date = getSyncTime();
 
-	// Check for invalid sync time
-	if (date.year == (uint32_t)-1 || date.month == (uint8_t)-1 ||
-		date.day == (uint8_t)-1 || date.hour == (uint8_t)-1 || date.minute == (uint8_t)-1)
-	{
-		return "N/A";
-	}
+  // Check for invalid sync time
+  if (date.year == (uint32_t)-1 || date.month == (uint8_t)-1 ||
+      date.day == (uint8_t)-1 || date.hour == (uint8_t)-1 ||
+      date.minute == (uint8_t)-1) {
+    return "N/A";
+  }
 
-	// Convert both to minutes since epoch (rough approximation)
-	// Assumes both are in the same year; for short-term comparison (like a watch), this is fine
-	uint32_t nowMinutes = (((now.day * 24UL) + now.hour) * 60UL) + now.minute;
-	uint32_t dateMinutes = (((date.day * 24UL) + date.hour) * 60UL) + date.minute;
+  // Convert both to minutes since epoch (rough approximation)
+  // Assumes both are in the same year; for short-term comparison (like a
+  // watch), this is fine
+  uint32_t nowMinutes = (((now.day * 24UL) + now.hour) * 60UL) + now.minute;
+  uint32_t dateMinutes = (((date.day * 24UL) + date.hour) * 60UL) + date.minute;
 
-	long diffMinutes = (long)nowMinutes - (long)dateMinutes;
-	if (diffMinutes < 0)
-		diffMinutes = 0; // safety
+  long diffMinutes = (long)nowMinutes - (long)dateMinutes;
+  if (diffMinutes < 0)
+    diffMinutes = 0; // safety
 
-	if (diffMinutes < 60)
-	{
-		// Less than an hour → show minutes only
-		return String(diffMinutes) + "m";
-	}
+  if (diffMinutes < 60) {
+    // Less than an hour → show minutes only
+    return String(diffMinutes) + "m";
+  }
 
-	long diffHours = diffMinutes / 60;
-	long remainingMins = diffMinutes % 60;
+  long diffHours = diffMinutes / 60;
+  long remainingMins = diffMinutes % 60;
 
-	if (diffHours < 24)
-	{
-		// Within a day
-		if (remainingMins == 0)
-			return String(diffHours) + "h";
-		else
-			return String(diffHours) + "h " + String(remainingMins) + "m";
-	}
+  if (diffHours < 24) {
+    // Within a day
+    if (remainingMins == 0)
+      return String(diffHours) + "h";
+    else
+      return String(diffHours) + "h " + String(remainingMins) + "m";
+  }
 
-	// More than a day → show in days only
-	long diffDays = diffHours / 24;
-	return String(diffDays) + "d";
+  // More than a day → show in days only
+  long diffDays = diffHours / 24;
+  return String(diffDays) + "d";
 }
 
 /**
  * Get the Chronos app version from last sync
  * @return version eg v3.8.5
  */
-String DeviceModule::getAppVersion()
-{
-	return settingsDoc["phoneInfo"]["version"] | "";
+String DeviceModule::getAppVersion() {
+  return settingsDoc["phoneInfo"]["version"] | "";
 }
 
 /**
  * Get the Chronos app code from last sync
  * @return code eg 53
  */
-int DeviceModule::getAppCode()
-{
-	return settingsDoc["phoneInfo"]["code"] | 0;
-}
+int DeviceModule::getAppCode() { return settingsDoc["phoneInfo"]["code"] | 0; }
 
 /**
  * Get the phone battery percentage from last sync
  * @return battery eg 85
  */
-uint8_t DeviceModule::getPhoneBattery()
-{
-	return settingsDoc["phoneInfo"]["battery"] | 0;
+uint8_t DeviceModule::getPhoneBattery() {
+  return settingsDoc["phoneInfo"]["battery"] | 0;
 }
 
 /**
  * Get the phone battery charge state from last sync
  * @return true if was charging or false
  */
-bool DeviceModule::isPhoneCharging()
-{
-	return settingsDoc["phoneInfo"]["charging"] | false;
+bool DeviceModule::isPhoneCharging() {
+  return settingsDoc["phoneInfo"]["charging"] | false;
 }
 
 /**
@@ -1290,13 +1159,11 @@ bool DeviceModule::isPhoneCharging()
  * @param day day of year or -1 to use current day of year
  * @return (year * 1000) + day
  */
-int DeviceModule::yearDay(int year, int day)
-{
-	if (year == -1 || day == -1)
-	{
-		return mWatch.getYear() * 1000 + mWatch.getDayofYear();
-	}
-	return year * 1000 + day;
+int DeviceModule::yearDay(int year, int day) {
+  if (year == -1 || day == -1) {
+    return mWatch.getYear() * 1000 + mWatch.getDayofYear();
+  }
+  return year * 1000 + day;
 }
 
 /**
@@ -1304,10 +1171,9 @@ int DeviceModule::yearDay(int year, int day)
  * @param day day of week (0-6)
  * @return day of week eg TUE
  */
-String DeviceModule::getDay(int day)
-{
-	String days[7] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
-	return days[day % 7];
+String DeviceModule::getDay(int day) {
+  String days[7] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+  return days[day % 7];
 }
 
 /**
@@ -1318,20 +1184,19 @@ String DeviceModule::getDay(int day)
  * @param hour hour
  * @param battery battery percentage
  */
-void DeviceModule::saveHourlyBattery(int year, int month, int day, int hour, int battery)
-{
-	mStorage.createDir(BATTERY_FOLDER);
-	String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
-	String content;
-	JsonDocument doc;
-	if (mStorage.readFile(path, content))
-	{
-		// file exists, parse JSON
-		DeserializationError error = deserializeJson(doc, content);
-	}
-	doc[String(hour)] = battery;
+void DeviceModule::saveHourlyBattery(int year, int month, int day, int hour,
+                                     int battery) {
+  mStorage.createDir(BATTERY_FOLDER);
+  String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
+  String content;
+  JsonDocument doc;
+  if (mStorage.readFile(path, content)) {
+    // file exists, parse JSON
+    DeserializationError error = deserializeJson(doc, content);
+  }
+  doc[String(hour)] = battery;
 
-	mStorage.writeFile(path, doc);
+  mStorage.writeFile(path, doc);
 }
 
 /**
@@ -1341,21 +1206,19 @@ void DeviceModule::saveHourlyBattery(int year, int month, int day, int hour, int
  * @param day day
  * @return json string with data
  */
-String DeviceModule::readDailyBattery(int year, int month, int day)
-{
-	String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
-	String content;
-	JsonDocument doc;
-	if (mStorage.readFile(path, content))
-	{
-		// file exists, parse JSON
-		DeserializationError error = deserializeJson(doc, content);
-	}
-	doc["day"] = day;
-	doc["month"] = month;
-	doc["year"] = year;
-	serializeJson(doc, content);
-	return content;
+String DeviceModule::readDailyBattery(int year, int month, int day) {
+  String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
+  String content;
+  JsonDocument doc;
+  if (mStorage.readFile(path, content)) {
+    // file exists, parse JSON
+    DeserializationError error = deserializeJson(doc, content);
+  }
+  doc["day"] = day;
+  doc["month"] = month;
+  doc["year"] = year;
+  serializeJson(doc, content);
+  return content;
 }
 
 /**
@@ -1365,15 +1228,13 @@ String DeviceModule::readDailyBattery(int year, int month, int day)
  * @param day day
  * @return json string with data
  */
-String DeviceModule::getDailyBatteryLevels(int year, int month, int day)
-{
-	String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
-	String content;
-	if (mStorage.readFile(path, content))
-	{
-		return content;
-	}
-	return "{}"; // return empty JSON object if file doesn't exist
+String DeviceModule::getDailyBatteryLevels(int year, int month, int day) {
+  String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
+  String content;
+  if (mStorage.readFile(path, content)) {
+    return content;
+  }
+  return "{}"; // return empty JSON object if file doesn't exist
 }
 
 /**
@@ -1386,84 +1247,70 @@ String DeviceModule::getDailyBatteryLevels(int year, int month, int day)
  * @param day day
  * @return highest value in the records (0 means no records)
  */
-uint32_t DeviceModule::getStepsRecords(int32_t *array, int start, int count, int year, int month, int day)
-{
-	String path = mStorage.filePath(STEPS_FOLDER, year, month, day);
-	String content;
-	JsonDocument doc;
-	uint32_t highest = 0;
-	DateTime now = getDateTime();
+uint32_t DeviceModule::getStepsRecords(int32_t *array, int start, int count,
+                                       int year, int month, int day) {
+  String path = mStorage.filePath(STEPS_FOLDER, year, month, day);
+  String content;
+  JsonDocument doc;
+  uint32_t highest = 0;
+  DateTime now = getDateTime();
 
-	if (mStorage.readFile(path, content))
-	{
-		// file exists, parse JSON
-		Timber.i(content);
-		DeserializationError error = deserializeJson(doc, content);
-		if (!error)
-		{
-			uint32_t prev = 0;
-			bool hasStarted = false;
+  if (mStorage.readFile(path, content)) {
+    // file exists, parse JSON
+    Timber.i(content);
+    DeserializationError error = deserializeJson(doc, content);
+    if (!error) {
+      uint32_t prev = 0;
+      bool hasStarted = false;
 
-			for (int i = start; i < start + count; i++)
-			{
-				uint32_t v = doc[String(i)] | 0;
-				uint32_t current = 0;
+      for (int i = start; i < start + count; i++) {
+        uint32_t v = doc[String(i)] | 0;
+        uint32_t current = 0;
 
-				if (now.year == year && now.month == month && now.day == day && now.hour == i)
-				{
-					v = mMotion.getCurrentSteps();
-				}
+        if (now.year == year && now.month == month && now.day == day &&
+            now.hour == i) {
+          v = mMotion.getCurrentSteps();
+        }
 
-				if (!hasStarted)
-				{
-					// Wait until we see the first non-zero value
-					if (v > 0)
-					{
-						hasStarted = true;
-						current = v; // first valid reading
-					}
-				}
-				else
-				{
-					if (v == 0)
-					{
-						// 0 means no data yet, keep as 0
-						current = 0;
-					}
-					else if (v >= prev)
-					{
-						// Normal progression
-						current = v - prev;
-					}
-					else
-					{
-						// Cumulative reset (e.g., new day)
-						current = v; // treat as fresh start
-					}
-				}
+        if (!hasStarted) {
+          // Wait until we see the first non-zero value
+          if (v > 0) {
+            hasStarted = true;
+            current = v; // first valid reading
+          }
+        } else {
+          if (v == 0) {
+            // 0 means no data yet, keep as 0
+            current = 0;
+          } else if (v >= prev) {
+            // Normal progression
+            current = v - prev;
+          } else {
+            // Cumulative reset (e.g., new day)
+            current = v; // treat as fresh start
+          }
+        }
 
-				array[i - start] = current;
+        array[i - start] = current;
 
-				if (current > highest)
-					highest = current;
+        if (current > highest)
+          highest = current;
 
-				prev = v;
-			}
-		}
-	}
-	if (highest == 0)
-	{
-		for (int i = start; i < start + count; i++)
-		{
-			array[i - start] = 0;
-			if (now.year == year && now.month == month && now.day == day && now.hour == i)
-			{
-				array[i - start] = mMotion.getCurrentSteps();
-				highest = array[i - start];
-			}
-		}
-	}
-	return highest;
+        prev = v;
+      }
+    }
+  }
+  if (highest == 0) {
+    for (int i = start; i < start + count; i++) {
+      array[i - start] = 0;
+      if (now.year == year && now.month == month && now.day == day &&
+          now.hour == i) {
+        array[i - start] = mMotion.getCurrentSteps();
+        highest = array[i - start];
+      }
+    }
+  }
+  return highest;
 }
 
 /**
@@ -1473,9 +1320,10 @@ uint32_t DeviceModule::getStepsRecords(int32_t *array, int start, int count, int
  * @param count number of records to read
  * @return highest value in the records (0 means no records)
  */
-uint32_t DeviceModule::getStepsRecordsToday(int32_t *array, int start, int count)
-{
-	return getStepsRecords(array, start, count, mWatch.getYear(), mWatch.getMonth() + 1, mWatch.getDay());
+uint32_t DeviceModule::getStepsRecordsToday(int32_t *array, int start,
+                                            int count) {
+  return getStepsRecords(array, start, count, mWatch.getYear(),
+                         mWatch.getMonth() + 1, mWatch.getDay());
 }
 
 /**
@@ -1488,49 +1336,43 @@ uint32_t DeviceModule::getStepsRecordsToday(int32_t *array, int start, int count
  * @param day day
  * @return highest value in the records (0 means no records)
  */
-uint32_t DeviceModule::getBatteryRecords(int32_t *array, int start, int count, int year, int month, int day)
-{
-	String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
-	String content;
-	JsonDocument doc;
-	uint32_t highest = 0;
-	DateTime now = getDateTime();
+uint32_t DeviceModule::getBatteryRecords(int32_t *array, int start, int count,
+                                         int year, int month, int day) {
+  String path = mStorage.filePath(BATTERY_FOLDER, year, month, day);
+  String content;
+  JsonDocument doc;
+  uint32_t highest = 0;
+  DateTime now = getDateTime();
 
-	if (mStorage.readFile(path, content))
-	{
-		// file exists, parse JSON
-		Timber.i(content);
-		DeserializationError error = deserializeJson(doc, content);
-		if (!error)
-		{
-			for (int i = start; i < start + count; i++)
-			{
-				uint32_t v = doc[String(i)] | 0;
-				if (now.year == year && now.month == month && now.day == day && now.hour == i)
-				{
-					v = getBattery();
-				}
-				if (v > highest)
-				{
-					highest = v;
-				}
-				array[i - start] = v;
-			}
-		}
-	}
-	if (highest == 0)
-	{
-		for (int i = start; i < start + count; i++)
-		{
-			array[i - start] = 0;
-			if (now.year == year && now.month == month && now.day == day && now.hour == i)
-			{
-				array[i - start] = getBattery();
-				highest = array[i - start];
-			}
-		}
-	}
-	return highest;
+  if (mStorage.readFile(path, content)) {
+    // file exists, parse JSON
+    Timber.i(content);
+    DeserializationError error = deserializeJson(doc, content);
+    if (!error) {
+      for (int i = start; i < start + count; i++) {
+        uint32_t v = doc[String(i)] | 0;
+        if (now.year == year && now.month == month && now.day == day &&
+            now.hour == i) {
+          v = getBattery();
+        }
+        if (v > highest) {
+          highest = v;
+        }
+        array[i - start] = v;
+      }
+    }
+  }
+  if (highest == 0) {
+    for (int i = start; i < start + count; i++) {
+      array[i - start] = 0;
+      if (now.year == year && now.month == month && now.day == day &&
+          now.hour == i) {
+        array[i - start] = getBattery();
+        highest = array[i - start];
+      }
+    }
+  }
+  return highest;
 }
 
 /**
@@ -1540,18 +1382,18 @@ uint32_t DeviceModule::getBatteryRecords(int32_t *array, int start, int count, i
  * @param count number of records to read
  * @return highest value in the records (0 means no records)
  */
-uint32_t DeviceModule::getBatteryRecordsToday(int32_t *array, int start, int count)
-{
-	return getBatteryRecords(array, start, count, mWatch.getYear(), mWatch.getMonth() + 1, mWatch.getDay());
+uint32_t DeviceModule::getBatteryRecordsToday(int32_t *array, int start,
+                                              int count) {
+  return getBatteryRecords(array, start, count, mWatch.getYear(),
+                           mWatch.getMonth() + 1, mWatch.getDay());
 }
 
 /**
  * Helper: check if a year is leap
  * return true if leap year
  */
-bool DeviceModule::isLeapYear(uint32_t year)
-{
-	return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
+bool DeviceModule::isLeapYear(uint32_t year) {
+  return ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0));
 }
 
 /**
@@ -1560,191 +1402,164 @@ bool DeviceModule::isLeapYear(uint32_t year)
  * @param year year
  * @return number of days in month
  */
-uint8_t DeviceModule::daysInMonth(uint8_t month, uint32_t year)
-{
-	static const uint8_t days[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-	if (month == 2 && isLeapYear(year))
-		return 29;
-	return days[month - 1];
+uint8_t DeviceModule::daysInMonth(uint8_t month, uint32_t year) {
+  static const uint8_t days[] = {31, 28, 31, 30, 31, 30,
+                                 31, 31, 30, 31, 30, 31};
+  if (month == 2 && isLeapYear(year))
+    return 29;
+  return days[month - 1];
 }
 
 /**
  * Get the date from the specified date and offset
  * @param date date
  * @param diff offset positive for future negative for past
- * @return date ie. if today's date is passed and -1 as diff then it returns yesterday's date
+ * @return date ie. if today's date is passed and -1 as diff then it returns
+ * yesterday's date
  */
-DateTime DeviceModule::getDateDifference(DateTime date, int32_t diff)
-{
-	int32_t day = date.day + diff;
-	int32_t month = date.month;
-	int32_t year = date.year;
+DateTime DeviceModule::getDateDifference(DateTime date, int32_t diff) {
+  int32_t day = date.day + diff;
+  int32_t month = date.month;
+  int32_t year = date.year;
 
-	// Normalize forward
-	while (day > daysInMonth(month, year))
-	{
-		day -= daysInMonth(month, year);
-		month++;
-		if (month > 12)
-		{
-			month = 1;
-			year++;
-		}
-	}
+  // Normalize forward
+  while (day > daysInMonth(month, year)) {
+    day -= daysInMonth(month, year);
+    month++;
+    if (month > 12) {
+      month = 1;
+      year++;
+    }
+  }
 
-	// Normalize backward
-	while (day < 1)
-	{
-		month--;
-		if (month < 1)
-		{
-			month = 12;
-			year--;
-		}
-		day += daysInMonth(month, year);
-	}
+  // Normalize backward
+  while (day < 1) {
+    month--;
+    if (month < 1) {
+      month = 12;
+      year--;
+    }
+    day += daysInMonth(month, year);
+  }
 
-	DateTime newDate = date;
-	newDate.day = (uint8_t)day;
-	newDate.month = (uint8_t)month;
-	newDate.year = year;
-	return newDate;
+  DateTime newDate = date;
+  newDate.day = (uint8_t)day;
+  newDate.month = (uint8_t)month;
+  newDate.year = year;
+  return newDate;
 }
 
 /**
  * Check whether the device should save data to the flash storage
  */
-void DeviceModule::checkHourlyData()
-{
-	DateTime dt = getDateTime();
-	uint8_t currentHour = dt.hour;
-	uint8_t currentDay = dt.day;
+void DeviceModule::checkHourlyData() {
+  DateTime dt = getDateTime();
+  uint8_t currentHour = dt.hour;
+  uint8_t currentDay = dt.day;
 
-	if (lastHour == 0xFF || lastDay == 0xFF)
-	{
-		lastHour = currentHour;
-		lastDay = currentDay;
-		return;
-	}
+  if (lastHour == 0xFF || lastDay == 0xFF) {
+    lastHour = currentHour;
+    lastDay = currentDay;
+    return;
+  }
 
-	// If no time progression detected, nothing to do
-	if (currentDay == lastDay && currentHour == lastHour)
-		return;
+  // If no time progression detected, nothing to do
+  if (currentDay == lastDay && currentHour == lastHour)
+    return;
 
-	DateTime tempDate = dt;
-	tempDate.day = lastDay;
-	tempDate.hour = lastHour;
+  DateTime tempDate = dt;
+  tempDate.day = lastDay;
+  tempDate.hour = lastHour;
 
-	uint8_t hour = lastHour;
-	uint8_t day = lastDay;
+  uint8_t hour = lastHour;
+  uint8_t day = lastDay;
 
-	while (true)
-	{
-		// Move to next hour
-		hour++;
-		if (hour >= 24)
-		{
-			hour = 0;
-			tempDate = getDateDifference(tempDate, 1); // move to next day
-			day = tempDate.day;
-			mMotion.resetPedometer(); // reset once per day
-		}
+  while (true) {
+    // Move to next hour
+    hour++;
+    if (hour >= 24) {
+      hour = 0;
+      tempDate = getDateDifference(tempDate, 1); // move to next day
+      day = tempDate.day;
+      mMotion.resetPedometer(); // reset once per day
+    }
 
-		// Save battery and step data for this hour
-		saveHourlyBattery(
-			tempDate.year,
-			tempDate.month,
-			tempDate.day,
-			hour,
-			getBattery());
+    // Save battery and step data for this hour
+    saveHourlyBattery(tempDate.year, tempDate.month, tempDate.day, hour,
+                      getBattery());
 
-		mHealth.saveHourlyStepCount(
-			tempDate.year,
-			tempDate.month,
-			tempDate.day,
-			hour,
-			mMotion.getCurrentSteps());
+    mHealth.saveHourlyStepCount(tempDate.year, tempDate.month, tempDate.day,
+                                hour, mMotion.getCurrentSteps());
 
-		// Stop once we've reached the current time
-		if (day == currentDay && hour == currentHour)
-			break;
-	}
+    // Stop once we've reached the current time
+    if (day == currentDay && hour == currentHour)
+      break;
+  }
 
-	if (currentDay != lastDay)
-	{
-		houseKeeping();
-	}
+  if (currentDay != lastDay) {
+    houseKeeping();
+  }
 
-	lastHour = currentHour;
-	lastDay = currentDay;
-	sync_data = true;
+  lastHour = currentHour;
+  lastDay = currentDay;
+  sync_data = true;
 }
 
 /**
  * Change the state of the sync data flag
  * @param state state of the flag
  */
-void DeviceModule::setSyncData(bool state)
-{
-	sync_data = state;
-}
+void DeviceModule::setSyncData(bool state) { sync_data = state; }
 
 /**
  * Whether the device should sync data back to the app
  * @return true if there is new data
  */
-bool DeviceModule::shouldSyncData()
-{
-	return sync_data;
-}
+bool DeviceModule::shouldSyncData() { return sync_data; }
 
 /**
  * Get the current date time object
  * @return date time now
  */
-DateTime DeviceModule::getDateTime()
-{
-	DateTime dt;
-	dt.second = mWatch.getSecond();
-	dt.minute = mWatch.getMinute();
-	dt.hour = mWatch.getHour(true);
-	dt.day = mWatch.getDay();
-	dt.month = mWatch.getMonth() + 1;
-	dt.year = mWatch.getYear();
-	return dt;
+DateTime DeviceModule::getDateTime() {
+  DateTime dt;
+  dt.second = mWatch.getSecond();
+  dt.minute = mWatch.getMinute();
+  dt.hour = mWatch.getHour(true);
+  dt.day = mWatch.getDay();
+  dt.month = mWatch.getMonth() + 1;
+  dt.year = mWatch.getYear();
+  return dt;
 }
 
 /**
- * Run house keeping functions, mainly clearing old steps and sleep records from storage to save space
+ * Run house keeping functions, mainly clearing old steps and sleep records from
+ * storage to save space
  */
-void DeviceModule::houseKeeping()
-{
-	clearOldRecordFiles(BATTERY_FOLDER);
-	clearOldRecordFiles(STEPS_FOLDER);
+void DeviceModule::houseKeeping() {
+  clearOldRecordFiles(BATTERY_FOLDER);
+  clearOldRecordFiles(STEPS_FOLDER);
 }
 
 /**
  * Remove old file records on a path
  * @param path the folder path with records
  */
-void DeviceModule::clearOldRecordFiles(String path)
-{
-	DateTime now = getDateTime();
-	JsonDocument files = mStorage.listFiles(path, false, true);
-	JsonArray array = files.as<JsonArray>();
-	for (int i = 0; i < MAX_RECORD_DAYS; i++)
-	{
-		DateTime date = getDateDifference(now, i * -1);
-		String name = mStorage.filePath(path, date.year, date.month, date.day);
-		arrayRemove(array, name);
-	}
-	for (JsonVariant v : array)
-	{
-		String file = v.as<String>();
-		mStorage.deleteFile(file);
-	}
-	Timber.e(path);
-	Timber.w("Deleted %d records", array.size());
+void DeviceModule::clearOldRecordFiles(String path) {
+  DateTime now = getDateTime();
+  JsonDocument files = mStorage.listFiles(path, false, true);
+  JsonArray array = files.as<JsonArray>();
+  for (int i = 0; i < MAX_RECORD_DAYS; i++) {
+    DateTime date = getDateDifference(now, i * -1);
+    String name = mStorage.filePath(path, date.year, date.month, date.day);
+    arrayRemove(array, name);
+  }
+  for (JsonVariant v : array) {
+    String file = v.as<String>();
+    mStorage.deleteFile(file);
+  }
+  Timber.e(path);
+  Timber.w("Deleted %d records", array.size());
 }
 
 /**
@@ -1752,15 +1567,12 @@ void DeviceModule::clearOldRecordFiles(String path)
  * @param array the array
  * @param value the value to remove
  */
-void DeviceModule::arrayRemove(JsonArray &array, String value)
-{
-	for (JsonArray::iterator it = array.begin(); it != array.end(); ++it)
-	{
-		if ((*it) == value)
-		{
-			array.remove(it);
-		}
-	}
+void DeviceModule::arrayRemove(JsonArray &array, String value) {
+  for (JsonArray::iterator it = array.begin(); it != array.end(); ++it) {
+    if ((*it) == value) {
+      array.remove(it);
+    }
+  }
 }
 
 /**
@@ -1768,29 +1580,27 @@ void DeviceModule::arrayRemove(JsonArray &array, String value)
  * @param index app index
  * @return the app name
  */
-String DeviceModule::getQrApp(int index)
-{
-	switch (index)
-	{
-	case 0:
-		return "Chronos";
-	case 1:
-		return "Wechat";
-	case 2:
-		return "Facebook";
-	case 3:
-		return "QQ";
-	case 4:
-		return "X (Twitter)";
-	case 5:
-		return "Whatsapp";
-	case 6:
-		return "Wechat Pay";
-	case 7:
-		return "Alipay";
-	case 8:
-		return "Paypal";
-	default:
-		return "Chronos";
-	}
+String DeviceModule::getQrApp(int index) {
+  switch (index) {
+  case 0:
+    return "Chronos";
+  case 1:
+    return "Wechat";
+  case 2:
+    return "Facebook";
+  case 3:
+    return "QQ";
+  case 4:
+    return "X (Twitter)";
+  case 5:
+    return "Whatsapp";
+  case 6:
+    return "Wechat Pay";
+  case 7:
+    return "Alipay";
+  case 8:
+    return "Paypal";
+  default:
+    return "Chronos";
+  }
 }

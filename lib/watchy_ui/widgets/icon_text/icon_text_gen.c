@@ -8,8 +8,14 @@
  *********************/
 
 #include "icon_text_private_gen.h"
-#include "src/core/lv_obj_class_private.h"
-#include "watchy_ui.h"
+#ifdef LV_LVGL_H_INCLUDE_SIMPLE
+    #include "lvgl.h"
+    #include "src/core/lv_obj_class_private.h"
+#else
+    #include "lvgl.h"
+    #include "src/core/lv_obj_class_private.h"
+#endif
+#include "../../watchy_ui.h"
 
 /*********************
  *      DEFINES

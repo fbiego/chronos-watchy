@@ -8,7 +8,7 @@
  *********************/
 
 #include "activity_gen.h"
-#include "watchy_ui.h"
+#include "../watchy_ui.h"
 
 /*********************
  *      DEFINES
@@ -84,7 +84,7 @@ lv_obj_t * activity_create(void)
     lv_obj_set_name_static(lv_obj_0, "activity_#");
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    lv_obj_t * status_bar_0 = status_bar_create(lv_obj_0);
+    status_bar_create(lv_obj_0);
     
     lv_obj_t * a_date = lv_label_create(lv_obj_0);
     lv_obj_set_name(a_date, "a_date");
@@ -98,6 +98,7 @@ lv_obj_t * activity_create(void)
     
     lv_obj_t * bar_chart = lv_chart_create(lv_obj_0);
     lv_obj_set_name(bar_chart, "bar_chart");
+    lv_chart_set_type(bar_chart, LV_CHART_TYPE_BAR);
     lv_obj_set_y(bar_chart, 40);
     lv_chart_set_point_count(bar_chart, 17);
     lv_chart_set_hor_div_line_count(bar_chart, 0);

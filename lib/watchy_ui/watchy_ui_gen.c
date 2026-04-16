@@ -44,10 +44,6 @@
  *-------------------*/
 
 /*----------------
- * Global styles
- *----------------*/
-
-/*----------------
  * Fonts
  *----------------*/
 
@@ -208,6 +204,14 @@ const void * ic_previous;
 extern const void * ic_previous_data;
 const void * ic_low_battery;
 extern const void * ic_low_battery_data;
+const void * ic_shutdown;
+extern const void * ic_shutdown_data;
+const void * ic_shutdown_mode;
+extern const void * ic_shutdown_mode_data;
+
+/*----------------
+ * Global styles
+ *----------------*/
 
 /*----------------
  * Subjects
@@ -263,9 +267,6 @@ void watchy_ui_init_gen(const char * asset_path)
 {
     char buf[256];
 
-    /*----------------
-     * Global styles
-     *----------------*/
 
     /*----------------
      * Fonts
@@ -358,6 +359,12 @@ void watchy_ui_init_gen(const char * asset_path)
     ic_facebook = &ic_facebook_data;
     ic_previous = &ic_previous_data;
     ic_low_battery = &ic_low_battery_data;
+    ic_shutdown = &ic_shutdown_data;
+    ic_shutdown_mode = &ic_shutdown_mode_data;
+
+    /*----------------
+     * Global styles
+     *----------------*/
 
     /*----------------
      * Subjects
@@ -504,7 +511,7 @@ void watchy_ui_init_gen(const char * asset_path)
                           );
     lv_subject_init_int(&subject_settings_index, 0);
     lv_subject_set_min_value_int(&subject_settings_index, 0);
-    lv_subject_set_max_value_int(&subject_settings_index, 4);
+    lv_subject_set_max_value_int(&subject_settings_index, 5);
     lv_subject_init_int(&subject_settings_view, 0);
     lv_subject_init_int(&subject_music_view, 0);
     lv_subject_set_min_value_int(&subject_music_view, 0);
@@ -653,6 +660,8 @@ void watchy_ui_init_gen(const char * asset_path)
     lv_xml_register_image(NULL, "ic_facebook", ic_facebook);
     lv_xml_register_image(NULL, "ic_previous", ic_previous);
     lv_xml_register_image(NULL, "ic_low_battery", ic_low_battery);
+    lv_xml_register_image(NULL, "ic_shutdown", ic_shutdown);
+    lv_xml_register_image(NULL, "ic_shutdown_mode", ic_shutdown_mode);
 #endif
 
 #if LV_USE_XML == 0
