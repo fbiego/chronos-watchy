@@ -57,8 +57,8 @@
 		</lv_obj>
 		<lv_obj align="bottom_mid" y="-1" x="0">
 			<style name="style_cont" />
-			<lv_label width="60" text="steps" />
-			<lv_label width="60" text="kcal" />
+			<lv_label width="60" translation_tag="steps" />
+			<lv_label width="60" translation_tag="kcal" />
 			<lv_label width="60" bind_text="subject_distance_unit" />
 		</lv_obj>
 	</view>

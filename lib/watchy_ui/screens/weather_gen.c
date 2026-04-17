@@ -126,17 +126,17 @@ lv_obj_t * weather_create(void)
     lv_obj_set_y(w_forecast, 110);
     lv_obj_add_style(w_forecast, &style_forecast, 0);
     lv_obj_add_style(w_forecast, &style_scrollbar, LV_PART_SCROLLBAR);
-    forecast_create(w_forecast, "MON", ic_cloud, "24");
+    forecast_create(w_forecast, "mon", ic_cloud, "24");
     
-    forecast_create(w_forecast, "TUE", ic_sun_cloud, "23");
+    forecast_create(w_forecast, "tue", ic_sun_cloud, "23");
     
-    forecast_create(w_forecast, "WED", ic_sunny, "25");
+    forecast_create(w_forecast, "wed", ic_sunny, "25");
     
-    forecast_create(w_forecast, "MON", ic_cloud, "24");
+    forecast_create(w_forecast, "thur", ic_cloud, "24");
     
-    forecast_create(w_forecast, "TUE", ic_sun_cloud, "23");
+    forecast_create(w_forecast, "fri", ic_sun_cloud, "23");
     
-    forecast_create(w_forecast, "WED", ic_sunny, "25");
+    forecast_create(w_forecast, "sat", ic_sunny, "25");
 
     LV_TRACE_OBJ_CREATE("finished");
 

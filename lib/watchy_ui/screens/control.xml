@@ -6,20 +6,20 @@
 		<style name="style_main" />
 		<status_bar />
 
-		<lv_label x="-45" y="38" align="top_right" text="Find Phone" style_text_align="center" />
+		<lv_label x="-45" y="30" align="top_right" translation_tag="find_phone" style_text_align="center" />
 		<lv_image src="ic_search" align="top_right" x="-5" y="30" />
 
 		<lv_label
 			width="180"
 			align="center"
+			y="-10"
 			text="Camera&#10;Ready"
 			bind_text="subject_camera_state"
-			bind_text-fmt="Camera&#10;%s"
 			style_text_align="center"
 			style_text_font="NS_Bold_20"
 		/>
 
-		<lv_label y="-5" align="bottom_mid" text="Press buttons&#10;or Double tap" style_text_align="center" />
+		<lv_label width="140" y="-5" align="bottom_mid" translation_tag="press_tap" style_text_align="center" />
 		<lv_image src="ic_camera" align="bottom_left" x="5" y="-5" />
 		<lv_image src="ic_camera" align="bottom_right" x="-5" y="-5" />
 	</view>

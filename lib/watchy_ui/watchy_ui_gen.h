@@ -63,6 +63,18 @@ extern lv_font_t * NS_Bold_30;
 
 extern lv_font_t * NS_Bold_40;
 
+extern lv_font_t * NS_Regular_ru_16;
+
+extern lv_font_t * NS_Regular_ru_20;
+
+extern lv_font_t * NS_Regular_ru_30;
+
+extern lv_font_t * NS_Bold_ru_20;
+
+extern lv_font_t * NS_Bold_ru_30;
+
+extern lv_font_t * NS_Bold_ru_40;
+
 /*----------------
  * Images
  *----------------*/
@@ -101,7 +113,7 @@ extern const void * ic_file_bin;
 extern const void * ic_haze;
 extern const void * ic_sun_cloud;
 extern const void * ic_timeout;
-extern const void * watchface_default;
+extern const void * img_watchface_default;
 extern const void * ic_no_weather;
 extern const void * ic_chronos_40;
 extern const void * ic_calories;

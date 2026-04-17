@@ -27,13 +27,13 @@
 		/>
 	</styles>
 	<api>
-		<prop name="day" type="string" default="SUN" />
+		<prop name="day" type="string" default="sun" />
 		<prop name="icon" type="image" default="ic_sun_cloud" />
 		<prop name="temp" type="string" default="23" />
 	</api>
 	<view scrollable="false">
 		<style name="style_main" />
-		<lv_label text="$day" y="2" align="left_mid" />
+		<lv_label translation_tag="$day" y="2" align="left_mid" />
 		<lv_image align="center" src="$icon" />
 		<lv_obj align="right_mid" y="2">
 			<style name="style_cont" />

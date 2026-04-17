@@ -10,12 +10,18 @@
 			border_width="0"
 			text_color="0x000000"
 			text_font="NS_Regular_16"
+			layout="flex"
+			flex_flow="column"
+			flex_main_place="space_between"
+			flex_track_place="center"
+			flex_cross_place="center"
 		/>
-		<style name="style_list" layout="flex" flex_flow="column" />
+		<style name="style_list" layout="flex" flex_flow="column" flex_main_place="start" />
 		<style name="style_chart" width="200" height="100" border_width="0" radius="0" pad_column="2" />
 		<style name="style_bar" width="180" height="30" radius="5" bg_opa="0" border_width="4" />
 		<style name="style_bar_indicator" radius="5" bg_color="0x000000" />
 		<style name="style_scrollbar" bg_color="0x000000" bg_opa="255" pad_all="0" pad_right="0" radius="0" />
+		<style name="style_flex_none" layout="none" />
 	</styles>
 	<view>
 		<style name="style_main" />
@@ -27,12 +33,12 @@
 			<style name="style_list" />
 			<style name="style_scrollbar" selector="scrollbar" />
 			<bind_flag_if_not_eq subject="subject_settings_view" flag="hidden" ref_value="0" />
-			<list_item icon="ic_bluetooth" text="Interval" index="0" />
-			<list_item icon="ic_configs" text="Configs" index="1" />
-			<list_item icon="ic_battery" text="Battery" index="2" />
-			<list_item icon="ic_storage" text="Storage" index="3" />
-			<list_item icon="ic_info" text="About" index="4" />
-			<list_item icon="ic_shutdown" text="Shutdown" index="5" />
+			<list_item icon="ic_bluetooth" text="Interval" tag="interval" index="0" />
+			<list_item icon="ic_configs" text="Configs" tag="configs" index="1" />
+			<list_item icon="ic_battery" text="Battery" tag="battery" index="2" />
+			<list_item icon="ic_storage" text="Storage" tag="storage" index="3" />
+			<list_item icon="ic_info" text="About" tag="about" index="4" />
+			<list_item icon="ic_shutdown" text="Shutdown" tag="shutdown" index="5" />
 		</lv_obj>
 
 		<!-- INTERVAL VIEW (1) -->
@@ -40,8 +46,8 @@
 			<style name="style_cont" />
 			<bind_flag_if_not_eq subject="subject_settings_view" flag="hidden" ref_value="1" />
 
-			<lv_label align="top_mid" width="180" y="5" text="BLE connect interval" style_text_font="NS_Bold_20" />
-			<lv_label align="top_mid" width="180" y="50" text="NB: Connection to the phone is not always guaranteed" />
+			<lv_label align="top_mid" width="180" y="5" translation_tag="ble_interval" style_text_font="NS_Bold_20" />
+			<lv_label align="top_mid" width="180" y="50" translation_tag="con_note" />
 			<lv_label name="s_interval" align="top_mid" text="10 mins" y="130" style_text_font="NS_Bold_30" />
 		</lv_obj>
 
@@ -50,7 +56,7 @@
 			<style name="style_cont" />
 			<bind_flag_if_not_eq subject="subject_settings_view" flag="hidden" ref_value="2" />
 
-			<lv_label align="top_mid" width="190" y="5" text="These can be changed from Chronos app" />
+			<lv_label align="top_mid" width="190" y="5" translation_tag="change_app" />
 			<lv_label
 				name="s_configs"
 				align="top_mid"
@@ -75,23 +81,23 @@
 				/>
 			</lv_chart>
 
-			<lv_label
-				align="bottom_left"
-				x="10"
-				y="-10"
-				bind_text="subject_battery"
-				bind_text-fmt="%d%%"
-				style_text_font="NS_Bold_20"
-			/>
+			<lv_obj width="100%" height="content" style_border_width="0" style_pad_all="5">
+				<lv_label
+					align="bottom_left"
+					x="10"
+					bind_text="subject_battery"
+					bind_text-fmt="%d%%"
+					style_text_font="NS_Bold_20"
+				/>
 
-			<lv_label
-				align="bottom_right"
-				x="-10"
-				y="-10"
-				bind_text="subject_voltage"
-				bind_text-fmt="%dmV"
-				style_text_font="NS_Bold_20"
-			/>
+				<lv_label
+					align="bottom_right"
+					x="-10"
+					bind_text="subject_voltage"
+					bind_text-fmt="%dmV"
+					style_text_font="NS_Bold_20"
+				/>
+			</lv_obj>
 		</lv_obj>
 
 		<!-- STORAGE VIEW (4) -->
@@ -99,36 +105,28 @@
 			<style name="style_cont" />
 			<bind_flag_if_not_eq subject="subject_settings_view" flag="hidden" ref_value="4" />
 
-			<lv_label name="s_total" x="10" y="10" text="1334kB" style_text_font="NS_Regular_20" />
+			<lv_label name="s_total" x="10" width="90%" text="1334kB" style_text_font="NS_Regular_20" />
 			<lv_bar name="s_bar" value="50" align="top_mid" y="30">
 				<style name="style_bar" />
 				<style name="style_bar_indicator" selector="indicator" />
 			</lv_bar>
-			<lv_label name="s_used" x="10" y="64" text="134kB&#10;used" />
-			<lv_label name="s_free" align="top_right" x="-10" y="65" style_text_align="right" text="954kB&#10;free" />
 
-			<lv_label
-				text="Data Records"
-				align="top_mid"
-				y="105"
-				style_text_font="NS_Regular_20"
-				style_text_decor="underline"
-			/>
+			<lv_obj width="100%" height="content" style_border_width="0" style_pad_all="5">
+				<lv_label name="s_used" x="10" text="134kB&#10;used" />
+				<lv_label name="s_free" align="top_right" x="-10" style_text_align="right" text="954kB&#10;free" />
+			</lv_obj>
+			<lv_label translation_tag="data_records" style_text_font="NS_Regular_20" style_text_decor="underline" />
 
-			<lv_label name="s_steps" x="10" y="130" text="Steps&#10;21" />
-			<lv_label
-				name="s_battery"
-				x="-10"
-				y="130"
-				align="top_right"
-				style_text_align="right"
-				text="Battery&#10;21"
-			/>
+			<lv_obj width="100%" height="content" style_border_width="0" style_pad_all="5">
+				<lv_label name="s_steps" x="10" text="Steps&#10;21" />
+				<lv_label name="s_battery" x="-10" align="top_right" style_text_align="right" text="Battery&#10;21" />
+			</lv_obj>
 		</lv_obj>
 
 		<!-- ABOUT VIEW (5) -->
 		<lv_obj y="25">
 			<style name="style_cont" />
+			<style name="style_flex_none" />
 			<bind_flag_if_not_eq subject="subject_settings_view" flag="hidden" ref_value="5" />
 
 			<lv_image src="ic_chronos_40" x="10" y="10" />

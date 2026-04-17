@@ -79,6 +79,9 @@ void configCallback(Config config, uint32_t a, uint32_t b) {
         (uint32_t)((uint8_t)((b >> 16) & 0xFF) * 1000) // target steps
     );
     break;
+  case CF_LANG:
+    display.setLanguage(b);
+    break;
   }
 
   device.handleConfigs(config, a, b);

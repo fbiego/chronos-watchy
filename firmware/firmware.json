@@ -1,29 +1,29 @@
 {
     "merged": {
-        "file": "watchy_20_v1.1.0_20260401_merged_0x1000.bin",
+        "file": "watchy_20_v1.2.0_20260417_merged_0x1000.bin",
         "address": "0x1000",
         "hex": 4096,
-        "size": 1424288,
+        "size": 1470800,
         "chip": "esp32"
     },
     "split": [
         {
-            "file": "watchy_20_v1.1.0_20260401_bootloader_0x1000.bin",
+            "file": "watchy_20_v1.2.0_20260417_bootloader_0x1000.bin",
             "address": "0x1000",
             "hex": 4096
         },
         {
-            "file": "watchy_20_v1.1.0_20260401_partitions_0x8000.bin",
+            "file": "watchy_20_v1.2.0_20260417_partitions_0x8000.bin",
             "address": "0x8000",
             "hex": 32768
         },
         {
-            "file": "watchy_20_v1.1.0_20260401_boot_app0_0xe000.bin",
+            "file": "watchy_20_v1.2.0_20260417_boot_app0_0xe000.bin",
             "address": "0xE000",
             "hex": 57344
         },
         {
-            "file": "watchy_20_v1.1.0_20260401_firmware_0x10000.bin",
+            "file": "watchy_20_v1.2.0_20260417_firmware_0x10000.bin",
             "address": "0x10000",
             "hex": 65536
         }

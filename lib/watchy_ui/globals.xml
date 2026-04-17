@@ -91,7 +91,7 @@
 		<data name="ic_haze" src_path="images/icon_haze.png" color_format="i1" />
 		<data name="ic_sun_cloud" src_path="images/icon_sun_cloud.png" color_format="i1" />
 		<data name="ic_timeout" src_path="images/icon_timeout.png" color_format="i1" />
-		<data name="watchface_default" src_path="images/watchface_default.png" color_format="i1" />
+		<data name="img_watchface_default" src_path="images/watchface_default.png" color_format="i1" />
 		<data name="ic_no_weather" src_path="images/icon_no_weather.png" color_format="i1" />
 		<data name="ic_chronos_40" src_path="images/icon_chronos_40.png" color_format="i1" />
 		<data name="ic_calories" src_path="images/icon_calories.png" color_format="i1" />
@@ -186,6 +186,61 @@
 			range="0x20-0x7F"
 			as_file="false"
 			symbols="°·"
+		/>
+
+		<bin
+			name="NS_Regular_ru_16"
+			size="16"
+			src_path="fonts/NotoSans-Regular.ttf"
+			bpp="2"
+			range=""
+			symbols="ЁАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяё"
+			as_file="false"
+		/>
+		<bin
+			name="NS_Regular_ru_20"
+			size="20"
+			src_path="fonts/NotoSans-Regular.ttf"
+			bpp="2"
+			range=""
+			symbols="ЁАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяё"
+			as_file="false"
+		/>
+		<bin
+			name="NS_Regular_ru_30"
+			size="30"
+			src_path="fonts/NotoSans-Regular.ttf"
+			bpp="2"
+			range=""
+			symbols="ЁАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяё"
+			as_file="false"
+		/>
+		<bin
+			name="NS_Bold_ru_20"
+			size="20"
+			src_path="fonts/NotoSans-Bold.ttf"
+			bpp="2"
+			range=""
+			symbols="ЁАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяё"
+			as_file="false"
+		/>
+		<bin
+			name="NS_Bold_ru_30"
+			size="30"
+			src_path="fonts/NotoSans-Bold.ttf"
+			bpp="2"
+			range=""
+			symbols="ЁАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяё"
+			as_file="false"
+		/>
+		<bin
+			name="NS_Bold_ru_40"
+			size="40"
+			src_path="fonts/NotoSans-Bold.ttf"
+			bpp="2"
+			range=""
+			symbols="ЁАБВГДЕЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдежзийклмнопрстуфхцчшщъыьэюяё"
+			as_file="false"
 		/>
 	</fonts>
 </globals>

@@ -25,6 +25,7 @@
 	<api>
 		<prop name="icon" type="image" default="ic_steps" />
 		<prop name="text" type="string" default="Bluetooth" />
+		<prop name="tag" type="string" default="interval" />
 		<prop name="index" type="int" default="0" />
 	</api>
 	<view state_trickle="true" scroll_on_focus="true">
@@ -33,7 +34,7 @@
 		<lv_image src="$icon">
 			<style name="style_icon_checked" selector="checked" />
 		</lv_image>
-		<lv_label text="$text" style_pad_top="5" />
+		<lv_label text="$text" translation_tag="$tag" style_pad_top="5" />
 		<bind_state_if_eq subject="subject_settings_index" state="checked" ref_value="$index" />
 	</view>
 </component>

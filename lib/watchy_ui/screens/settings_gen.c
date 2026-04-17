@@ -41,6 +41,7 @@ lv_obj_t * settings_create(void)
     static lv_style_t style_bar;
     static lv_style_t style_bar_indicator;
     static lv_style_t style_scrollbar;
+    static lv_style_t style_flex_none;
 
     static bool style_inited = false;
 
@@ -58,10 +59,16 @@ lv_obj_t * settings_create(void)
         lv_style_set_border_width(&style_cont, 0);
         lv_style_set_text_color(&style_cont, lv_color_hex(0x000000));
         lv_style_set_text_font(&style_cont, NS_Regular_16);
+        lv_style_set_layout(&style_cont, LV_LAYOUT_FLEX);
+        lv_style_set_flex_flow(&style_cont, LV_FLEX_FLOW_COLUMN);
+        lv_style_set_flex_main_place(&style_cont, LV_FLEX_ALIGN_SPACE_BETWEEN);
+        lv_style_set_flex_track_place(&style_cont, LV_FLEX_ALIGN_CENTER);
+        lv_style_set_flex_cross_place(&style_cont, LV_FLEX_ALIGN_CENTER);
 
         lv_style_init(&style_list);
         lv_style_set_layout(&style_list, LV_LAYOUT_FLEX);
         lv_style_set_flex_flow(&style_list, LV_FLEX_FLOW_COLUMN);
+        lv_style_set_flex_main_place(&style_list, LV_FLEX_ALIGN_START);
 
         lv_style_init(&style_chart);
         lv_style_set_width(&style_chart, 200);
@@ -88,6 +95,9 @@ lv_obj_t * settings_create(void)
         lv_style_set_pad_right(&style_scrollbar, 0);
         lv_style_set_radius(&style_scrollbar, 0);
 
+        lv_style_init(&style_flex_none);
+        lv_style_set_layout(&style_flex_none, LV_LAYOUT_NONE);
+
         style_inited = true;
     }
 
@@ -104,17 +114,17 @@ lv_obj_t * settings_create(void)
     lv_obj_add_style(settings_main_list, &style_list, 0);
     lv_obj_add_style(settings_main_list, &style_scrollbar, LV_PART_SCROLLBAR);
     lv_obj_bind_flag_if_not_eq(settings_main_list, &subject_settings_view, LV_OBJ_FLAG_HIDDEN, 0);
-    list_item_create(settings_main_list, ic_bluetooth, "Interval", 0);
+    list_item_create(settings_main_list, ic_bluetooth, "Interval", "interval", 0);
     
-    list_item_create(settings_main_list, ic_configs, "Configs", 1);
+    list_item_create(settings_main_list, ic_configs, "Configs", "configs", 1);
     
-    list_item_create(settings_main_list, ic_battery, "Battery", 2);
+    list_item_create(settings_main_list, ic_battery, "Battery", "battery", 2);
     
-    list_item_create(settings_main_list, ic_storage, "Storage", 3);
+    list_item_create(settings_main_list, ic_storage, "Storage", "storage", 3);
     
-    list_item_create(settings_main_list, ic_info, "About", 4);
+    list_item_create(settings_main_list, ic_info, "About", "about", 4);
     
-    list_item_create(settings_main_list, ic_shutdown, "Shutdown", 5);
+    list_item_create(settings_main_list, ic_shutdown, "Shutdown", "shutdown", 5);
     
     lv_obj_t * lv_obj_1 = lv_obj_create(lv_obj_0);
     lv_obj_set_y(lv_obj_1, 25);
@@ -124,14 +134,14 @@ lv_obj_t * settings_create(void)
     lv_obj_set_align(lv_label_0, LV_ALIGN_TOP_MID);
     lv_obj_set_width(lv_label_0, 180);
     lv_obj_set_y(lv_label_0, 5);
-    lv_label_set_text(lv_label_0, "BLE connect interval");
+    lv_label_set_translation_tag(lv_label_0, "ble_interval");
     lv_obj_set_style_text_font(lv_label_0, NS_Bold_20, 0);
     
     lv_obj_t * lv_label_1 = lv_label_create(lv_obj_1);
     lv_obj_set_align(lv_label_1, LV_ALIGN_TOP_MID);
     lv_obj_set_width(lv_label_1, 180);
     lv_obj_set_y(lv_label_1, 50);
-    lv_label_set_text(lv_label_1, "NB: Connection to the phone is not always guaranteed");
+    lv_label_set_translation_tag(lv_label_1, "con_note");
     
     lv_obj_t * s_interval = lv_label_create(lv_obj_1);
     lv_obj_set_name(s_interval, "s_interval");
@@ -149,7 +159,7 @@ lv_obj_t * settings_create(void)
     lv_obj_set_align(lv_label_2, LV_ALIGN_TOP_MID);
     lv_obj_set_width(lv_label_2, 190);
     lv_obj_set_y(lv_label_2, 5);
-    lv_label_set_text(lv_label_2, "These can be changed from Chronos app");
+    lv_label_set_translation_tag(lv_label_2, "change_app");
     
     lv_obj_t * s_configs = lv_label_create(lv_obj_2);
     lv_obj_set_name(s_configs, "s_configs");
@@ -182,32 +192,35 @@ lv_obj_t * settings_create(void)
     static const int32_t bar_chart_values_0[] = {60, 43, 34, 24, 38, 54, 54, 20, 45, 0, 25, 56, 80, 34, 65, 45, 56, 50, 35, 15, 34, 65, 25, 56};
     lv_chart_set_series_values(bar_chart, lv_chart_series_0, bar_chart_values_0, 24);
     
-    lv_obj_t * lv_label_3 = lv_label_create(lv_obj_3);
+    lv_obj_t * lv_obj_4 = lv_obj_create(lv_obj_3);
+    lv_obj_set_width(lv_obj_4, lv_pct(100));
+    lv_obj_set_height(lv_obj_4, LV_SIZE_CONTENT);
+    lv_obj_set_style_border_width(lv_obj_4, 0, 0);
+    lv_obj_set_style_pad_all(lv_obj_4, 5, 0);
+    lv_obj_t * lv_label_3 = lv_label_create(lv_obj_4);
     lv_obj_set_align(lv_label_3, LV_ALIGN_BOTTOM_LEFT);
     lv_obj_set_x(lv_label_3, 10);
-    lv_obj_set_y(lv_label_3, -10);
     lv_label_bind_text(lv_label_3, &subject_battery, "%d%%");
     lv_obj_set_style_text_font(lv_label_3, NS_Bold_20, 0);
     
-    lv_obj_t * lv_label_4 = lv_label_create(lv_obj_3);
+    lv_obj_t * lv_label_4 = lv_label_create(lv_obj_4);
     lv_obj_set_align(lv_label_4, LV_ALIGN_BOTTOM_RIGHT);
     lv_obj_set_x(lv_label_4, -10);
-    lv_obj_set_y(lv_label_4, -10);
     lv_label_bind_text(lv_label_4, &subject_voltage, "%dmV");
     lv_obj_set_style_text_font(lv_label_4, NS_Bold_20, 0);
     
-    lv_obj_t * lv_obj_4 = lv_obj_create(lv_obj_0);
-    lv_obj_set_y(lv_obj_4, 25);
-    lv_obj_add_style(lv_obj_4, &style_cont, 0);
-    lv_obj_bind_flag_if_not_eq(lv_obj_4, &subject_settings_view, LV_OBJ_FLAG_HIDDEN, 4);
-    lv_obj_t * s_total = lv_label_create(lv_obj_4);
+    lv_obj_t * lv_obj_5 = lv_obj_create(lv_obj_0);
+    lv_obj_set_y(lv_obj_5, 25);
+    lv_obj_add_style(lv_obj_5, &style_cont, 0);
+    lv_obj_bind_flag_if_not_eq(lv_obj_5, &subject_settings_view, LV_OBJ_FLAG_HIDDEN, 4);
+    lv_obj_t * s_total = lv_label_create(lv_obj_5);
     lv_obj_set_name(s_total, "s_total");
     lv_obj_set_x(s_total, 10);
-    lv_obj_set_y(s_total, 10);
+    lv_obj_set_width(s_total, lv_pct(90));
     lv_label_set_text(s_total, "1334kB");
     lv_obj_set_style_text_font(s_total, NS_Regular_20, 0);
     
-    lv_obj_t * s_bar = lv_bar_create(lv_obj_4);
+    lv_obj_t * s_bar = lv_bar_create(lv_obj_5);
     lv_obj_set_name(s_bar, "s_bar");
     lv_bar_set_value(s_bar, 50, false);
     lv_obj_set_align(s_bar, LV_ALIGN_TOP_MID);
@@ -215,75 +228,80 @@ lv_obj_t * settings_create(void)
     lv_obj_add_style(s_bar, &style_bar, 0);
     lv_obj_add_style(s_bar, &style_bar_indicator, LV_PART_INDICATOR);
     
-    lv_obj_t * s_used = lv_label_create(lv_obj_4);
+    lv_obj_t * lv_obj_6 = lv_obj_create(lv_obj_5);
+    lv_obj_set_width(lv_obj_6, lv_pct(100));
+    lv_obj_set_height(lv_obj_6, LV_SIZE_CONTENT);
+    lv_obj_set_style_border_width(lv_obj_6, 0, 0);
+    lv_obj_set_style_pad_all(lv_obj_6, 5, 0);
+    lv_obj_t * s_used = lv_label_create(lv_obj_6);
     lv_obj_set_name(s_used, "s_used");
     lv_obj_set_x(s_used, 10);
-    lv_obj_set_y(s_used, 64);
     lv_label_set_text(s_used, "134kB\nused");
     
-    lv_obj_t * s_free = lv_label_create(lv_obj_4);
+    lv_obj_t * s_free = lv_label_create(lv_obj_6);
     lv_obj_set_name(s_free, "s_free");
     lv_obj_set_align(s_free, LV_ALIGN_TOP_RIGHT);
     lv_obj_set_x(s_free, -10);
-    lv_obj_set_y(s_free, 65);
     lv_obj_set_style_text_align(s_free, LV_TEXT_ALIGN_RIGHT, 0);
     lv_label_set_text(s_free, "954kB\nfree");
     
-    lv_obj_t * lv_label_5 = lv_label_create(lv_obj_4);
-    lv_label_set_text(lv_label_5, "Data Records");
-    lv_obj_set_align(lv_label_5, LV_ALIGN_TOP_MID);
-    lv_obj_set_y(lv_label_5, 105);
+    lv_obj_t * lv_label_5 = lv_label_create(lv_obj_5);
+    lv_label_set_translation_tag(lv_label_5, "data_records");
     lv_obj_set_style_text_font(lv_label_5, NS_Regular_20, 0);
     lv_obj_set_style_text_decor(lv_label_5, LV_TEXT_DECOR_UNDERLINE, 0);
     
-    lv_obj_t * s_steps = lv_label_create(lv_obj_4);
+    lv_obj_t * lv_obj_7 = lv_obj_create(lv_obj_5);
+    lv_obj_set_width(lv_obj_7, lv_pct(100));
+    lv_obj_set_height(lv_obj_7, LV_SIZE_CONTENT);
+    lv_obj_set_style_border_width(lv_obj_7, 0, 0);
+    lv_obj_set_style_pad_all(lv_obj_7, 5, 0);
+    lv_obj_t * s_steps = lv_label_create(lv_obj_7);
     lv_obj_set_name(s_steps, "s_steps");
     lv_obj_set_x(s_steps, 10);
-    lv_obj_set_y(s_steps, 130);
     lv_label_set_text(s_steps, "Steps\n21");
     
-    lv_obj_t * s_battery = lv_label_create(lv_obj_4);
+    lv_obj_t * s_battery = lv_label_create(lv_obj_7);
     lv_obj_set_name(s_battery, "s_battery");
     lv_obj_set_x(s_battery, -10);
-    lv_obj_set_y(s_battery, 130);
     lv_obj_set_align(s_battery, LV_ALIGN_TOP_RIGHT);
     lv_obj_set_style_text_align(s_battery, LV_TEXT_ALIGN_RIGHT, 0);
     lv_label_set_text(s_battery, "Battery\n21");
     
-    lv_obj_t * lv_obj_5 = lv_obj_create(lv_obj_0);
-    lv_obj_set_y(lv_obj_5, 25);
-    lv_obj_add_style(lv_obj_5, &style_cont, 0);
-    lv_obj_bind_flag_if_not_eq(lv_obj_5, &subject_settings_view, LV_OBJ_FLAG_HIDDEN, 5);
-    lv_obj_t * lv_image_0 = lv_image_create(lv_obj_5);
+    lv_obj_t * lv_obj_8 = lv_obj_create(lv_obj_0);
+    lv_obj_set_y(lv_obj_8, 25);
+    lv_obj_add_style(lv_obj_8, &style_cont, 0);
+    lv_obj_add_style(lv_obj_8, &style_flex_none, 0);
+    lv_obj_bind_flag_if_not_eq(lv_obj_8, &subject_settings_view, LV_OBJ_FLAG_HIDDEN, 5);
+    lv_obj_t * lv_image_0 = lv_image_create(lv_obj_8);
     lv_image_set_src(lv_image_0, ic_chronos_40);
     lv_obj_set_x(lv_image_0, 10);
     lv_obj_set_y(lv_image_0, 10);
     
-    lv_obj_t * lv_label_6 = lv_label_create(lv_obj_5);
+    lv_obj_t * lv_label_6 = lv_label_create(lv_obj_8);
     lv_label_set_text(lv_label_6, "Chronos\nWatchy");
     lv_obj_set_x(lv_label_6, 60);
     lv_obj_set_y(lv_label_6, 10);
     lv_obj_set_style_text_font(lv_label_6, NS_Bold_20, 0);
     
-    lv_obj_t * about_version = lv_label_create(lv_obj_5);
+    lv_obj_t * about_version = lv_label_create(lv_obj_8);
     lv_obj_set_name(about_version, "about_version");
     lv_label_set_text(about_version, "v1.0.0 (20251018)");
     lv_obj_set_x(about_version, 10);
     lv_obj_set_y(about_version, 60);
     
-    lv_obj_t * lv_label_7 = lv_label_create(lv_obj_5);
+    lv_obj_t * lv_label_7 = lv_label_create(lv_obj_8);
     lv_label_set_text(lv_label_7, "");
     lv_label_bind_text(lv_label_7, &subject_address, NULL);
     lv_obj_set_x(lv_label_7, 10);
     lv_obj_set_y(lv_label_7, 80);
     
-    lv_obj_t * about_ch_esp = lv_label_create(lv_obj_5);
+    lv_obj_t * about_ch_esp = lv_label_create(lv_obj_8);
     lv_obj_set_name(about_ch_esp, "about_ch_esp");
     lv_label_set_text(about_ch_esp, "ChronosESP32 v1.8.2");
     lv_obj_set_x(about_ch_esp, 10);
     lv_obj_set_y(about_ch_esp, 110);
     
-    lv_obj_t * about_ch_app = lv_label_create(lv_obj_5);
+    lv_obj_t * about_ch_app = lv_label_create(lv_obj_8);
     lv_obj_set_name(about_ch_app, "about_ch_app");
     lv_label_set_text(about_ch_app, "Chronos v3.8.5 (53)\nLast sync: 2h 34m ago");
     lv_obj_set_x(about_ch_app, 10);

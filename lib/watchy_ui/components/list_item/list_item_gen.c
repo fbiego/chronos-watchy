@@ -30,7 +30,7 @@
  *   GLOBAL FUNCTIONS
  **********************/
 
-lv_obj_t * list_item_create(lv_obj_t * parent, const void * icon, const char * text, int32_t index)
+lv_obj_t * list_item_create(lv_obj_t * parent, const void * icon, const char * text, const char * tag, int32_t index)
 {
     LV_TRACE_OBJ_CREATE("begin");
 
@@ -80,6 +80,7 @@ lv_obj_t * list_item_create(lv_obj_t * parent, const void * icon, const char * t
     
     lv_obj_t * lv_label_0 = lv_label_create(lv_obj_0);
     lv_label_set_text(lv_label_0, text);
+    lv_label_set_translation_tag(lv_label_0, tag);
     lv_obj_set_style_pad_top(lv_label_0, 5, 0);
     
     lv_obj_bind_state_if_eq(lv_obj_0, &subject_settings_index, LV_STATE_CHECKED, index);

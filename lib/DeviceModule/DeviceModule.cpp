@@ -206,7 +206,7 @@ void DeviceModule::setRTCAlarm(DateTime dt) {
  * Get the current voltage of the battery
  * @return millivolts
  */
-float DeviceModule::getMillitVolts() { return milliVolts; }
+float DeviceModule::getMilliVolts() { return milliVolts; }
 
 /**
  * Calculate the current battery percentage based on millivolts
@@ -214,7 +214,7 @@ float DeviceModule::getMillitVolts() { return milliVolts; }
  * @note algorithm may not be accurate
  */
 int DeviceModule::getBattery() {
-  float v = getMillitVolts() / 1000.0; // convert to volts
+  float v = getMilliVolts() / 1000.0; // convert to volts
   float percent = (v - 3.3) / (4.2 - 3.3) * 100.0;
   if (percent > 100)
     percent = 100;
@@ -1172,8 +1172,42 @@ int DeviceModule::yearDay(int year, int day) {
  * @return day of week eg TUE
  */
 String DeviceModule::getDay(int day) {
-  String days[7] = {"SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"};
+  String days[7] = {"sun", "mon", "tue", "wed", "thu", "fri", "sat"};
   return days[day % 7];
+}
+
+/**
+ * Get month string
+ * @param month month (1-12)
+ * @return month eg JAN
+ */
+String DeviceModule::getMonth(int month) {
+  String months[12] = {"jan", "feb", "mar", "apr", "may", "jun",
+                       "jul", "aug", "sep", "oct", "nov", "dec"};
+  return months[(month - 1) % 12];
+}
+
+/**
+ * Get day string
+ * @param day day of week (0-6)
+ * @return day of week eg TUE
+ */
+String DeviceModule::getDayLong(int day) {
+  String days[7] = {"sunday",   "monday", "tuesday", "wednesday",
+                    "thursday", "friday", "saturday"};
+  return days[day % 7];
+}
+
+/**
+ * Get month string
+ * @param month month (1-12)
+ * @return month eg JAN
+ */
+String DeviceModule::getMonthLong(int month) {
+  String months[12] = {"january",   "february", "march",    "april",
+                       "may",       "june",     "july",     "august",
+                       "september", "october",  "november", "december"};
+  return months[(month - 1) % 12];
 }
 
 /**

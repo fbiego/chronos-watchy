@@ -54,9 +54,9 @@ lv_obj_t * control_create(void)
     
     lv_obj_t * lv_label_0 = lv_label_create(lv_obj_0);
     lv_obj_set_x(lv_label_0, -45);
-    lv_obj_set_y(lv_label_0, 38);
+    lv_obj_set_y(lv_label_0, 30);
     lv_obj_set_align(lv_label_0, LV_ALIGN_TOP_RIGHT);
-    lv_label_set_text(lv_label_0, "Find Phone");
+    lv_label_set_translation_tag(lv_label_0, "find_phone");
     lv_obj_set_style_text_align(lv_label_0, LV_TEXT_ALIGN_CENTER, 0);
     
     lv_obj_t * lv_image_0 = lv_image_create(lv_obj_0);
@@ -68,15 +68,17 @@ lv_obj_t * control_create(void)
     lv_obj_t * lv_label_1 = lv_label_create(lv_obj_0);
     lv_obj_set_width(lv_label_1, 180);
     lv_obj_set_align(lv_label_1, LV_ALIGN_CENTER);
+    lv_obj_set_y(lv_label_1, -10);
     lv_label_set_text(lv_label_1, "Camera\nReady");
-    lv_label_bind_text(lv_label_1, &subject_camera_state, "Camera\n%s");
+    lv_label_bind_text(lv_label_1, &subject_camera_state, NULL);
     lv_obj_set_style_text_align(lv_label_1, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_text_font(lv_label_1, NS_Bold_20, 0);
     
     lv_obj_t * lv_label_2 = lv_label_create(lv_obj_0);
+    lv_obj_set_width(lv_label_2, 140);
     lv_obj_set_y(lv_label_2, -5);
     lv_obj_set_align(lv_label_2, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(lv_label_2, "Press buttons\nor Double tap");
+    lv_label_set_translation_tag(lv_label_2, "press_tap");
     lv_obj_set_style_text_align(lv_label_2, LV_TEXT_ALIGN_CENTER, 0);
     
     lv_obj_t * lv_image_1 = lv_image_create(lv_obj_0);

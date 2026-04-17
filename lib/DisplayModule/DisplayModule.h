@@ -37,6 +37,7 @@
 struct IconText {
   const void *icon;
   const char *text;
+  const char *tag;
 };
 
 enum AppList {
@@ -47,7 +48,7 @@ enum AppList {
   CONTROLS,
   NAVIGATION,
   SETTINGS,
-  PAIRING,
+  // PAIRING,
   CONTACTS,
   QR_CODES,
   XML_LOADER,
@@ -95,6 +96,8 @@ public:
   void lowBatteryMode();
 
   void loadFace(String path);
+
+  void setLanguage(uint8_t id);
 
 protected:
   // cannot be accessed from outside the class, however, they can be accessed in

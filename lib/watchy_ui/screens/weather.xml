@@ -52,12 +52,12 @@
 		<lv_obj name="w_forecast" align="top_mid" y="110">
 			<style name="style_forecast" />
 			<style name="style_scrollbar" selector="scrollbar" />
-			<forecast day="MON" icon="ic_cloud" temp="24" />
-			<forecast day="TUE" icon="ic_sun_cloud" temp="23" />
-			<forecast day="WED" icon="ic_sunny" temp="25" />
-			<forecast day="MON" icon="ic_cloud" temp="24" />
-			<forecast day="TUE" icon="ic_sun_cloud" temp="23" />
-			<forecast day="WED" icon="ic_sunny" temp="25" />
+			<forecast day="mon" icon="ic_cloud" temp="24" />
+			<forecast day="tue" icon="ic_sun_cloud" temp="23" />
+			<forecast day="wed" icon="ic_sunny" temp="25" />
+			<forecast day="thur" icon="ic_cloud" temp="24" />
+			<forecast day="fri" icon="ic_sun_cloud" temp="23" />
+			<forecast day="sat" icon="ic_sunny" temp="25" />
 		</lv_obj>
 	</view>
 </screen>

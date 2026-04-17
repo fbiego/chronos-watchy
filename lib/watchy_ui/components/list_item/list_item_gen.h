@@ -33,7 +33,7 @@ extern "C" {
  * GLOBAL PROTOTYPES
  **********************/
 
-lv_obj_t * list_item_create(lv_obj_t * parent, const void * icon, const char * text, int32_t index);
+lv_obj_t * list_item_create(lv_obj_t * parent, const void * icon, const char * text, const char * tag, int32_t index);
 
 /**********************
  *      MACROS

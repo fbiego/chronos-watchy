@@ -10,9 +10,15 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Bold_20_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Bold_30_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Bold_40_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Bold_ru_20_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Bold_ru_30_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Bold_ru_40_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Regular_16_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Regular_20_data.c
   ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Regular_30_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Regular_ru_16_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Regular_ru_20_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/fonts/NS_Regular_ru_30_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_activity_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_battery_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_bluetooth_data.c
@@ -84,7 +90,7 @@ list(
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_whatsapp_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_wind_data.c
   ${CMAKE_CURRENT_LIST_DIR}/images/ic_xml_data.c
-  ${CMAKE_CURRENT_LIST_DIR}/images/watchface_default_data.c
+  ${CMAKE_CURRENT_LIST_DIR}/images/img_watchface_default_data.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/activity_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/contacts_gen.c
   ${CMAKE_CURRENT_LIST_DIR}/screens/control_gen.c

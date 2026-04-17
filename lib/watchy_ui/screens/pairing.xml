@@ -15,7 +15,7 @@
 		<status_bar />
 
 		<lv_qrcode name="p_qr" y="30" align="top_mid" size="150" data="https://chronos.ke/" />
-		<lv_label align="bottom_mid" text="Scan with Chronos" />
+		<lv_label align="bottom_mid" translation_tag="scan_chronos" />
 		<lv_label name="p_name" bind_text="subject_ble_name" style_transform_rotation="-900" align="left_mid" x="-72">
 			<style name="style_text" />
 		</lv_label>

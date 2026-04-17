@@ -55,7 +55,7 @@ lv_obj_t * selector_create(void)
     lv_obj_set_scrollbar_mode(lv_obj_0, LV_SCROLLBAR_MODE_OFF);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
-    face_item_create(lv_obj_0, watchface_default, "Default");
+    face_item_create(lv_obj_0, img_watchface_default, "Default");
 
     LV_TRACE_OBJ_CREATE("finished");
 

@@ -36,6 +36,9 @@ extern "C" {
  */
 void watchy_ui_init(const char * asset_path);
 
+
+void watchy_ui_set_language(uint8_t id);
+
 /**********************
  *      MACROS
  **********************/

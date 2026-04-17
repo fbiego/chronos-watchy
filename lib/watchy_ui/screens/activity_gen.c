@@ -152,11 +152,11 @@ lv_obj_t * activity_create(void)
     lv_obj_add_style(lv_obj_3, &style_cont, 0);
     lv_obj_t * lv_label_1 = lv_label_create(lv_obj_3);
     lv_obj_set_width(lv_label_1, 60);
-    lv_label_set_text(lv_label_1, "steps");
+    lv_label_set_translation_tag(lv_label_1, "steps");
     
     lv_obj_t * lv_label_2 = lv_label_create(lv_obj_3);
     lv_obj_set_width(lv_label_2, 60);
-    lv_label_set_text(lv_label_2, "kcal");
+    lv_label_set_translation_tag(lv_label_2, "kcal");
     
     lv_obj_t * lv_label_3 = lv_label_create(lv_obj_3);
     lv_obj_set_width(lv_label_3, 60);

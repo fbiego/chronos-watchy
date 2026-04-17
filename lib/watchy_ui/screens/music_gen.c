@@ -54,23 +54,24 @@ lv_obj_t * music_create(void)
     
     lv_obj_t * lv_label_0 = lv_label_create(lv_obj_0);
     lv_obj_set_width(lv_label_0, 180);
-    lv_obj_set_y(lv_label_0, 40);
-    lv_obj_set_x(lv_label_0, 10);
+    lv_obj_set_y(lv_label_0, 25);
+    lv_obj_set_x(lv_label_0, 5);
     lv_label_set_text(lv_label_0, "Music Control\nConnected");
     lv_label_bind_text(lv_label_0, &subject_bluetooth_state, "Music Control\n%s");
     lv_obj_set_style_text_font(lv_label_0, NS_Bold_20, 0);
     
     lv_obj_t * lv_label_1 = lv_label_create(lv_obj_0);
-    lv_obj_set_y(lv_label_1, -55);
-    lv_obj_set_width(lv_label_1, 170);
-    lv_obj_set_align(lv_label_1, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(lv_label_1, "Long press to change controls between track & volume");
+    lv_obj_set_y(lv_label_1, 64);
+    lv_obj_set_width(lv_label_1, 200);
+    lv_obj_set_align(lv_label_1, LV_ALIGN_TOP_MID);
+    lv_label_set_translation_tag(lv_label_1, "track_volume");
     lv_obj_set_style_text_align(lv_label_1, LV_TEXT_ALIGN_CENTER, 0);
     
     lv_obj_t * lv_label_2 = lv_label_create(lv_obj_0);
-    lv_obj_set_y(lv_label_2, -5);
+    lv_obj_set_width(lv_label_2, 140);
+    lv_obj_set_y(lv_label_2, 0);
     lv_obj_set_align(lv_label_2, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(lv_label_2, "Double tap\nfor next");
+    lv_label_set_translation_tag(lv_label_2, "tap_next");
     lv_obj_set_style_text_align(lv_label_2, LV_TEXT_ALIGN_CENTER, 0);
     
     lv_obj_t * lv_image_0 = lv_image_create(lv_obj_0);

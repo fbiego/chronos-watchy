@@ -6,6 +6,12 @@
 		<style name="style_main" />
 		<status_bar />
 		<lv_image name="m_icon" src="ic_notifications" align="center" />
-		<lv_label name="m_text" text="Notifications" align="bottom_mid" y="-10" style_text_font="NS_Bold_20" />
+		<lv_label
+			name="m_text"
+			translation_tag="notifications"
+			align="bottom_mid"
+			y="-10"
+			style_text_font="NS_Bold_20"
+		/>
 	</view>
 </screen>

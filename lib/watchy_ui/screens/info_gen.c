@@ -49,6 +49,7 @@ lv_obj_t * info_create(void)
 
     lv_obj_t * lv_obj_0 = lv_obj_create(NULL);
     lv_obj_set_name_static(lv_obj_0, "info_#");
+    lv_obj_set_flag(lv_obj_0, LV_OBJ_FLAG_SCROLLABLE, false);
 
     lv_obj_add_style(lv_obj_0, &style_main, 0);
     lv_obj_t * info_icon = lv_image_create(lv_obj_0);
@@ -61,7 +62,7 @@ lv_obj_t * info_create(void)
     lv_obj_set_name(info_text, "info_text");
     lv_obj_set_y(info_text, 80);
     lv_obj_set_width(info_text, lv_pct(100));
-    lv_label_set_text(info_text, "Watchy is sleeping until 07:00. Wake it up by pressing any button.");
+    lv_label_set_translation_tag(info_text, "state_sleeping");
     lv_obj_set_style_text_align(info_text, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_pad_all(info_text, 5, 0);
 

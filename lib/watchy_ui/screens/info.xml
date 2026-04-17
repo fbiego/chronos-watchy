@@ -2,7 +2,7 @@
 	<styles>
 		<style name="style_main" bg_color="0xffffff" text_color="0x000000" text_font="NS_Regular_20" />
 	</styles>
-	<view>
+	<view scrollable="false">
 		<style name="style_main" />
 
 		<lv_image name="info_icon" src="ic_sleep_mode" align="top_mid" y="10" />
@@ -10,7 +10,7 @@
 			name="info_text"
 			y="80"
 			width="100%"
-			text="Watchy is sleeping until 07:00. Wake it up by pressing any button."
+			translation_tag="state_sleeping"
 			style_text_align="center"
 			style_pad_all="5"
 		/>

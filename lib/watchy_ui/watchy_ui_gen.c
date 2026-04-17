@@ -35,6 +35,99 @@
  * Translations
  *----------------*/
 
+#ifndef LV_EDITOR_PREVIEW
+    static const char * translation_languages[] = {"en", "ru", NULL};
+    static const char * translation_tags[] = {"id", "locale", "sun", "mon", "tue", "wed", "thur", "fri", "sat", "jan", "feb", "mar", "apr", "jun", "jul", "aug", "sept", "oct", "nov", "dec", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "today", "yesterday", "steps", "kcal", "km", "miles", "find_phone", "camera", "ready", "disconnected", "connected", "press_tap", "sleep_mode", "notifications", "activity", "weather", "music", "controls", "navigation", "settings", "pairing", "contacts", "qr_links", "files", "track_volume", "tap_next", "scan_chronos", "interval", "configs", "battery", "storage", "shutdown", "ble_interval", "con_note", "min_5", "min_10", "min_15", "min_20", "min_30", "data_records", "change_app", "about", "no_notifications", "inactive", "powered_off", "low_battery", "start_nav", NULL};
+    static const char * translation_texts[] = {
+        "en", "ru", /* id */
+        "English", "Russian", /* locale */
+        "Sun", "Солнце", /* sun */
+        "Mon", "Пн", /* mon */
+        "Tue", "Вт", /* tue */
+        "Wed", "Обвенчались", /* wed */
+        "Thur", "Чт", /* thur */
+        "Fri", "Пятница", /* fri */
+        "Sat", "Сб", /* sat */
+        "Jan", "Янв", /* jan */
+        "Feb", "февраль", /* feb */
+        "Mar", "март", /* mar */
+        "Apr", "Апр", /* apr */
+        "Jun", "Джун", /* jun */
+        "Jul", "июль", /* jul */
+        "Aug", "Август", /* aug */
+        "Sep", "Сентябрь", /* sept */
+        "Oct", "Октябрь", /* oct */
+        "Nov", "Ноябрь", /* nov */
+        "Dec", "Декабрь", /* dec */
+        "Sunday", "Воскресенье", /* sunday */
+        "Monday", "Понедельник", /* monday */
+        "Tuesday", "Вторник", /* tuesday */
+        "Wednesday", "Среда", /* wednesday */
+        "Thursday", "Четверг", /* thursday */
+        "Friday", "Пятница", /* friday */
+        "Saturday", "Суббота", /* saturday */
+        "January", "Январь", /* january */
+        "February", "Февраль", /* february */
+        "March", "Маршировать", /* march */
+        "April", "Апрель", /* april */
+        "May", "Может", /* may */
+        "June", "Июнь", /* june */
+        "July", "Июль", /* july */
+        "August", "Август", /* august */
+        "September", "Сентябрь", /* september */
+        "October", "Октябрь", /* october */
+        "November", "Ноябрь", /* november */
+        "December", "Декабрь", /* december */
+        "Today", "Сегодня", /* today */
+        "Yesterday", "Вчера", /* yesterday */
+        "steps", "шаги", /* steps */
+        "kcal", "ккал", /* kcal */
+        "km", "км", /* km */
+        "miles", "мили", /* miles */
+        "Find Phone", "Найти телефон", /* find_phone */
+        "Camera", "Камера", /* camera */
+        "Ready", "Готовый", /* ready */
+        "Disconnected", "Отключено", /* disconnected */
+        "Connected", "Подключен", /* connected */
+        "Press buttons or double tap", "Нажмите кнопки или дважды коснитесь экрана.", /* press_tap */
+        "Watchy is sleeping until %d:%d. Wake it up by pressing any button.", "Watchy находится в спящем режиме до %d:%d. Разбудите его, нажав любую кнопку.", /* sleep_mode */
+        "Notifications", "Уведомления", /* notifications */
+        "Activity", "Активность", /* activity */
+        "Weather", "Погода", /* weather */
+        "Music", "Музыка", /* music */
+        "Controls", "Элементы управления", /* controls */
+        "Navigation", "Навигация", /* navigation */
+        "Settings", "Настройки", /* settings */
+        "Pairing", "Сочетание", /* pairing */
+        "Contacts", "Контакты", /* contacts */
+        "QR Links", "QR-коды", /* qr_links */
+        "Files", "Файлы", /* files */
+        "Long press to change controls between track & volume", "Длительное нажатие переключает управление между треком и громкостью.", /* track_volume */
+        "Double tap for next", "Дважды коснитесь для перехода к следующему", /* tap_next */
+        "Scan with Chronos", "Сканирование с помощью Chronos", /* scan_chronos */
+        "Interval", "Интервал", /* interval */
+        "Configs", "Конфигурации", /* configs */
+        "Battery", "Батарея", /* battery */
+        "Storage", "Хранилище", /* storage */
+        "Shutdown", "Неисправность", /* shutdown */
+        "BLE connect interval", "интервал подключения BLE", /* ble_interval */
+        "NB: Connection to the phone is not always guaranteed", "Примечание: подключение к телефону не всегда гарантировано.", /* con_note */
+        "5 mins", "5 мин.", /* min_5 */
+        "10 mins", "10 мин.", /* min_10 */
+        "15 mins", "15 мин.", /* min_15 */
+        "20 mins", "20 мин.", /* min_20 */
+        "30 mins", "30 мин.", /* min_30 */
+        "Data Records", "Записи данных", /* data_records */
+        "These can be changed from Chronos app", "Эти параметры можно изменить в приложении Chronos.", /* change_app */
+        "About", "О", /* about */
+        "No notifications, check back later", "Уведомления отсутствуют, загляните позже.", /* no_notifications */
+        "Inactive", "Неактивный", /* inactive */
+        "Watchy is powered off. Turn it on by pressing any button", "Watchy выключен. Включите его, нажав любую кнопку.", /* powered_off */
+        "Watchy is battery is too low. Please charge it.", "Батарея Watchy разряжена. Пожалуйста, зарядите её.", /* low_battery */
+        "Start navigation on the connected phone", "Запустить навигацию на подключенном телефоне", /* start_nav */
+    };
+#endif
+
 /**********************
  *  GLOBAL VARIABLES
  **********************/
@@ -59,6 +152,18 @@ lv_font_t * NS_Bold_30;
 extern lv_font_t NS_Bold_30_data;
 lv_font_t * NS_Bold_40;
 extern lv_font_t NS_Bold_40_data;
+lv_font_t * NS_Regular_ru_16;
+extern lv_font_t NS_Regular_ru_16_data;
+lv_font_t * NS_Regular_ru_20;
+extern lv_font_t NS_Regular_ru_20_data;
+lv_font_t * NS_Regular_ru_30;
+extern lv_font_t NS_Regular_ru_30_data;
+lv_font_t * NS_Bold_ru_20;
+extern lv_font_t NS_Bold_ru_20_data;
+lv_font_t * NS_Bold_ru_30;
+extern lv_font_t NS_Bold_ru_30_data;
+lv_font_t * NS_Bold_ru_40;
+extern lv_font_t NS_Bold_ru_40_data;
 
 /*----------------
  * Images
@@ -132,8 +237,8 @@ const void * ic_sun_cloud;
 extern const void * ic_sun_cloud_data;
 const void * ic_timeout;
 extern const void * ic_timeout_data;
-const void * watchface_default;
-extern const void * watchface_default_data;
+const void * img_watchface_default;
+extern const void * img_watchface_default_data;
 const void * ic_no_weather;
 extern const void * ic_no_weather_data;
 const void * ic_chronos_40;
@@ -284,6 +389,18 @@ void watchy_ui_init_gen(const char * asset_path)
     NS_Bold_30 = &NS_Bold_30_data;
     /* get font 'NS_Bold_40' from a C array */
     NS_Bold_40 = &NS_Bold_40_data;
+    /* get font 'NS_Regular_ru_16' from a C array */
+    NS_Regular_ru_16 = &NS_Regular_ru_16_data;
+    /* get font 'NS_Regular_ru_20' from a C array */
+    NS_Regular_ru_20 = &NS_Regular_ru_20_data;
+    /* get font 'NS_Regular_ru_30' from a C array */
+    NS_Regular_ru_30 = &NS_Regular_ru_30_data;
+    /* get font 'NS_Bold_ru_20' from a C array */
+    NS_Bold_ru_20 = &NS_Bold_ru_20_data;
+    /* get font 'NS_Bold_ru_30' from a C array */
+    NS_Bold_ru_30 = &NS_Bold_ru_30_data;
+    /* get font 'NS_Bold_ru_40' from a C array */
+    NS_Bold_ru_40 = &NS_Bold_ru_40_data;
 
 
     /*----------------
@@ -323,7 +440,7 @@ void watchy_ui_init_gen(const char * asset_path)
     ic_haze = &ic_haze_data;
     ic_sun_cloud = &ic_sun_cloud_data;
     ic_timeout = &ic_timeout_data;
-    watchface_default = &watchface_default_data;
+    img_watchface_default = &img_watchface_default_data;
     ic_no_weather = &ic_no_weather_data;
     ic_chronos_40 = &ic_chronos_40_data;
     ic_calories = &ic_calories_data;
@@ -529,6 +646,10 @@ void watchy_ui_init_gen(const char * asset_path)
      * Translations
      *----------------*/
 
+    #ifndef LV_EDITOR_PREVIEW
+        lv_translation_add_static(translation_languages, translation_tags, translation_texts);
+    #endif
+
 #if LV_USE_XML
     /* Register widgets */
     analog_hand_register();
@@ -543,6 +664,12 @@ void watchy_ui_init_gen(const char * asset_path)
     lv_xml_register_font(NULL, "NS_Bold_20", NS_Bold_20);
     lv_xml_register_font(NULL, "NS_Bold_30", NS_Bold_30);
     lv_xml_register_font(NULL, "NS_Bold_40", NS_Bold_40);
+    lv_xml_register_font(NULL, "NS_Regular_ru_16", NS_Regular_ru_16);
+    lv_xml_register_font(NULL, "NS_Regular_ru_20", NS_Regular_ru_20);
+    lv_xml_register_font(NULL, "NS_Regular_ru_30", NS_Regular_ru_30);
+    lv_xml_register_font(NULL, "NS_Bold_ru_20", NS_Bold_ru_20);
+    lv_xml_register_font(NULL, "NS_Bold_ru_30", NS_Bold_ru_30);
+    lv_xml_register_font(NULL, "NS_Bold_ru_40", NS_Bold_ru_40);
 
     /* Register subjects */
     lv_xml_register_subject(NULL, "subject_time", &subject_time);
@@ -624,7 +751,7 @@ void watchy_ui_init_gen(const char * asset_path)
     lv_xml_register_image(NULL, "ic_haze", ic_haze);
     lv_xml_register_image(NULL, "ic_sun_cloud", ic_sun_cloud);
     lv_xml_register_image(NULL, "ic_timeout", ic_timeout);
-    lv_xml_register_image(NULL, "watchface_default", watchface_default);
+    lv_xml_register_image(NULL, "img_watchface_default", img_watchface_default);
     lv_xml_register_image(NULL, "ic_no_weather", ic_no_weather);
     lv_xml_register_image(NULL, "ic_chronos_40", ic_chronos_40);
     lv_xml_register_image(NULL, "ic_calories", ic_calories);

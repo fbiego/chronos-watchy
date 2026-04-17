@@ -13,16 +13,17 @@
 #include <SensorPCF8563.hpp>
 #include <Timber.h>
 #include <Wire.h>
+#include <cstdint>
 
 #include "HealthModule.h"
 #include "MotionModule.h"
 #include "StorageModule.h"
 
 #define CHRONOS_WATCHY_MAJOR 1
-#define CHRONOS_WATCHY_MINOR 1
+#define CHRONOS_WATCHY_MINOR 2
 #define CHRONOS_WATCHY_PATCH 0
 
-#define CHRONOS_WATCHY_BUILD "20260405"
+#define CHRONOS_WATCHY_BUILD "20260417"
 
 #define BATT_ADC_PIN 34
 
@@ -75,7 +76,7 @@ public:
 
   String getAddress();
 
-  float getMillitVolts();
+  float getMilliVolts();
   int getBattery();
   void updateBattery();
 
@@ -144,6 +145,9 @@ public:
   int yearDay(int year = -1, int day = -1);
 
   String getDay(int day);
+  String getMonth(int month);
+  String getDayLong(int day);
+  String getMonthLong(int month);
   String getCity();
 
   void saveHourlyBattery(int year, int month, int day, int hour,

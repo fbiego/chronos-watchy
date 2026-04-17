@@ -70,7 +70,7 @@ lv_obj_t * pairing_create(void)
     
     lv_obj_t * lv_label_0 = lv_label_create(lv_obj_0);
     lv_obj_set_align(lv_label_0, LV_ALIGN_BOTTOM_MID);
-    lv_label_set_text(lv_label_0, "Scan with Chronos");
+    lv_label_set_translation_tag(lv_label_0, "scan_chronos");
     
     lv_obj_t * p_name = lv_label_create(lv_obj_0);
     lv_obj_set_name(p_name, "p_name");

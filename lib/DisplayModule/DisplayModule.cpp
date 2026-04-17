@@ -109,9 +109,6 @@ void DisplayModule::begin(bool full_refresh) {
     lv_canvas_set_palette(canvas, 1, lv_color32_make(255, 255, 255, 255));
     lv_obj_add_flag(canvas, LV_OBJ_FLAG_HIDDEN);
   }
-
-  navigationDataCallback("Navigation\nInactive", "Chronos",
-                         "Start navigation on the connected phone", false);
   lv_subject_set_int(&subject_navigation, 0);
 }
 
@@ -121,6 +118,13 @@ void DisplayModule::begin(bool full_refresh) {
 void DisplayModule::configure() {
   setInvert(mDevice.getInvertDisplay());
 
+  watchy_ui_set_language(mDevice.getLanguage());
+
+  navigationDataCallback(String(lv_translation_get("navigation")) + "\n" +
+                             String(lv_translation_get("inactive")),
+                         "Chronos", String(lv_translation_get("start_nav")),
+                         false);
+
   String face = mDevice.getWatchface();
   Timber.i("Using Watchface: " + face);
   if (face == "default") {
@@ -129,6 +133,12 @@ void DisplayModule::configure() {
     load_watchface_from_path(face);
   }
 }
+
+/**
+ * Set the display language
+ * @param id the language id
+ */
+void DisplayModule::setLanguage(uint8_t id) { watchy_ui_set_language(id); }
 
 /**
  * Set info to the info screen
@@ -168,10 +178,8 @@ void DisplayModule::sleepMode(int hour, int minute) {
   }
   lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
   if (info_label) {
-    lv_label_set_text_fmt(info_label,
-                          "Watchy is sleeping until %02d:%02d. You can wake it "
-                          "up by pressing any button.",
-                          hour, minute);
+    lv_label_set_text_fmt(info_label, lv_translation_get("sleep_mode"), hour,
+                          minute);
   }
   lv_screen_load(info_screen);
   lv_timer_handler();
@@ -188,8 +196,10 @@ void DisplayModule::shutdownMode() {
   }
   lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
   if (info_label) {
-    lv_label_set_text(info_label, "Watchy is powered off. Turn it on "
-                                  "by pressing any button.");
+    lv_label_set_text(
+        info_label,
+        "Watchy is powered off. Turn it on by pressing any button.");
+    lv_label_set_translation_tag(info_label, "powered_off");
   }
   lv_screen_load(info_screen);
   lv_timer_handler();
@@ -206,8 +216,9 @@ void DisplayModule::lowBatteryMode() {
   }
   lv_obj_t *info_label = lv_obj_find_by_name(info_screen, "info_text");
   if (info_label) {
-    lv_label_set_text(info_label, "Watchy is battery is too low. "
-                                  "Please charge it.");
+    lv_label_set_text(info_label,
+                      "Watchy is battery is too low. Please charge it.");
+    lv_label_set_translation_tag(info_label, "low_battery");
   }
   lv_screen_load(info_screen);
   lv_timer_handler();
@@ -224,8 +235,14 @@ void DisplayModule::update() {
   String time = mDevice.mWatch.getHourZ() + mDevice.mWatch.getTime(":%M ") +
                 mDevice.mWatch.getAmPmC(false);
   lv_subject_copy_string(&subject_time, time.c_str());
-  lv_subject_copy_string(&subject_date,
-                         mDevice.mWatch.getTime("%a %d %b").c_str());
+  lv_subject_copy_string(
+      &subject_date,
+      String(lv_translation_get(
+                 mDevice.getDay(mDevice.mWatch.getDayofWeek()).c_str()) +
+             mDevice.mWatch.getTime(" %d ") +
+             lv_translation_get(
+                 mDevice.getMonth(mDevice.mWatch.getMonth() + 1).c_str()))
+          .c_str());
   lv_subject_set_int(&subject_hour, mDevice.mWatch.getHourC());
   lv_subject_set_int(&subject_minute, mDevice.mWatch.getMinute());
   lv_subject_set_int(&subject_hour_analog,
@@ -239,32 +256,45 @@ void DisplayModule::update() {
   lv_subject_set_int(&subject_weekday, mDevice.mWatch.getDayofWeek());
   lv_subject_copy_string(&subject_am_pm,
                          mDevice.mWatch.getAmPmC(false).c_str());
-  lv_subject_copy_string(&subject_month_short,
-                         mDevice.mWatch.getTime("%b").c_str());
-  lv_subject_copy_string(&subject_month_long,
-                         mDevice.mWatch.getTime("%B").c_str());
-  lv_subject_copy_string(&subject_weekday_short,
-                         mDevice.mWatch.getTime("%a").c_str());
-  lv_subject_copy_string(&subject_weekday_long,
-                         mDevice.mWatch.getTime("%A").c_str());
+  lv_subject_copy_string(
+      &subject_month_short,
+      lv_translation_get(
+          mDevice.getMonth(mDevice.mWatch.getMonth() + 1).c_str()));
+  lv_subject_copy_string(
+      &subject_month_long,
+      lv_translation_get(
+          mDevice.getMonthLong(mDevice.mWatch.getMonth() + 1).c_str()));
+  lv_subject_copy_string(
+      &subject_weekday_short,
+      lv_translation_get(
+          mDevice.getDay(mDevice.mWatch.getDayofWeek()).c_str()));
+  lv_subject_copy_string(
+      &subject_weekday_long,
+      lv_translation_get(
+          mDevice.getDayLong(mDevice.mWatch.getDayofWeek()).c_str()));
 
   lv_subject_copy_string(&subject_power_off, mDevice.sleepTimerLeft().c_str());
 
   lv_subject_set_int(&subject_bluetooth, mDevice.mWatch.isConnected() ? 2
                                          : mDevice.mWatch.isRunning() ? 1
                                                                       : 0);
-  lv_subject_set_int(&subject_voltage, (int)mDevice.getMillitVolts());
+  lv_subject_set_int(&subject_voltage, (int)mDevice.getMilliVolts());
   lv_subject_set_int(&subject_steps, steps);
   lv_subject_set_int(&subject_calories, mHealth.calculateCalories(steps));
   lv_subject_set_int(&subject_battery, mDevice.getBattery());
   lv_subject_set_int(&subject_phone_battery, mDevice.getPhoneBattery());
   lv_subject_copy_string(&subject_last_sync, mDevice.getLastSync().c_str());
 
-  lv_subject_copy_string(&subject_bluetooth_state, mDevice.mWatch.isConnected()
-                                                       ? "Connected"
-                                                       : "Disconnected");
+  lv_subject_copy_string(&subject_bluetooth_state,
+                         mDevice.mWatch.isConnected()
+                             ? lv_translation_get("connected")
+                             : lv_translation_get("disconnected"));
   lv_subject_copy_string(&subject_camera_state,
-                         mDevice.mWatch.isCameraReady() ? "Ready" : "Inactive");
+                         String(String(lv_translation_get("camera")) + "\n" +
+                                String(mDevice.mWatch.isCameraReady()
+                                           ? lv_translation_get("ready")
+                                           : lv_translation_get("inactive")))
+                             .c_str());
 
   lv_subject_copy_string(
       &subject_distance,
@@ -272,7 +302,7 @@ void DisplayModule::update() {
              2)
           .c_str());
   lv_subject_copy_string(&subject_distance_unit,
-                         mDevice.getDistanceUnit().c_str());
+                         lv_translation_get(mDevice.getDistanceUnit().c_str()));
   lv_subject_copy_string(&subject_temp_unit, mDevice.getTempUnit().c_str());
 
   Weather w = mDevice.getCurrent();
@@ -399,9 +429,9 @@ void DisplayModule::handleButtons(ButtonEvent buttonEvent) {
         case WEATHER:
           load_weather_screen();
           break;
-        case PAIRING:
-          load_pairing_screen();
-          break;
+        // case PAIRING:
+        //   load_pairing_screen();
+        //   break;
         case NAVIGATION:
           lv_screen_load(navigation_screen);
           mDevice.sleepTimerStart(TIMER_INFINITE);
@@ -949,6 +979,7 @@ void DisplayModule::load_notifications_screen() {
     lv_label_set_text(message, n_size > 0
                                    ? notifications[n_index].message.c_str()
                                    : "No notifications, check back later");
+    lv_label_set_translation_tag(message, n_size > 0 ? "" : "no_notifications");
   }
   lv_obj_t *time = lv_obj_find_by_name(notification_screen, "n_time");
   if (time) {
@@ -1022,11 +1053,14 @@ void DisplayModule::load_activity_screen() {
   if (day) {
     if (activity_day == 0) {
       lv_label_set_text(day, "Today");
+      lv_label_set_translation_tag(day, "today");
     } else if (activity_day == -1) {
       lv_label_set_text(day, "Yesterday");
+      lv_label_set_translation_tag(day, "yesterday");
     } else {
       lv_label_set_text_fmt(day, "%02d/%02d/%04d", date.day, date.month,
                             date.year);
+      lv_label_set_translation_tag(day, "");
     }
   }
 
@@ -1085,6 +1119,7 @@ void DisplayModule::load_menu_screen() {
   lv_obj_t *icon = lv_obj_find_by_name(menu_screen, "m_icon");
   if (text) {
     lv_label_set_text(text, app.text);
+    lv_label_set_translation_tag(text, app.tag);
   }
   if (icon) {
     lv_image_set_src(icon, app.icon);
@@ -1133,7 +1168,9 @@ void DisplayModule::load_settings_screen() {
   if (lv_subject_get_int(&subject_settings_view) == 1) {
     lv_obj_t *s_interval = lv_obj_find_by_name(settings_screen, "s_interval");
     if (s_interval) {
-      lv_label_set_text_fmt(s_interval, "%d mins", mDevice.getBLEInterval());
+      char buf[20];
+      lv_snprintf(buf, sizeof(buf), "min_%d", mDevice.getBLEInterval());
+      lv_label_set_translation_tag(s_interval, buf);
     }
   }
 
@@ -1151,7 +1188,10 @@ void DisplayModule::load_settings_screen() {
       }
       confs += mDevice.get24hr() ? "24 hour mode\n" : "12 hour mode\n";
       confs += "Temp units: " + mDevice.getTempUnit() + "\n";
-      confs += "Distance units: " + mDevice.getDistanceUnit() + "\n";
+      confs += "Distance units: " +
+               String(lv_translation_get(mDevice.getDistanceUnit().c_str())) +
+               "\n";
+      confs += "Language ID: " + String(mDevice.getLanguage()) + "\n";
       confs +=
           "Display: " + String(mDevice.getInvertDisplay() ? "Dark" : "Light");
       lv_label_set_text_fmt(s_configs, confs.c_str(), slp.startHour,
@@ -1167,11 +1207,15 @@ void DisplayModule::load_settings_screen() {
     if (day) {
       if (battery_day == 0) {
         lv_label_set_text(day, "Today");
+        lv_label_set_translation_tag(day, "today");
       } else if (battery_day == -1) {
         lv_label_set_text(day, "Yesterday");
+        lv_label_set_translation_tag(day, "yesterday");
       } else {
         lv_label_set_text_fmt(day, "%02d/%02d/%04d", date.day, date.month,
                               date.year);
+
+        lv_label_set_translation_tag(day, "");
       }
     }
     lv_obj_t *bar_chart = lv_obj_find_by_name(settings_screen, "bar_chart");
@@ -1371,7 +1415,7 @@ void DisplayModule::load_selector_screen() {
   if (face_max == -1) {
     /* Load the face list once */
     lv_obj_clean(selector_screen);
-    face_item_create(selector_screen, watchface_default, "Default");
+    face_item_create(selector_screen, img_watchface_default, "Default");
     face_list = mDevice.mStorage.listFaces();
     JsonArray array = face_list.as<JsonArray>();
     String current = mDevice.getWatchface();
@@ -1560,31 +1604,31 @@ const void *DisplayModule::getAppIcon(int id) {
 IconText DisplayModule::getApp(AppList app) {
   switch (app) {
   case ACTIVITY:
-    return {ic_activity, "Activity"};
+    return {ic_activity, "Activity", "activity"};
   case NOTIFICATIONS:
-    return {ic_notifications, "Notifications"};
+    return {ic_notifications, "Notifications", "notifications"};
   case MUSIC:
-    return {ic_music, "Music"};
+    return {ic_music, "Music", "music"};
   case WEATHER:
-    return {ic_weather, "Weather"};
-  case PAIRING:
-    return {ic_pairing, "Pairing"};
+    return {ic_weather, "Weather", "weather"};
+  // case PAIRING:
+  //   return {ic_pairing, "Pairing", "pairing"};
   case SETTINGS:
-    return {ic_settings, "Settings"};
+    return {ic_settings, "Settings", "settings"};
   case NAVIGATION:
-    return {ic_navigation, "Navigation"};
+    return {ic_navigation, "Navigation", "navigation"};
   case QR_CODES:
-    return {ic_qr_codes, "QR Links"};
+    return {ic_qr_codes, "QR Links", "qr_links"};
   case CONTROLS:
-    return {ic_controls, "Controls"};
+    return {ic_controls, "Controls", "controls"};
   case CONTACTS:
-    return {ic_contacts, "Contacts"};
+    return {ic_contacts, "Contacts", "contacts"};
   case XML_LOADER:
-    return {ic_xml, "LVGL Files"};
+    return {ic_xml, "LVGL Files", "files"};
   default:
-    return {NULL, "Unknown"};
+    return {NULL, "Unknown", ""};
   }
-  return {NULL, "Unknown"};
+  return {NULL, "Unknown", ""};
 }
 
 /**

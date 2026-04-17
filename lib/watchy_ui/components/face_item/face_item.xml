@@ -21,7 +21,7 @@
 		<style name="style_cont" width="154" height="154" border_width="2" border_color="0x000000" radius="0" />
 	</styles>
 	<api>
-		<prop name="image" type="image" default="watchface_default" />
+		<prop name="image" type="image" default="img_watchface_default" />
 		<prop name="name" type="string" default="Default" />
 	</api>
 	<view scrollable="false">

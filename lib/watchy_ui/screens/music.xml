@@ -8,21 +8,15 @@
 
 		<lv_label
 			width="180"
-			y="40"
-			x="10"
+			y="25"
+			x="5"
 			text="Music Control&#10;Connected"
 			bind_text="subject_bluetooth_state"
 			bind_text-fmt="Music Control&#10;%s"
 			style_text_font="NS_Bold_20"
 		/>
-		<lv_label
-			y="-55"
-			width="170"
-			align="bottom_mid"
-			text="Long press to change controls between track &amp; volume"
-			style_text_align="center"
-		/>
-		<lv_label y="-5" align="bottom_mid" text="Double tap&#10;for next" style_text_align="center" />
+		<lv_label y="64" width="200" align="top_mid" translation_tag="track_volume" style_text_align="center" />
+		<lv_label width="140" y="0" align="bottom_mid" translation_tag="tap_next" style_text_align="center" />
 		<lv_image src="ic_previous" align="top_right" x="-5" y="30">
 			<bind_flag_if_not_eq flag="hidden" subject="subject_music_view" ref_value="0" />
 		</lv_image>

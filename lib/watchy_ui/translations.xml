@@ -1,0 +1,88 @@
+<translations languages="en ru">
+	<translation tag="id" char_count="3" en="en" ru="ru"  />
+	<translation tag="locale" char_count="8" en="English" ru="Russian"  />
+	<translation tag="sun" char_count="7" en="Sun" ru="Солнце"  />
+	<translation tag="mon" char_count="4" en="Mon" ru="Пн"  />
+	<translation tag="tue" char_count="4" en="Tue" ru="Вт"  />
+	<translation tag="wed" char_count="12" en="Wed" ru="Обвенчались"  />
+	<translation tag="thur" char_count="5" en="Thur" ru="Чт"  />
+	<translation tag="fri" char_count="8" en="Fri" ru="Пятница"  />
+	<translation tag="sat" char_count="4" en="Sat" ru="Сб"  />
+	<translation tag="jan" char_count="4" en="Jan" ru="Янв"  />
+	<translation tag="feb" char_count="8" en="Feb" ru="февраль"  />
+	<translation tag="mar" char_count="5" en="Mar" ru="март"  />
+	<translation tag="apr" char_count="4" en="Apr" ru="Апр"  />
+	<translation tag="jun" char_count="5" en="Jun" ru="Джун"  />
+	<translation tag="jul" char_count="5" en="Jul" ru="июль"  />
+	<translation tag="aug" char_count="7" en="Aug" ru="Август"  />
+	<translation tag="sept" char_count="9" en="Sep" ru="Сентябрь"  />
+	<translation tag="oct" char_count="8" en="Oct" ru="Октябрь"  />
+	<translation tag="nov" char_count="7" en="Nov" ru="Ноябрь"  />
+	<translation tag="dec" char_count="8" en="Dec" ru="Декабрь"  />
+	<translation tag="sunday" char_count="12" en="Sunday" ru="Воскресенье"  />
+	<translation tag="monday" char_count="12" en="Monday" ru="Понедельник"  />
+	<translation tag="tuesday" char_count="8" en="Tuesday" ru="Вторник"  />
+	<translation tag="wednesday" char_count="10" en="Wednesday" ru="Среда"  />
+	<translation tag="thursday" char_count="9" en="Thursday" ru="Четверг"  />
+	<translation tag="friday" char_count="8" en="Friday" ru="Пятница"  />
+	<translation tag="saturday" char_count="9" en="Saturday" ru="Суббота"  />
+	<translation tag="january" char_count="8" en="January" ru="Январь"  />
+	<translation tag="february" char_count="9" en="February" ru="Февраль"  />
+	<translation tag="march" char_count="12" en="March" ru="Маршировать"  />
+	<translation tag="april" char_count="7" en="April" ru="Апрель"  />
+	<translation tag="may" char_count="6" en="May" ru="Может"  />
+	<translation tag="june" char_count="5" en="June" ru="Июнь"  />
+	<translation tag="july" char_count="5" en="July" ru="Июль"  />
+	<translation tag="august" char_count="7" en="August" ru="Август"  />
+	<translation tag="september" char_count="10" en="September" ru="Сентябрь"  />
+	<translation tag="october" char_count="8" en="October" ru="Октябрь"  />
+	<translation tag="november" char_count="9" en="November" ru="Ноябрь"  />
+	<translation tag="december" char_count="9" en="December" ru="Декабрь"  />
+	<translation tag="today" char_count="8" en="Today" ru="Сегодня"  />
+	<translation tag="yesterday" char_count="10" en="Yesterday" ru="Вчера"  />
+	<translation tag="steps" char_count="6" en="steps" ru="шаги"  />
+	<translation tag="kcal" char_count="5" en="kcal" ru="ккал"  />
+	<translation tag="km" char_count="3" en="km" ru="км"  />
+	<translation tag="miles" char_count="6" en="miles" ru="мили"  />
+	<translation tag="find_phone" char_count="14" en="Find Phone" ru="Найти телефон"  />
+	<translation tag="camera" char_count="7" en="Camera" ru="Камера"  />
+	<translation tag="ready" char_count="8" en="Ready" ru="Готовый"  />
+	<translation tag="disconnected" char_count="13" en="Disconnected" ru="Отключено"  />
+	<translation tag="connected" char_count="10" en="Connected" ru="Подключен"  />
+	<translation tag="press_tap" char_count="44" en="Press buttons or double tap" ru="Нажмите кнопки или дважды коснитесь экрана."  />
+	<translation tag="sleep_mode" char_count="78" en="Watchy is sleeping until %d:%d. Wake it up by pressing any button." ru="Watchy находится в спящем режиме до %d:%d. Разбудите его, нажав любую кнопку."  />
+	<translation tag="notifications" char_count="14" en="Notifications" ru="Уведомления"  />
+	<translation tag="activity" char_count="11" en="Activity" ru="Активность"  />
+	<translation tag="weather" char_count="8" en="Weather" ru="Погода"  />
+	<translation tag="music" char_count="7" en="Music" ru="Музыка"  />
+	<translation tag="controls" char_count="20" en="Controls" ru="Элементы управления"  />
+	<translation tag="navigation" char_count="11" en="Navigation" ru="Навигация"  />
+	<translation tag="settings" char_count="10" en="Settings" ru="Настройки"  />
+	<translation tag="pairing" char_count="10" en="Pairing" ru="Сочетание"  />
+	<translation tag="contacts" char_count="9" en="Contacts" ru="Контакты"  />
+	<translation tag="qr_links" char_count="9" en="QR Links" ru="QR-коды"  />
+	<translation tag="files" char_count="6" en="Files" ru="Файлы"  />
+	<translation tag="track_volume" char_count="69" en="Long press to change controls between track &amp; volume" ru="Длительное нажатие переключает управление между треком и громкостью."  />
+	<translation tag="tap_next" char_count="43" en="Double tap for next" ru="Дважды коснитесь для перехода к следующему"  />
+	<translation tag="scan_chronos" char_count="31" en="Scan with Chronos" ru="Сканирование с помощью Chronos"  />
+	<translation tag="interval" char_count="9" en="Interval" ru="Интервал"  />
+	<translation tag="configs" char_count="13" en="Configs" ru="Конфигурации"  />
+	<translation tag="battery" char_count="8" en="Battery" ru="Батарея"  />
+	<translation tag="storage" char_count="10" en="Storage" ru="Хранилище"  />
+	<translation tag="shutdown" char_count="14" en="Shutdown" ru="Неисправность"  />
+	<translation tag="ble_interval" char_count="25" en="BLE connect interval" ru="интервал подключения BLE"  />
+	<translation tag="con_note" char_count="60" en="NB: Connection to the phone is not always guaranteed" ru="Примечание: подключение к телефону не всегда гарантировано."  />
+	<translation tag="min_5" char_count="7" en="5 mins" ru="5 мин."  />
+	<translation tag="min_10" char_count="8" en="10 mins" ru="10 мин."  />
+	<translation tag="min_15" char_count="8" en="15 mins" ru="15 мин."  />
+	<translation tag="min_20" char_count="8" en="20 mins" ru="20 мин."  />
+	<translation tag="min_30" char_count="8" en="30 mins" ru="30 мин."  />
+	<translation tag="data_records" char_count="14" en="Data Records" ru="Записи данных"  />
+	<translation tag="change_app" char_count="51" en="These can be changed from Chronos app" ru="Эти параметры можно изменить в приложении Chronos."  />
+	<translation tag="about" char_count="6" en="About" ru="О"  />
+	<translation tag="no_notifications" char_count="42" en="No notifications, check back later" ru="Уведомления отсутствуют, загляните позже."  />
+	<translation tag="inactive" char_count="11" en="Inactive" ru="Неактивный"  />
+	<translation tag="powered_off" char_count="57" en="Watchy is powered off. Turn it on by pressing any button" ru="Watchy выключен. Включите его, нажав любую кнопку."  />
+	<translation tag="low_battery" char_count="51" en="Watchy is battery is too low. Please charge it." ru="Батарея Watchy разряжена. Пожалуйста, зарядите её."  />
+	<translation tag="start_nav" char_count="45" en="Start navigation on the connected phone" ru="Запустить навигацию на подключенном телефоне"  />
+</translations>

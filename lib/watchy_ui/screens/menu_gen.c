@@ -59,7 +59,7 @@ lv_obj_t * menu_create(void)
     
     lv_obj_t * m_text = lv_label_create(lv_obj_0);
     lv_obj_set_name(m_text, "m_text");
-    lv_label_set_text(m_text, "Notifications");
+    lv_label_set_translation_tag(m_text, "notifications");
     lv_obj_set_align(m_text, LV_ALIGN_BOTTOM_MID);
     lv_obj_set_y(m_text, -10);
     lv_obj_set_style_text_font(m_text, NS_Bold_20, 0);
