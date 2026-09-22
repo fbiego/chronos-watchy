@@ -1172,7 +1172,7 @@ int DeviceModule::yearDay(int year, int day) {
  * @return day of week eg TUE
  */
 String DeviceModule::getDay(int day) {
-  String days[7] = {"sun", "mon", "tue", "wed", "thu", "fri", "sat"};
+  String days[7] = {"sun", "mon", "tue", "wed", "thur", "fri", "sat"};
   return days[day % 7];
 }
 
@@ -1182,8 +1182,8 @@ String DeviceModule::getDay(int day) {
  * @return month eg JAN
  */
 String DeviceModule::getMonth(int month) {
-  String months[12] = {"jan", "feb", "mar", "apr", "may", "jun",
-                       "jul", "aug", "sep", "oct", "nov", "dec"};
+  String months[12] = {"jan", "feb", "mar",  "apr", "may", "jun",
+                       "jul", "aug", "sept", "oct", "nov", "dec"};
   return months[(month - 1) % 12];
 }
 
